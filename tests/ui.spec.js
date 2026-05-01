@@ -41,6 +41,17 @@ test.describe("Tree view", () => {
     await expect(page.locator("#zoom-in")).toBeVisible();
     await expect(page.locator("#export-gedcom")).toBeVisible();
   });
+
+  test("renders the root's spouse next to root with a marriage line", async ({ page, isolatedReads }) => {
+    await page.goto("/");
+    await page.waitForSelector(".card");
+    // Test fixture seeds @TF_SPOUSE@ as Richard's wife in @TF_MARR@.
+    const spouseCard = page.locator(`.card[data-id="@TF_SPOUSE@"]`);
+    await expect(spouseCard).toBeAttached();
+    // Marriage line is a distinct SVG element, not a parent-child path.
+    const marriageLine = page.locator("#connections line.marriage");
+    await expect(marriageLine).toHaveCount(1);
+  });
 });
 
 test.describe("Detail panel — clean state on selection", () => {

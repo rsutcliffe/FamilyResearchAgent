@@ -136,11 +136,39 @@ const placePlaceholder = (childId, role, gen, xLeft, xRight) => {
   });
 };
 
+// Place the root's spouse(s) at the same row as root, offset to the right
+// by one slot. The pedigree algorithm proper only walks ancestor links —
+// spouses are sideways, not upward — so this is a one-shot placement
+// rather than a recursive call.
+const placeRootSpouses = (totalW) => {
+  const root = state.byId.get(ROOT_ID);
+  const rootFams = root?.fams ?? [];
+  if (rootFams.length === 0) return;
+  const rootMid = totalW / 2;
+  let i = 0;
+  for (const famId of rootFams) {
+    const fam = state.famById.get(famId);
+    if (!fam) continue;
+    const spouseId = fam.husband === ROOT_ID ? fam.wife : fam.husband;
+    if (!spouseId) continue;
+    if (state.positions.has(spouseId)) continue; // already placed
+    state.positions.set(spouseId, {
+      x: rootMid + SLOT_W * (1 + i),
+      y: 0,
+      generation: 0,
+      role: "spouse",
+      spouseFamilyId: famId,
+    });
+    i += 1;
+  }
+};
+
 const computeLayout = () => {
   state.positions.clear();
   const totalSlots = Math.pow(2, state.depth);
   const totalW = totalSlots * SLOT_W;
   placeAncestors(ROOT_ID, 0, 0, totalW);
+  placeRootSpouses(totalW);
   computeChainWeakness();
 };
 
@@ -279,6 +307,26 @@ const roleLabel = (pos) => {
 const drawConnections = (offsetX, offsetY) => {
   const svg = $("#connections");
   svg.innerHTML = "";
+
+  // Marriage lines: short horizontal connector between root and each spouse.
+  const rootPos = state.positions.get(ROOT_ID);
+  if (rootPos) {
+    for (const [id, pos] of state.positions) {
+      if (pos.role !== "spouse") continue;
+      const x1 = rootPos.x + offsetX;
+      const y1 = rootPos.y + offsetY;
+      const x2 = pos.x + offsetX;
+      const y2 = pos.y + offsetY;
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", x1);
+      line.setAttribute("y1", y1);
+      line.setAttribute("x2", x2);
+      line.setAttribute("y2", y2);
+      line.setAttribute("class", "marriage");
+      svg.appendChild(line);
+    }
+  }
+
   // For each placed real individual, draw a line up to each parent (real or
   // placeholder). Line colour comes from the parent's confidence band; for
   // placeholders, render as a faint dashed gray.

@@ -293,6 +293,15 @@ body.tree-mode {
 #connections path.D { stroke: #c00000; stroke-dasharray: 4 3; }
 #connections path.placeholder { stroke: #5a6170; stroke-dasharray: 2 4; opacity: 0.4; }
 
+/* Marriage line: short horizontal connector at the root row. Visually
+   distinct from parent-child curves so it reads as "spouse" not "parent". */
+#connections line.marriage {
+  stroke: #b380cc;
+  stroke-width: 3;
+  stroke-linecap: round;
+  opacity: 0.75;
+}
+
 /* Highlight the single weakest link in each ancestor chain. */
 #connections path.weakest {
   stroke: #ff5252;

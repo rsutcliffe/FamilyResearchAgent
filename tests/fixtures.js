@@ -48,13 +48,15 @@ const baseInd = {
 };
 
 export const FIXTURE_INDIVIDUALS = [
-  { ...baseInd, id: ROOT_ID, name: "Test Root", sex: "M", birth_year: 1972, birth_place: "Leeds", confidence: "A", generation: 0, famc: "@TF1@" },
+  { ...baseInd, id: ROOT_ID, name: "Test Root", sex: "M", birth_year: 1972, birth_place: "Leeds", confidence: "A", generation: 0, famc: "@TF1@", fams: ["@TF_MARR@"] },
   { ...baseInd, id: "@TF_DAD@", name: "Test Father", sex: "M", birth_year: 1940, birth_place: "Leeds", confidence: "D", generation: 1, fams: ["@TF1@"] },
   { ...baseInd, id: "@TF_MUM@", name: "Test Mother", sex: "F", birth_year: 1942, birth_place: "York", confidence: "D", generation: 1, fams: ["@TF1@"] },
+  { ...baseInd, id: "@TF_SPOUSE@", name: "Test Spouse", sex: "F", birth_year: 1974, birth_place: "Leeds", confidence: "B", generation: 0, fams: ["@TF_MARR@"] },
 ];
 
 export const FIXTURE_FAMILIES = [
   { id: "@TF1@", husband: "@TF_DAD@", wife: "@TF_MUM@", children: [ROOT_ID], marriage_date: "", marriage_place: "" },
+  { id: "@TF_MARR@", husband: ROOT_ID, wife: "@TF_SPOUSE@", children: [], marriage_date: "", marriage_place: "" },
 ];
 
 // Mock the read-side state-bearing endpoints so tests don't depend on whatever
