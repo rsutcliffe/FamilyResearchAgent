@@ -16,6 +16,7 @@ import {
   parseExternalLookups,
 } from "./agent/researchKb.js";
 import { gatherApiLeads, isCacheFresh } from "./agent/externalApiOrchestrator.js";
+import { tryAcquireRunLock, releaseRunLock } from "./agent/runLock.js";
 import { searchWikiTreePersons, isWikiTreeDisabled } from "./agent/apiClients/wikiTreeClient.js";
 import { searchFamilySearchTree, isFamilySearchDisabled } from "./agent/apiClients/familySearchClient.js";
 import { searchTnaDiscovery, isTnaDisabled } from "./agent/apiClients/tnaDiscoveryClient.js";
@@ -527,6 +528,14 @@ app.get("/api/agent/run/:id", async (req, res) => {
     return;
   }
 
+  // Per-individual run lock. Prevents the EventSource auto-reconnect bug
+  // and any other accidental rapid-fire from incurring repeated paid runs.
+  const lock = tryAcquireRunLock(id);
+  if (!lock.ok) {
+    res.status(429).json({ error: lock.reason });
+    return;
+  }
+
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
@@ -563,6 +572,7 @@ app.get("/api/agent/run/:id", async (req, res) => {
 
   send({ type: "start", profile });
 
+  try {
   await runAgent({
     profile,
     kbBody,
@@ -608,6 +618,9 @@ app.get("/api/agent/run/:id", async (req, res) => {
       }
     },
   });
+  } finally {
+    releaseRunLock(id);
+  }
 
   res.end();
 });
@@ -643,6 +656,15 @@ app.get("/api/ancestor/run/:childId/:role", async (req, res) => {
     ? individuals.filter((p) => fam.children.includes(p.id) && p.id !== childId)
     : [];
 
+  // Per-individual run lock keyed by child+role so the EventSource
+  // auto-reconnect bug can't fire repeated paid runs.
+  const lockKey = `${childId}:${role}`;
+  const lock = tryAcquireRunLock(lockKey);
+  if (!lock.ok) {
+    res.status(429).json({ error: lock.reason });
+    return;
+  }
+
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
@@ -670,6 +692,7 @@ app.get("/api/ancestor/run/:childId/:role", async (req, res) => {
 
   send({ type: "start", child, role, otherParent, siblings });
 
+  try {
   await runAncestorAgent({
     child,
     role,
@@ -713,6 +736,9 @@ app.get("/api/ancestor/run/:childId/:role", async (req, res) => {
       }
     },
   });
+  } finally {
+    releaseRunLock(lockKey);
+  }
 
   res.end();
 });

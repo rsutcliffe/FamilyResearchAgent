@@ -1064,12 +1064,21 @@ const runAgent = () => {
       accumulated.searches = event.result.search_count;
       $("#status-text").textContent = `Web search ${accumulated.searches} complete.`;
       if (state.streaming) state.streaming.completed = true;
-      // Hide the spinner section the moment the run is logically complete
-      // — don't wait for the saved event in case it never arrives.
       $("#status").hidden = true;
       $("#run-btn").disabled = false;
       showDecisionButtons(true, null);
+      // CRITICAL: hard timer to force-close the EventSource if `saved`
+      // never arrives. Without this, the server's res.end() triggers the
+      // browser's default EventSource auto-reconnect, which in turn
+      // re-fires a fresh agent run — exactly the bug that produced 51
+      // back-to-back runs on a single individual on 2026-05-01.
+      if (state.streaming) {
+        state.streaming.doneTimer = setTimeout(() => {
+          if (state.streaming?.es === es) cleanupStream();
+        }, 5000);
+      }
     } else if (event.type === "saved") {
+      if (state.streaming?.doneTimer) clearTimeout(state.streaming.doneTimer);
       cleanupStream();
       $("#status").hidden = true;
       showDecisionButtons(true, null);
@@ -1081,9 +1090,9 @@ const runAgent = () => {
     }
   };
   es.onerror = () => {
-    // SSE fires onerror on every stream close — including clean completion
-    // after we received a "done" event. Only treat as a real error if we
-    // closed mid-stream without finishing.
+    // Always close the local EventSource — preventing the auto-reconnect
+    // that would otherwise fire a fresh agent run.
+    es.close();
     if (state.streaming && !state.streaming.completed) {
       $("#status-text").textContent = "Connection lost.";
       cleanupStream();
@@ -1381,10 +1390,16 @@ const runAncestorDiscoveryBoth = (pos) => {
       accumulated.searches = event.result.search_count;
       $("#status-text").textContent = `Web search ${accumulated.searches} complete.`;
       if (state.streaming) state.streaming.completed = true;
-      // Hide spinner immediately on done — don't depend on saved to clean up.
       $("#status").hidden = true;
       $("#run-btn").disabled = false;
+      // Hard timer to force-close ES if `saved` never arrives — see runAgent.
+      if (state.streaming) {
+        state.streaming.doneTimer = setTimeout(() => {
+          if (state.streaming?.es === es) cleanupStream();
+        }, 5000);
+      }
     } else if (event.type === "saved") {
+      if (state.streaming?.doneTimer) clearTimeout(state.streaming.doneTimer);
       cleanupStream();
       $("#status").hidden = true;
       fetch("/api/spend").then((r) => r.json()).then((s) => {
@@ -1395,7 +1410,6 @@ const runAncestorDiscoveryBoth = (pos) => {
       if (pairs.length > 0) {
         renderPairPicker(pairs, pos);
       } else {
-        // Fallback: maybe the agent emitted single-parent candidates instead
         const singles = parseCandidateParents(accumulated.text);
         if (singles.length > 0) {
           renderCandidatePicker(singles, pos);
@@ -1407,6 +1421,7 @@ const runAncestorDiscoveryBoth = (pos) => {
     }
   };
   es.onerror = () => {
+    es.close();
     if (state.streaming && !state.streaming.completed) {
       $("#status-text").textContent = "Connection lost.";
       cleanupStream();
@@ -1454,20 +1469,24 @@ const runAncestorDiscovery = () => {
       accumulated.searches = event.result.search_count;
       $("#status-text").textContent = `Web search ${accumulated.searches} complete.`;
       if (state.streaming) state.streaming.completed = true;
-      // Hide spinner immediately on done — don't depend on saved to clean up.
       $("#status").hidden = true;
       $("#run-btn").disabled = false;
+      // Hard timer to force-close ES if `saved` never arrives — see runAgent.
+      if (state.streaming) {
+        state.streaming.doneTimer = setTimeout(() => {
+          if (state.streaming?.es === es) cleanupStream();
+        }, 5000);
+      }
     } else if (event.type === "saved") {
+      if (state.streaming?.doneTimer) clearTimeout(state.streaming.doneTimer);
       cleanupStream();
       $("#status").hidden = true;
-      // Refresh spend so the topbar reflects the run's cost
       fetch("/api/spend")
         .then((r) => r.json())
         .then((s) => {
           state.spend = s;
           renderSpend();
         });
-      // Parse candidate parents from the agent output and offer Accept buttons
       const candidates = parseCandidateParents(accumulated.text);
       if (candidates.length > 0) {
         renderCandidatePicker(candidates, ph);
@@ -1478,9 +1497,7 @@ const runAncestorDiscovery = () => {
     }
   };
   es.onerror = () => {
-    // SSE fires onerror on every stream close — including clean completion
-    // after we received a "done" event. Only treat as a real error if we
-    // closed mid-stream without finishing.
+    es.close();
     if (state.streaming && !state.streaming.completed) {
       $("#status-text").textContent = "Connection lost.";
       cleanupStream();
