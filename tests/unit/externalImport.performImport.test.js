@@ -98,6 +98,44 @@ describe("performImport", () => {
     assert.equal(typeof summary.individual_count, "number");
   });
 
+  test("re-importing the same filename replaces prior entries from that file (no duplicates)", () => {
+    // Regression: in production a user double-clicked Import and the same file
+    // imported twice — matched entries got two stamped copies under each our_id,
+    // and unmatched grew from 745 to 1490. Re-importing the same filename must
+    // be idempotent: treat the file as a versioned source and overwrite prior
+    // records from it rather than appending. Different filenames still stack
+    // (covered by the "incremental imports preserve previous data" test).
+    const first = performImport({
+      gedcomText: gedcomA,
+      filename: "ancestry.ged",
+      ourTree,
+      currentSuggestions: null,
+    });
+
+    const second = performImport({
+      gedcomText: gedcomA,
+      filename: "ancestry.ged",
+      ourTree,
+      currentSuggestions: first.suggestions,
+    });
+
+    assert.equal(
+      second.suggestions.by_individual["@OUR_ANN@"].length,
+      1,
+      "Ann should have one match, not two, after re-importing the same file",
+    );
+    assert.equal(
+      second.suggestions.unmatched.filter((u) => u.name === "Joseph Sweeting").length,
+      1,
+      "Joseph should appear once in unmatched, not twice",
+    );
+    assert.equal(
+      second.suggestions.imports.length,
+      1,
+      "imports list should dedupe by filename",
+    );
+  });
+
   test("handles empty GEDCOM gracefully", () => {
     const { suggestions, summary } = performImport({
       gedcomText: "",

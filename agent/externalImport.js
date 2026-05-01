@@ -362,6 +362,18 @@ export const performImport = ({ gedcomText, filename, ourTree, currentSuggestion
   next.unmatched = next.unmatched ?? [];
   next.imports = next.imports ?? [];
 
+  // Re-importing the same filename is idempotent: strip any prior records
+  // tagged with this filename before merging. Each filename = one versioned
+  // source; different filenames still stack.
+  for (const ourId of Object.keys(next.by_individual)) {
+    next.by_individual[ourId] = next.by_individual[ourId].filter(
+      (m) => m.external_source_file !== filename,
+    );
+    if (next.by_individual[ourId].length === 0) delete next.by_individual[ourId];
+  }
+  next.unmatched = next.unmatched.filter((u) => u.external_source_file !== filename);
+  next.imports = next.imports.filter((i) => i.filename !== filename);
+
   for (const [ourId, matches] of Object.entries(by_individual)) {
     next.by_individual[ourId] = [
       ...(next.by_individual[ourId] ?? []),

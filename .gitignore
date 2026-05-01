@@ -9,3 +9,4 @@ playwright-report/
 test-results/
 tests/**/__screenshots__/
 
+data/external_suggestions.json.bak-*
