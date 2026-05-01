@@ -31,6 +31,7 @@
         <button id="zoom-in" title="Zoom in">+</button>
         <button id="reset-view" title="Reset view">Reset</button>
         <button id="import-gedcom" title="Import an external GEDCOM (Ancestry export, etc.) as Tier 3 leads — never raises a band on its own; surfaced to agents as hypotheses to verify">Import .ged</button>
+        <button id="claim-descendants" title="Promote unmatched people from your imported GEDCOM(s) into the local tree — useful for adding your own descendants (children, grandchildren) who weren't in the curated ancestor tree">Claim from import</button>
         <button id="export-gedcom" title="Export an updated GEDCOM with confidence bands, accepted citations as SOUR records, and any agent-proposed individuals">Export .ged</button>
         <a href="/list" class="link">List view</a>
       </div>
@@ -129,6 +130,42 @@
           <button type="button" id="import-submit" class="primary">
             Import
           </button>
+        </menu>
+      </form>
+    </dialog>
+
+    <dialog id="claim-dialog">
+      <form method="dialog">
+        <h3>Claim from import</h3>
+        <p class="muted">
+          People in the imported GEDCOM(s) who didn't match anyone in your
+          local tree. Promoting one creates a new individual in
+          <code>data/individuals.json</code> as a child of the family you
+          choose. Useful for descendants (children, grandchildren) that
+          weren't in the curated ancestor tree.
+        </p>
+        <div style="margin:8px 0;">
+          <input
+            id="claim-filter"
+            type="search"
+            placeholder="Filter by name or year"
+            style="width:100%;padding:6px;"
+          />
+        </div>
+        <div
+          id="claim-list"
+          style="max-height:50vh;overflow-y:auto;border:1px solid #ddd;border-radius:4px;"
+        ></div>
+        <p
+          id="claim-empty"
+          class="muted"
+          hidden
+          style="text-align:center;padding:20px;"
+        >
+          No unmatched externals to claim. Import a GEDCOM first.
+        </p>
+        <menu>
+          <button value="cancel" formnovalidate>Close</button>
         </menu>
       </form>
     </dialog>

@@ -1818,6 +1818,100 @@ const wireDepth = () => {
     }
   });
 
+  // Claim-from-import: surface unmatched externals so the user can promote
+  // direct descendants into the tree.
+  const familyDisplay = (fam) => {
+    const husband = state.byId.get(fam.husband);
+    const wife = state.byId.get(fam.wife);
+    const parts = [];
+    if (husband) parts.push(`${husband.name} (b.${husband.birth_year ?? "?"})`);
+    if (wife) parts.push(`${wife.name} (b.${wife.birth_year ?? "?"})`);
+    return parts.join(" + ") || `Family ${fam.id}`;
+  };
+
+  const renderClaimList = (unmatched, filterText) => {
+    const list = $("#claim-list");
+    const empty = $("#claim-empty");
+    list.innerHTML = "";
+    const f = (filterText ?? "").toLowerCase().trim();
+    const filtered = unmatched.filter((u) => {
+      if (!f) return true;
+      const hay = `${u.name ?? ""} ${u.birth_year ?? ""}`.toLowerCase();
+      return hay.includes(f);
+    });
+    if (filtered.length === 0) {
+      empty.hidden = false;
+      empty.textContent = unmatched.length === 0
+        ? "No unmatched externals to claim. Import a GEDCOM first."
+        : "No matches for that filter.";
+      return;
+    }
+    empty.hidden = true;
+    const familyOptions = state.families
+      .map((fam) => `<option value="${escapeHtml(fam.id)}">${escapeHtml(familyDisplay(fam))}</option>`)
+      .join("");
+    for (const u of filtered) {
+      const row = document.createElement("div");
+      row.style.cssText = "padding:8px;border-bottom:1px solid #eee;display:flex;gap:8px;align-items:center;flex-wrap:wrap;";
+      row.innerHTML = `
+        <div style="flex:1;min-width:200px;">
+          <strong>${escapeHtml(u.name ?? "(unknown)")}</strong>
+          <span class="muted" style="margin-left:6px;">b.${u.birth_year ?? "?"}${u.birth_place ? ", " + escapeHtml(u.birth_place) : ""}</span>
+          <div class="muted" style="font-size:11px;">from ${escapeHtml(u.external_source_file ?? "(unknown)")}</div>
+        </div>
+        <select class="claim-fam" style="min-width:160px;max-width:260px;">
+          <option value="">— add as child of —</option>
+          ${familyOptions}
+        </select>
+        <button type="button" class="claim-btn primary">Claim</button>
+      `;
+      const select = row.querySelector(".claim-fam");
+      const btn = row.querySelector(".claim-btn");
+      btn.addEventListener("click", async () => {
+        if (!select.value) {
+          alert("Pick a family to attach this person to first.");
+          return;
+        }
+        btn.disabled = true;
+        btn.textContent = "Claiming…";
+        try {
+          const res = await fetch("/api/external/claim-as-descendant", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ external_id: u.id, target_family_id: select.value }),
+          });
+          const body = await res.json();
+          if (!res.ok) {
+            alert(`Claim failed: ${body.error}`);
+            btn.disabled = false;
+            btn.textContent = "Claim";
+            return;
+          }
+          row.remove();
+          await refreshAndReselect(body.claimed.id);
+        } catch (e) {
+          alert(`Claim failed: ${e.message}`);
+          btn.disabled = false;
+          btn.textContent = "Claim";
+        }
+      });
+      list.appendChild(row);
+    }
+  };
+
+  $("#claim-descendants")?.addEventListener("click", async () => {
+    try {
+      const res = await fetch("/api/external/unmatched");
+      const { unmatched } = await res.json();
+      $("#claim-filter").value = "";
+      renderClaimList(unmatched, "");
+      $("#claim-filter").oninput = (e) => renderClaimList(unmatched, e.target.value);
+      $("#claim-dialog").showModal();
+    } catch (e) {
+      alert(`Failed to load unmatched: ${e.message}`);
+    }
+  });
+
   $("#export-gedcom")?.addEventListener("click", async () => {
     const btn = $("#export-gedcom");
     btn.disabled = true;

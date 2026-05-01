@@ -271,6 +271,58 @@ test.describe("Import GEDCOM", () => {
   });
 });
 
+test.describe("Claim from import", () => {
+  test("topbar exposes a Claim button", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("#claim-descendants")).toBeVisible();
+  });
+
+  test("dialog lists unmatched externals and posts to claim endpoint", async ({ page }) => {
+    await page.route("**/api/external/unmatched", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          unmatched: [
+            {
+              id: "@EXT_KID@",
+              name: "Imaginary Child",
+              sex: "F",
+              birth_year: 2010,
+              birth_place: "Leeds",
+              external_source_file: "ancestry.ged",
+            },
+          ],
+        }),
+      }),
+    );
+    let posted = null;
+    await page.route("**/api/external/claim-as-descendant", async (route) => {
+      posted = JSON.parse(route.request().postData());
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ ok: true, claimed: { id: "@CLAIMED_NEW@", name: "Imaginary Child" } }),
+      });
+    });
+
+    await page.goto("/");
+    await page.waitForSelector(".card");
+    await page.locator("#claim-descendants").click();
+    await expect(page.locator("#claim-dialog")).toBeVisible();
+    await expect(page.locator("#claim-list")).toContainText("Imaginary Child");
+
+    // Pick the first available family in the dropdown and claim
+    const select = page.locator("#claim-list select.claim-fam").first();
+    const familyOption = await select.locator("option").nth(1).getAttribute("value");
+    await select.selectOption(familyOption);
+    await page.locator("#claim-list button.claim-btn").first().click();
+    await expect.poll(() => posted).not.toBeNull();
+    expect(posted.external_id).toBe("@EXT_KID@");
+    expect(posted.target_family_id).toBe(familyOption);
+  });
+});
+
 test.describe("Visual snapshots", () => {
   // Visual snapshots are platform-specific (font rendering, anti-aliasing
   // differ across macOS / Linux / Windows). The baselines are committed

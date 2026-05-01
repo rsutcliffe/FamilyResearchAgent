@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { runAgent, runAncestorAgent } from "./agent/researchAgent.js";
 import { exportGedcom } from "./gedcom/writer.js";
-import { performImport } from "./agent/externalImport.js";
+import { performImport, claimUnmatchedAsDescendant } from "./agent/externalImport.js";
 import {
   buildKbContextBody,
   applyAgentRunToKb,
@@ -312,6 +312,55 @@ app.post("/api/external/import", async (req, res) => {
     res.json({ ok: true, summary });
   } catch (e) {
     res.status(500).json({ error: e.message });
+  }
+});
+
+// List unmatched externals so the UI can offer claim-as-descendant flow.
+// No filtering — caller decides what to surface.
+app.get("/api/external/unmatched", async (_req, res) => {
+  try {
+    const sugg = await readJson(EXTERNAL_SUGGESTIONS_FILE);
+    res.json({ unmatched: sugg.unmatched ?? [] });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Promote an unmatched external person into the local tree as a child of
+// an existing family. Body: { external_id, target_family_id }. The new
+// individual id is derived server-side so it's never user-supplied.
+app.post("/api/external/claim-as-descendant", async (req, res) => {
+  const { external_id, target_family_id } = req.body ?? {};
+  if (!external_id || !target_family_id) {
+    res.status(400).json({ error: "external_id and target_family_id are required" });
+    return;
+  }
+  try {
+    const [individuals, families, suggestions] = await Promise.all([
+      readJson(INDIVIDUALS_FILE),
+      readJson(FAMILIES_FILE),
+      readJson(EXTERNAL_SUGGESTIONS_FILE),
+    ]);
+    // Server-side id; collision-safe via timestamp + suffix from external id.
+    const cleanExt = external_id.replace(/[^A-Za-z0-9]/g, "");
+    const newId = `@CLAIMED_${cleanExt}_${Date.now()}@`;
+    const out = claimUnmatchedAsDescendant({
+      externalId: external_id,
+      targetFamilyId: target_family_id,
+      newId,
+      individuals,
+      families,
+      suggestions,
+    });
+    await Promise.all([
+      writeJsonAtomic(INDIVIDUALS_FILE, out.individuals),
+      writeJsonAtomic(FAMILIES_FILE, out.families),
+      writeJsonAtomic(EXTERNAL_SUGGESTIONS_FILE, out.suggestions),
+    ]);
+    res.json({ ok: true, claimed: out.claimed });
+  } catch (e) {
+    const status = /not found|already in use/.test(e.message) ? 400 : 500;
+    res.status(status).json({ error: e.message });
   }
 });
 

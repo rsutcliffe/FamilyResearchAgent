@@ -398,3 +398,71 @@ export const performImport = ({ gedcomText, filename, ourTree, currentSuggestion
   return { suggestions: next, summary };
 };
 
+// Promote an unmatched external person into our local tree as a child of an
+// existing family. Used when the user wants their direct descendants
+// (children, grandchildren, etc.) — not researchable ancestors — pulled
+// out of `external_suggestions.unmatched` and into `data/individuals.json`
+// proper so they appear in the tree view.
+//
+// Pure function: takes the current state, returns the modified collections.
+// Caller persists. Throws if external_id or target_family_id can't be found.
+export const claimUnmatchedAsDescendant = ({
+  externalId,
+  targetFamilyId,
+  newId,
+  individuals,
+  families,
+  suggestions,
+}) => {
+  const ext = (suggestions.unmatched ?? []).find((u) => u.id === externalId);
+  if (!ext) throw new Error(`Unmatched external id not found: ${externalId}`);
+  const fam = (families ?? []).find((f) => f.id === targetFamilyId);
+  if (!fam) throw new Error(`Family not found: ${targetFamilyId}`);
+  if (individuals.some((p) => p.id === newId)) {
+    throw new Error(`Individual id already in use: ${newId}`);
+  }
+
+  const claimed = {
+    id: newId,
+    name: ext.name || "(unknown)",
+    sex: ext.sex || "",
+    birth_year: ext.birth_year ?? null,
+    birth_date: ext.birth_date || "",
+    birth_place: ext.birth_place || "",
+    death_date: ext.death_date || "",
+    death_place: ext.death_place || "",
+    baptism_date: ext.baptism_date || "",
+    baptism_place: ext.baptism_place || "",
+    famc: targetFamilyId,
+    fams: [],
+    confidence: "B", // user-asserted descendant — known to user, not yet researched
+    score: 5,
+    warnings: [],
+    alerts: [],
+    generation: null,
+    claimed_from_external: {
+      external_id: ext.id,
+      source_file: ext.external_source_file ?? null,
+      claimed_at: new Date().toISOString(),
+    },
+  };
+
+  const nextIndividuals = [...individuals, claimed];
+  const nextFamilies = families.map((f) =>
+    f.id === targetFamilyId
+      ? { ...f, children: [...(f.children ?? []), newId] }
+      : f,
+  );
+  const nextSuggestions = {
+    ...suggestions,
+    unmatched: (suggestions.unmatched ?? []).filter((u) => u.id !== externalId),
+  };
+
+  return {
+    individuals: nextIndividuals,
+    families: nextFamilies,
+    suggestions: nextSuggestions,
+    claimed,
+  };
+};
+
