@@ -261,6 +261,13 @@ test.describe("Import GEDCOM", () => {
 });
 
 test.describe("Visual snapshots", () => {
+  // Visual snapshots are platform-specific (font rendering, anti-aliasing
+  // differ across macOS / Linux / Windows). The baselines are committed
+  // for darwin-chromium only — the local Mac dev environment. CI runs on
+  // Linux and would need separate Linux baselines, which we don't generate.
+  // Skip in CI; run locally to catch regressions on the platform that
+  // matters for development.
+  test.skip(!!process.env.CI, "Visual snapshots are local-only (platform-specific)");
   // Pure capture tests — regression-safe since they just produce screenshots
   // for human review. Run with --update-snapshots to refresh baselines.
   test("home view", async ({ page }) => {
