@@ -100,12 +100,13 @@ const externalApiClients = {
 };
 
 // Wraps gatherApiLeads with cache check + atomic write. Errors are logged
-// and swallowed — never block the SSE stream.
-const refreshApiLeads = async (individual, ourTree) => {
+// and swallowed — never block the SSE stream. Pass { force: true } to
+// bypass the cache freshness check (used by the manual Refresh button).
+const refreshApiLeads = async (individual, ourTree, { force = false } = {}) => {
   try {
     const current = await readJson(EXTERNAL_SUGGESTIONS_FILE);
-    if (isCacheFresh(current.api_cache, individual.id, EXTERNAL_API_CACHE_DAYS)) {
-      return current;
+    if (!force && isCacheFresh(current.api_cache, individual.id, EXTERNAL_API_CACHE_DAYS)) {
+      return { suggestions: current, summary: null };
     }
     const { suggestions, summary } = await gatherApiLeads({
       individual,
@@ -118,15 +119,16 @@ const refreshApiLeads = async (individual, ourTree) => {
       `[externalApi] ${individual.id} ${individual.name}: WT=${summary.wikitree_count} FS=${summary.familysearch_count} TNA=${summary.tna_count}` +
         (summary.errors.length ? ` errors=${summary.errors.map((e) => e.source).join(",")}` : ""),
     );
-    return suggestions;
+    return { suggestions, summary };
   } catch (err) {
     console.warn(`[externalApi] orchestrator failed: ${err.message}`);
-    return await readJson(EXTERNAL_SUGGESTIONS_FILE).catch(() => ({
+    const fallback = await readJson(EXTERNAL_SUGGESTIONS_FILE).catch(() => ({
       by_individual: {},
       unmatched: [],
       imports: [],
       api_cache: {},
     }));
+    return { suggestions: fallback, summary: { errors: [{ source: "orchestrator", message: err.message }] } };
   }
 };
 
@@ -310,6 +312,37 @@ app.post("/api/external/import", async (req, res) => {
     });
     await writeJsonAtomic(EXTERNAL_SUGGESTIONS_FILE, suggestions);
     res.json({ ok: true, summary });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Read-only fetch of current external leads for a single individual.
+// Used by the detail panel on selection so we don't hit the live APIs
+// every time the user clicks a card.
+app.get("/api/external/leads/:id", async (req, res) => {
+  try {
+    const sugg = await readJson(EXTERNAL_SUGGESTIONS_FILE);
+    const leads = sugg.by_individual?.[req.params.id] ?? [];
+    res.json({ leads });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Force a fresh API fetch for one individual, bypassing the 30-day cache.
+// Returns the updated leads + the per-source summary so the UI can warn
+// about partial failures (e.g. "WikiTree rate-limited").
+app.post("/api/external/refresh/:id", async (req, res) => {
+  try {
+    const individuals = await readJson(INDIVIDUALS_FILE);
+    const profile = individuals.find((p) => p.id === req.params.id);
+    if (!profile) {
+      res.status(404).json({ error: "Individual not found" });
+      return;
+    }
+    const { suggestions, summary } = await refreshApiLeads(profile, individuals, { force: true });
+    res.json({ leads: suggestions.by_individual?.[req.params.id] ?? [], summary });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -518,7 +551,7 @@ app.get("/api/agent/run/:id", async (req, res) => {
   // Pre-fetch external API leads (WikiTree / FamilySearch / TNA) before
   // building the prompt context. Cached per individual; orchestrator
   // failures never block the run.
-  const externalSugg = await refreshApiLeads(profile, allIndividuals);
+  const { suggestions: externalSugg } = await refreshApiLeads(profile, allIndividuals);
   const kbWithExternal = { ...kb, external_suggestions: externalSugg };
   const kbBody = buildKbContextBody(
     kbWithExternal,
@@ -625,7 +658,7 @@ app.get("/api/ancestor/run/:childId/:role", async (req, res) => {
     readJson(RESEARCH_KB_FILE),
     readJson(EVIDENCE_LOG_FILE),
   ]);
-  const externalSugg = await refreshApiLeads(child, individuals);
+  const { suggestions: externalSugg } = await refreshApiLeads(child, individuals);
   const kbWithExternal = { ...kb, external_suggestions: externalSugg };
   const kbBody = buildKbContextBody(
     kbWithExternal,

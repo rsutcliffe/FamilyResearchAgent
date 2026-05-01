@@ -300,6 +300,46 @@ body {
   flex-wrap: wrap;
 }
 
+#external-leads {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+#external-leads .external-leads-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+#external-leads .external-leads-group {
+  margin-bottom: 12px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #f7f8fa;
+  border-left: 3px solid #b380cc;
+}
+#external-leads .external-leads-tna { border-left-color: #1f497d; }
+#external-leads .external-leads-wikitree { border-left-color: #1f6b3a; }
+#external-leads .external-leads-familysearch { border-left-color: #bf6f00; }
+#external-leads .external-leads-gedcom { border-left-color: #5a6170; }
+#external-leads .external-leads-group-title {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+#external-leads .external-leads-row {
+  padding: 6px 0;
+  border-top: 1px dashed var(--border);
+  font-size: 13px;
+}
+#external-leads .external-leads-row:first-of-type {
+  border-top: none;
+}
+#external-leads-summary {
+  font-size: 11px;
+  margin-top: 8px;
+}
+
 button {
   padding: 8px 16px;
   border-radius: 6px;

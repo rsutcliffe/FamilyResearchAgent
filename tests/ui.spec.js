@@ -101,6 +101,106 @@ test.describe("Detail panel — clean state on selection", () => {
   });
 });
 
+test.describe("External API leads panel", () => {
+  test("renders TNA + WikiTree leads from /api/external/leads/:id when a card is selected", async ({ page, isolatedReads }) => {
+    await page.route("**/api/external/leads/**", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          leads: [
+            {
+              source_kind: "tna",
+              external_id: "C12345",
+              catalogue_ref: "PROB 11/1058/411",
+              title: "Will of Anne Sweeting, Widow of Stogumber, Somerset",
+              held_by: "The National Archives, Kew",
+              covering_dates: "1780",
+              catalogue_url: "https://discovery.nationalarchives.gov.uk/details/r/C12345",
+            },
+            {
+              source_kind: "wikitree",
+              external_id: "Sweeting-12",
+              confidence: "strong",
+              reasons: ["surname match"],
+              external_data: {
+                name: "Ann Sweeting",
+                birth_year: 1802,
+                birth_place: "Monks Frystone",
+                profile_url: "https://www.wikitree.com/wiki/Sweeting-12",
+              },
+            },
+          ],
+        }),
+      }),
+    );
+
+    await page.goto("/");
+    await page.waitForSelector(".card");
+    await page.locator(".card").first().dispatchEvent("click");
+    await expect(page.locator("#detail-panel")).toBeVisible();
+    await expect(page.locator("#external-leads")).toBeVisible();
+    await expect(page.locator("#external-leads-list")).toContainText("PROB 11/1058/411");
+    await expect(page.locator("#external-leads-list")).toContainText("The National Archives, Kew");
+    // WikiTree section + a row showing the matched person's name
+    await expect(page.locator("#external-leads-list")).toContainText("WikiTree");
+    await expect(page.locator("#external-leads-list")).toContainText("Ann Sweeting");
+    // Two outbound links — one to the TNA catalogue, one to the WikiTree profile
+    await expect(page.locator("#external-leads-list a")).toHaveCount(2);
+    await expect(page.locator(`#external-leads-list a[href*="Sweeting-12"]`)).toBeVisible();
+  });
+
+  test("hidden when there are no leads for the selected individual", async ({ page, isolatedReads }) => {
+    await page.route("**/api/external/leads/**", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ leads: [] }) }),
+    );
+    await page.goto("/");
+    await page.waitForSelector(".card");
+    await page.locator(".card").first().dispatchEvent("click");
+    await expect(page.locator("#detail-panel")).toBeVisible();
+    await expect(page.locator("#external-leads")).toBeHidden();
+  });
+
+  test("Refresh button POSTs to /api/external/refresh/:id and re-renders", async ({ page, isolatedReads }) => {
+    let leadsCalls = 0;
+    await page.route("**/api/external/leads/**", (route) => {
+      leadsCalls += 1;
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          leads: [
+            { source_kind: "tna", external_id: "X1", catalogue_ref: "REF/1", title: "First", held_by: "TNA", catalogue_url: "https://x" },
+          ],
+        }),
+      });
+    });
+    let refreshPostBody = null;
+    await page.route("**/api/external/refresh/**", async (route) => {
+      refreshPostBody = route.request().postData() ?? "";
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          leads: [
+            { source_kind: "tna", external_id: "X1", catalogue_ref: "REF/1", title: "First", held_by: "TNA", catalogue_url: "https://x" },
+            { source_kind: "tna", external_id: "X2", catalogue_ref: "REF/2", title: "Second (after refresh)", held_by: "TNA", catalogue_url: "https://y" },
+          ],
+          summary: { wikitree_count: 0, familysearch_count: 0, tna_count: 2, errors: [] },
+        }),
+      });
+    });
+
+    await page.goto("/");
+    await page.waitForSelector(".card");
+    await page.locator(".card").first().dispatchEvent("click");
+    await expect(page.locator("#external-leads-list")).toContainText("First");
+    await page.locator("#refresh-leads-btn").click();
+    await expect(page.locator("#external-leads-list")).toContainText("Second (after refresh)");
+    expect(refreshPostBody).not.toBeNull();
+  });
+});
+
 test.describe("Agent run — UI lifecycle", () => {
   test("status section appears, completes, then hides on done", async ({
     page,

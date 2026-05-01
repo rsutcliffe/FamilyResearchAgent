@@ -682,6 +682,72 @@ const resetDetailPanelTransientState = () => {
   // Drop any candidate picker / external lookups section from a prior selection
   document.querySelector("#candidate-picker")?.remove();
   document.querySelector("#external-lookups-section")?.remove();
+  // Clear the external API leads section between selections.
+  $("#external-leads").hidden = true;
+  $("#external-leads-list").innerHTML = "";
+  $("#external-leads-summary").textContent = "";
+};
+
+// Render the external API leads list for the currently selected individual.
+// Source kinds: tna (catalogue ref) | wikitree | familysearch | gedcom.
+const renderExternalLeads = (leads) => {
+  const list = $("#external-leads-list");
+  list.innerHTML = "";
+  if (!leads?.length) {
+    $("#external-leads").hidden = true;
+    return;
+  }
+  $("#external-leads").hidden = false;
+  // Group by source kind for clarity.
+  const groups = { tna: [], wikitree: [], familysearch: [], gedcom: [] };
+  for (const lead of leads) {
+    const kind = lead.source_kind ?? "gedcom";
+    (groups[kind] ?? (groups[kind] = [])).push(lead);
+  }
+  const labels = { tna: "TNA Discovery", wikitree: "WikiTree", familysearch: "FamilySearch", gedcom: "GEDCOM import" };
+  for (const kind of ["tna", "wikitree", "familysearch", "gedcom"]) {
+    const items = groups[kind];
+    if (!items?.length) continue;
+    const header = document.createElement("div");
+    header.className = `external-leads-group external-leads-${kind}`;
+    header.innerHTML = `<div class="external-leads-group-title">${labels[kind]} <span class="muted">(${items.length})</span></div>`;
+    for (const lead of items) {
+      const row = document.createElement("div");
+      row.className = "external-leads-row";
+      if (kind === "tna") {
+        row.innerHTML = `
+          <div><strong>${escapeHtml(lead.catalogue_ref ?? "(no ref)")}</strong> <span class="muted">${escapeHtml(lead.covering_dates ?? "")}</span></div>
+          <div>${escapeHtml(lead.title ?? "")}</div>
+          <div class="muted" style="font-size:11px;">${escapeHtml(lead.held_by ?? "")} · <a href="${escapeHtml(lead.catalogue_url ?? "#")}" target="_blank" rel="noopener">View catalogue</a></div>
+        `;
+      } else {
+        const d = lead.external_data ?? {};
+        const conf = lead.confidence ? `<span class="badge ${lead.confidence}">${escapeHtml(lead.confidence)}</span>` : "";
+        const profile = d.profile_url ? ` · <a href="${escapeHtml(d.profile_url)}" target="_blank" rel="noopener">View profile</a>` : "";
+        const reasons = lead.reasons?.length ? `<div class="muted" style="font-size:11px;">${lead.reasons.map(escapeHtml).join(" · ")}</div>` : "";
+        row.innerHTML = `
+          <div><strong>${escapeHtml(d.name ?? lead.external_id)}</strong> ${conf}</div>
+          <div class="muted">b.${d.birth_year ?? "?"}${d.birth_place ? " · " + escapeHtml(d.birth_place) : ""}${profile}</div>
+          ${reasons}
+        `;
+      }
+      header.appendChild(row);
+    }
+    list.appendChild(header);
+  }
+};
+
+const fetchAndRenderExternalLeads = async (id) => {
+  try {
+    const res = await fetch(`/api/external/leads/${encodeURIComponent(id)}`);
+    if (!res.ok) return;
+    const { leads } = await res.json();
+    // Only render if this is still the selected individual (race-safety).
+    if (state.selectedId !== id) return;
+    renderExternalLeads(leads);
+  } catch {
+    /* network failure — leave section hidden */
+  }
 };
 
 const selectPerson = async (id) => {
@@ -716,6 +782,10 @@ const selectPerson = async (id) => {
     ${(p.pending_external_lookups ?? 0) > 0 ? `<div class="reresearch-banner" style="background:#fff8e1; border-left-color:#f5c66a; color:#8b6c00;">£ ${p.pending_external_lookups} paywalled lookup${p.pending_external_lookups === 1 ? "" : "s"} suggested for this person — see the External lookups section below.</div>` : ""}
     ${spendLine}
   `;
+
+  // Kick off the external-leads fetch in parallel — it's independent of
+  // the main evidence load and can settle whenever it returns.
+  fetchAndRenderExternalLeads(id);
 
   const evRes = await fetch(`/api/evidence/${encodeURIComponent(id)}`);
   const ev = await evRes.json();
@@ -1960,6 +2030,45 @@ const wireDepth = () => {
       $("#claim-dialog").showModal();
     } catch (e) {
       alert(`Failed to load unmatched: ${e.message}`);
+    }
+  });
+
+  $("#refresh-leads-btn")?.addEventListener("click", async () => {
+    const id = state.selectedId;
+    if (!id) return;
+    const btn = $("#refresh-leads-btn");
+    const summaryEl = $("#external-leads-summary");
+    btn.disabled = true;
+    const original = btn.textContent;
+    btn.textContent = "Refreshing…";
+    summaryEl.textContent = "";
+    try {
+      const res = await fetch(`/api/external/refresh/${encodeURIComponent(id)}`, { method: "POST" });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        summaryEl.textContent = `Refresh failed: ${err.error ?? res.status}`;
+        return;
+      }
+      const { leads, summary } = await res.json();
+      // Race-safety: only render if still on this individual.
+      if (state.selectedId !== id) return;
+      renderExternalLeads(leads);
+      if (summary) {
+        const parts = [
+          `WikiTree=${summary.wikitree_count ?? 0}`,
+          `FamilySearch=${summary.familysearch_count ?? 0}`,
+          `TNA=${summary.tna_count ?? 0}`,
+        ];
+        if (summary.errors?.length) {
+          parts.push(`errors: ${summary.errors.map((e) => e.source).join(", ")}`);
+        }
+        summaryEl.textContent = parts.join(" · ");
+      }
+    } catch (e) {
+      summaryEl.textContent = `Refresh failed: ${e.message}`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = original;
     }
   });
 

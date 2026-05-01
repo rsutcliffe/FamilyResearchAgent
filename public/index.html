@@ -56,6 +56,14 @@
         <button id="stop-btn" class="ghost">Stop</button>
       </section>
       <section id="result"></section>
+      <section id="external-leads" hidden>
+        <div class="external-leads-header">
+          <strong>External API leads</strong>
+          <button id="refresh-leads-btn" class="ghost" title="Bypass the 30-day cache and re-query WikiTree, FamilySearch, and TNA Discovery for this individual">Refresh</button>
+        </div>
+        <div id="external-leads-list"></div>
+        <p id="external-leads-summary" class="muted"></p>
+      </section>
       <section id="decision-bar" hidden>
         <button id="run-btn">Run Agent</button>
         <button id="accept-btn" class="primary" hidden>Accept Match</button>
