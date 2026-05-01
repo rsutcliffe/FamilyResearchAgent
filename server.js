@@ -18,6 +18,7 @@ import {
 import { gatherApiLeads, isCacheFresh } from "./agent/externalApiOrchestrator.js";
 import { tryAcquireRunLock, releaseRunLock } from "./agent/runLock.js";
 import { reviewTree } from "./agent/reviewer.js";
+import { reconcileSiblings } from "./agent/siblingReconciliation.js";
 import { searchWikiTreePersons, isWikiTreeDisabled } from "./agent/apiClients/wikiTreeClient.js";
 import { searchFamilySearchTree, isFamilySearchDisabled } from "./agent/apiClients/familySearchClient.js";
 import { searchTnaDiscovery, isTnaDisabled } from "./agent/apiClients/tnaDiscoveryClient.js";
@@ -432,6 +433,33 @@ app.get("/api/review", async (_req, res) => {
     ]);
     const findings = reviewTree({ individuals, families, evidenceLog });
     res.json({ findings });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Sibling reconciliation: count how many siblings have had accepted
+// agent matches, used as corroboration of the parental link in the family.
+app.get("/api/siblings/reconcile/:familyId", async (req, res) => {
+  try {
+    const [individuals, families, evidenceLog, decisions] = await Promise.all([
+      readJson(INDIVIDUALS_FILE),
+      readJson(FAMILIES_FILE),
+      readJson(EVIDENCE_LOG_FILE),
+      readJson(DECISIONS_FILE),
+    ]);
+    const report = reconcileSiblings({
+      familyId: req.params.familyId,
+      individuals,
+      families,
+      evidenceLog,
+      decisions,
+    });
+    if (!report) {
+      res.status(404).json({ error: "family not found" });
+      return;
+    }
+    res.json({ report });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

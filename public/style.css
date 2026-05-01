@@ -300,7 +300,8 @@ body {
   flex-wrap: wrap;
 }
 
-#external-leads {
+#external-leads,
+#sibling-reconciliation {
   margin-top: 16px;
   padding-top: 12px;
   border-top: 1px solid var(--border);

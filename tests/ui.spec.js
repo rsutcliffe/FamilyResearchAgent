@@ -440,6 +440,66 @@ test.describe("Claim from import", () => {
   });
 });
 
+test.describe("Sibling reconciliation panel", () => {
+  test("renders corroboration when the selected individual has researched siblings", async ({ page, isolatedReads }) => {
+    await page.route("**/api/siblings/reconcile/**", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          report: {
+            family_id: "@TF1@",
+            total_siblings: 3,
+            researched: ["@SIB1@", "@SIB2@"],
+            unresearched: ["@SIB3@"],
+            accepted_count: 2,
+            corroboration_strength: "strong",
+            siblings: [
+              { id: "@I1825902591@", name: "Test Root", birth_year: 1972, researched: false, run_count: 0, decision: null },
+              { id: "@SIB1@", name: "Sibling One", birth_year: 1970, researched: true, run_count: 1, decision: "accepted" },
+              { id: "@SIB2@", name: "Sibling Two", birth_year: 1968, researched: true, run_count: 1, decision: "accepted" },
+            ],
+          },
+        }),
+      }),
+    );
+    await page.goto("/");
+    await page.waitForSelector(".card");
+    await page.locator(`.card[data-id="@I1825902591@"]`).dispatchEvent("click");
+    await expect(page.locator("#sibling-reconciliation")).toBeVisible();
+    await expect(page.locator("#sibling-reconciliation-summary")).toContainText("2 of 2 sibling");
+    await expect(page.locator("#sibling-strength-badge")).toContainText("Strong");
+    await expect(page.locator("#sibling-reconciliation-list")).toContainText("Sibling One");
+    await expect(page.locator("#sibling-reconciliation-list")).toContainText("Sibling Two");
+    // Self should not appear in the list
+    await expect(page.locator("#sibling-reconciliation-list")).not.toContainText("Test Root");
+  });
+
+  test("hidden when individual has fewer than 2 siblings", async ({ page, isolatedReads }) => {
+    await page.route("**/api/siblings/reconcile/**", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          report: {
+            family_id: "@TF1@",
+            total_siblings: 1,
+            researched: [],
+            unresearched: ["@I1825902591@"],
+            accepted_count: 0,
+            corroboration_strength: "none",
+            siblings: [{ id: "@I1825902591@", name: "Test Root", birth_year: 1972, researched: false, decision: null }],
+          },
+        }),
+      }),
+    );
+    await page.goto("/");
+    await page.waitForSelector(".card");
+    await page.locator(`.card[data-id="@I1825902591@"]`).dispatchEvent("click");
+    await expect(page.locator("#sibling-reconciliation")).toBeHidden();
+  });
+});
+
 test.describe("Tree review", () => {
   test("topbar exposes a Review button", async ({ page }) => {
     await page.goto("/");

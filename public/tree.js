@@ -686,6 +686,10 @@ const resetDetailPanelTransientState = () => {
   $("#external-leads").hidden = true;
   $("#external-leads-list").innerHTML = "";
   $("#external-leads-summary").textContent = "";
+  // Clear the sibling-reconciliation section.
+  $("#sibling-reconciliation").hidden = true;
+  $("#sibling-reconciliation-list").innerHTML = "";
+  $("#sibling-reconciliation-summary").textContent = "";
 };
 
 // Render the external API leads list for the currently selected individual.
@@ -734,6 +738,63 @@ const renderExternalLeads = (leads) => {
       header.appendChild(row);
     }
     list.appendChild(header);
+  }
+};
+
+// Render the sibling-corroboration report for the selected individual's
+// famc family. Hidden when the individual has no famc, no siblings, or
+// fewer than 2 children (corroboration only meaningful for sibling sets).
+const STRENGTH_LABEL = { strong: "Strong", weak: "Weak", none: "None yet" };
+const STRENGTH_BAND = { strong: "A", weak: "C", none: "D" };
+const renderSiblingReconciliation = (report, selectedId) => {
+  if (!report || report.total_siblings < 2) {
+    $("#sibling-reconciliation").hidden = true;
+    return;
+  }
+  $("#sibling-reconciliation").hidden = false;
+  const badge = $("#sibling-strength-badge");
+  badge.textContent = STRENGTH_LABEL[report.corroboration_strength];
+  badge.className = `badge ${STRENGTH_BAND[report.corroboration_strength]}`;
+
+  const others = report.siblings.filter((s) => s.id !== selectedId);
+  $("#sibling-reconciliation-summary").textContent =
+    `${report.accepted_count} of ${report.total_siblings - 1} sibling${report.total_siblings - 1 === 1 ? "" : "s"} have an accepted match — independent corroboration of the parental link.`;
+
+  const list = $("#sibling-reconciliation-list");
+  list.innerHTML = "";
+  for (const s of others) {
+    const row = document.createElement("div");
+    row.style.cssText = "padding:6px 0;border-top:1px dashed var(--border);font-size:13px;display:flex;gap:8px;align-items:center;";
+    const decisionBadge = s.decision
+      ? `<span class="badge ${s.decision === "accepted" ? "A" : s.decision === "rejected" ? "D" : "C"}" style="font-size:10px;padding:2px 6px;">${escapeHtml(s.decision)}</span>`
+      : `<span class="muted" style="font-size:11px;">unresearched</span>`;
+    row.innerHTML = `
+      <div style="flex:1;">
+        <strong>${escapeHtml(s.name)}</strong>
+        <span class="muted" style="margin-left:6px;">b.${s.birth_year ?? "?"}</span>
+      </div>
+      ${decisionBadge}
+      <button type="button" class="ghost sibling-jump" data-id="${escapeHtml(s.id)}" style="font-size:11px;padding:4px 8px;">Open</button>
+    `;
+    row.querySelector(".sibling-jump").addEventListener("click", () => selectPerson(s.id));
+    list.appendChild(row);
+  }
+};
+
+const fetchAndRenderSiblingReconciliation = async (id) => {
+  const ind = state.byId.get(id);
+  if (!ind?.famc) {
+    $("#sibling-reconciliation").hidden = true;
+    return;
+  }
+  try {
+    const res = await fetch(`/api/siblings/reconcile/${encodeURIComponent(ind.famc)}`);
+    if (!res.ok) return;
+    const { report } = await res.json();
+    if (state.selectedId !== id) return; // stale
+    renderSiblingReconciliation(report, id);
+  } catch {
+    /* swallow */
   }
 };
 
@@ -786,6 +847,7 @@ const selectPerson = async (id) => {
   // Kick off the external-leads fetch in parallel — it's independent of
   // the main evidence load and can settle whenever it returns.
   fetchAndRenderExternalLeads(id);
+  fetchAndRenderSiblingReconciliation(id);
 
   const evRes = await fetch(`/api/evidence/${encodeURIComponent(id)}`);
   const ev = await evRes.json();
