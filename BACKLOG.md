@@ -82,3 +82,5 @@ session rather than slotting in piecemeal.
   - Visual baseline snapshots — run `npm run test:ui -- --update-snapshots` once the look is stable to lock in baselines
 
 - **Concurrent agent runs.** Currently one user, one run at a time. If two cards are clicked in quick succession, the second clobbers the first's UI state. Cheap to fix with a per-individual lock.
+
+- **Bump GitHub Actions to Node.js 24.** `.github/workflows/test.yml` uses `actions/checkout@v4` and `actions/setup-node@v4`, both pinned to Node.js 20. GitHub will force Node.js 24 by default from 2026-06-02 and remove Node.js 20 from runners on 2026-09-16. Bump to `@v5` (or whichever release supports Node 24) before then to avoid CI breakage. Non-urgent — workflow is just a deprecation warning today.
