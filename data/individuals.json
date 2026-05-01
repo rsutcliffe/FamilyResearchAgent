@@ -1,0 +1,3422 @@
+[
+  {
+    "id": "@I292516914743@",
+    "name": "John Evans",
+    "sex": "M",
+    "birth_year": null,
+    "birth_date": "",
+    "birth_place": "",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F134@"
+    ],
+    "confidence": "C",
+    "score": 5,
+    "warnings": [
+      "No birth date recorded"
+    ],
+    "alerts": [],
+    "generation": 5
+  },
+  {
+    "id": "@I292513289911@",
+    "name": "Jane Ann Tilsley",
+    "sex": "F",
+    "birth_year": 1560,
+    "birth_date": "Abt. 1560",
+    "birth_place": "Accrington, Lancashire",
+    "death_date": "1 April 1629",
+    "death_place": "Heptonstall  Calderdale, West Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F141@",
+      "@F178@"
+    ],
+    "confidence": "B",
+    "score": 10,
+    "warnings": [
+      "Birth date is estimated"
+    ],
+    "alerts": [
+      "EARLY-ERA: Birth 1560. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 13
+  },
+  {
+    "id": "@I292519755076@",
+    "name": "Hannah Ingham",
+    "sex": "F",
+    "birth_year": null,
+    "birth_date": "",
+    "birth_place": "",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F222@"
+    ],
+    "confidence": "C",
+    "score": 5,
+    "warnings": [
+      "No birth date recorded"
+    ],
+    "alerts": [],
+    "generation": null
+  },
+  {
+    "id": "@I1825902704@",
+    "name": "Jane Gay",
+    "sex": "F",
+    "birth_year": null,
+    "birth_date": "",
+    "birth_place": "",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F58@"
+    ],
+    "confidence": "D",
+    "score": 1,
+    "warnings": [
+      "No birth date recorded",
+      "Sources are family tree entries only"
+    ],
+    "alerts": [],
+    "generation": 8
+  },
+  {
+    "id": "@I292515544719@",
+    "name": "Sarah Thewlis",
+    "sex": "F",
+    "birth_year": 1826,
+    "birth_date": "25 Sep 1826",
+    "birth_place": "Lindley, Yorkshire, England",
+    "death_date": "11 February 1885",
+    "death_place": "Barkisland, Metropolitan Borough of Calderdale, West Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F158@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1826. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 5
+  },
+  {
+    "id": "@I1825902591@",
+    "name": "Richard David Sutcliffe",
+    "sex": "M",
+    "birth_year": 1972,
+    "birth_date": "10 Nov 1972",
+    "birth_place": "Leeds",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F85@",
+    "fams": [
+      "@F92@"
+    ],
+    "confidence": "A",
+    "score": 10,
+    "warnings": [],
+    "alerts": [],
+    "generation": 0
+  },
+  {
+    "id": "@I1825902649@",
+    "name": "Elizabeth Ann Fletcher",
+    "sex": "F",
+    "birth_year": 1859,
+    "birth_date": "January 1859",
+    "birth_place": "Southowram, Metropolitan Borough of Calderdale, West Yorkshire, England",
+    "death_date": "15 May 1911",
+    "death_place": "Siddal, Metropolitan Borough of Calderdale, West Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F107@"
+    ],
+    "confidence": "A",
+    "score": 12,
+    "warnings": [],
+    "alerts": [],
+    "generation": 4
+  },
+  {
+    "id": "@I292123924846@",
+    "name": "Joseph Cooper",
+    "sex": "M",
+    "birth_year": 1793,
+    "birth_date": "26 Jul 1793",
+    "birth_place": "Horsforth Guiseley Yorkshire",
+    "death_date": "1859",
+    "death_place": "Drighlington, St Paul, West Yorkshire, England",
+    "baptism_date": "20 Oct 1793",
+    "baptism_place": "Guiseley, St Oswald, Yorkshire, England",
+    "famc": "@F193@",
+    "fams": [
+      "@F233@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1793. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 5
+  },
+  {
+    "id": "@I292525419632@",
+    "name": "William Smales",
+    "sex": "M",
+    "birth_year": 1776,
+    "birth_date": "1776",
+    "birth_place": "Kippax, Yorkshire, Uk",
+    "death_date": "1 Jul 1834",
+    "death_place": "Kippax, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F260@"
+    ],
+    "confidence": "C",
+    "score": 6,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1776. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 7
+  },
+  {
+    "id": "@I292511585494@",
+    "name": "Sally Stansfield",
+    "sex": "F",
+    "birth_year": 1770,
+    "birth_date": "1770",
+    "birth_place": "Heptonstall, Yorkshire, England",
+    "death_date": "abt 1856",
+    "death_place": "",
+    "baptism_date": "23 Sep 1770",
+    "baptism_place": "Heptonstall, St Thomas, Yorkshire, England",
+    "famc": "@F218@",
+    "fams": [
+      "@F275@"
+    ],
+    "confidence": "B",
+    "score": 10,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1770. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 6
+  },
+  {
+    "id": "@I292513303983@",
+    "name": "Thomas Hulse",
+    "sex": "M",
+    "birth_year": null,
+    "birth_date": "1475",
+    "birth_place": "Marbury, Cheshire, England",
+    "death_date": "1525",
+    "death_place": "Great Budworth, Cheshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F237@"
+    ],
+    "confidence": "D",
+    "score": 7,
+    "warnings": [
+      "Sources are family tree entries only"
+    ],
+    "alerts": [
+      "PRE-PARISH: Birth 1475 pre-dates English parish registers (1538). No documentary evidence possible."
+    ],
+    "generation": 17
+  },
+  {
+    "id": "@I292123924625@",
+    "name": "Sarah Smales",
+    "sex": "F",
+    "birth_year": 1808,
+    "birth_date": "abt 1808",
+    "birth_place": "Methley, Yorkshire, England",
+    "death_date": "1865",
+    "death_place": "Sherburn, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F262@"
+    ],
+    "confidence": "A",
+    "score": 12,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1808. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 5
+  },
+  {
+    "id": "@I292513303984@",
+    "name": "Ellen De Leigh",
+    "sex": "F",
+    "birth_year": null,
+    "birth_date": "1478",
+    "birth_place": "Norbury, Cheshire, England",
+    "death_date": "1538",
+    "death_place": "Marbury, Cheshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F237@"
+    ],
+    "confidence": "D",
+    "score": 7,
+    "warnings": [
+      "Sources are family tree entries only"
+    ],
+    "alerts": [
+      "PRE-PARISH: Birth 1478 pre-dates English parish registers (1538). No documentary evidence possible."
+    ],
+    "generation": 17
+  },
+  {
+    "id": "@I292511586593@",
+    "name": "Jane Baren",
+    "sex": "F",
+    "birth_year": 1839,
+    "birth_date": "abt 1839",
+    "birth_place": "Horsham, Sussex, England",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F301@"
+    ],
+    "confidence": "D",
+    "score": 4,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [],
+    "generation": 5
+  },
+  {
+    "id": "@I292709159723@",
+    "name": "Nathaniel Crawshaw",
+    "sex": "",
+    "birth_year": 1791,
+    "birth_date": "1791",
+    "birth_place": "Rishworth, Yorkshire, England",
+    "death_date": "14 Sep 1862",
+    "death_place": "In Cattle Sh Mountain, Maryland",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F176@"
+    ],
+    "confidence": "B",
+    "score": 11,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1791. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 6
+  },
+  {
+    "id": "@I292513486431@",
+    "name": "William Rowley",
+    "sex": "M",
+    "birth_year": 1859,
+    "birth_date": "abt 1859",
+    "birth_place": "Kippax, Yorkshire, England",
+    "death_date": "Apr 1921",
+    "death_place": "Leeds, Yorkshire West Riding, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F173@",
+    "fams": [
+      "@F135@",
+      "@F51@"
+    ],
+    "confidence": "A",
+    "score": 12,
+    "warnings": [],
+    "alerts": [],
+    "generation": null
+  },
+  {
+    "id": "@I292512774562@",
+    "name": "Samuel Whitley",
+    "sex": "M",
+    "birth_year": 1801,
+    "birth_date": "abt 1801",
+    "birth_place": "Batley, Yorkshire, England",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F246@"
+    ],
+    "confidence": "A",
+    "score": 9,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1801. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 5
+  },
+  {
+    "id": "@I1825902681@",
+    "name": "Maud Maria Cooper",
+    "sex": "F",
+    "birth_year": 1876,
+    "birth_date": "Abt. 1876",
+    "birth_place": "Drighlington, York, England",
+    "death_date": "Jun 1928",
+    "death_place": "North Bierley, Yorkshire West Riding, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F228@",
+    "fams": [
+      "@F36@"
+    ],
+    "confidence": "B",
+    "score": 10,
+    "warnings": [
+      "Birth date is estimated"
+    ],
+    "alerts": [],
+    "generation": 3
+  },
+  {
+    "id": "@I292515544718@",
+    "name": "Henry Binns",
+    "sex": "M",
+    "birth_year": 1821,
+    "birth_date": "abt 1821",
+    "birth_place": "Norland, Yorkshire, England",
+    "death_date": "1908",
+    "death_place": "Barkisland, Metropolitan Borough of Calderdale, West Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F158@"
+    ],
+    "confidence": "A",
+    "score": 12,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1821. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 5
+  },
+  {
+    "id": "@I292513303404@",
+    "name": "Elizabeth Mary Hulse",
+    "sex": "F",
+    "birth_year": 1500,
+    "birth_date": "1500",
+    "birth_place": "Marbury, Cheshire, England",
+    "death_date": "Abt. 1573",
+    "death_place": "Marbury, Cheshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F237@",
+    "fams": [
+      "@F1@"
+    ],
+    "confidence": "D",
+    "score": 9,
+    "warnings": [],
+    "alerts": [
+      "PRE-PARISH: Birth 1500 pre-dates English parish registers (1538). No documentary evidence possible."
+    ],
+    "generation": 16
+  },
+  {
+    "id": "@I1825902629@",
+    "name": "Harold Cockerham",
+    "sex": "M",
+    "birth_year": 1884,
+    "birth_date": "17 Oct 1884",
+    "birth_place": "South Milford, Yorkshire, England",
+    "death_date": "20 May 1964",
+    "death_place": "South Milford",
+    "baptism_date": "23 Oct 1884",
+    "baptism_place": "South Milford, Yorkshire, England",
+    "famc": "@F116@",
+    "fams": [
+      "@F110@",
+      "@F111@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [],
+    "generation": 3
+  },
+  {
+    "id": "@I292525419737@",
+    "name": "Betty Glover",
+    "sex": "F",
+    "birth_year": 1750,
+    "birth_date": "1750",
+    "birth_place": "Halifax, St Hilda, Yorkshire, England",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F265@"
+    ],
+    "confidence": "D",
+    "score": 3,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1750. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 7
+  },
+  {
+    "id": "@I292519760527@",
+    "name": "John Sutcliffe",
+    "sex": "M",
+    "birth_year": 1560,
+    "birth_date": "1560",
+    "birth_place": "Burnley, Lancashire, England",
+    "death_date": "29 Jun 1636",
+    "death_place": "Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F141@"
+    ],
+    "confidence": "D",
+    "score": 7,
+    "warnings": [
+      "Sources are family tree entries only"
+    ],
+    "alerts": [
+      "EARLY-ERA: Birth 1560. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": null
+  },
+  {
+    "id": "@I292519741907@",
+    "name": "Martha",
+    "sex": "F",
+    "birth_year": 1660,
+    "birth_date": "1660",
+    "birth_place": "",
+    "death_date": "25 May 1712",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F196@"
+    ],
+    "confidence": "D",
+    "score": 5,
+    "warnings": [
+      "Sources are family tree entries only"
+    ],
+    "alerts": [
+      "EARLY-ERA: Birth 1660. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": null
+  },
+  {
+    "id": "@I292513289358@",
+    "name": "Mary Ellen Cockcroft",
+    "sex": "F",
+    "birth_year": 1635,
+    "birth_date": "1635",
+    "birth_place": "Heptonstall, Yorkshire, , England",
+    "death_date": "7 Feb 1678",
+    "death_place": "Surry County, Virginia, USA",
+    "baptism_date": "2 Aug 1635",
+    "baptism_place": "Heptonstall,York,England",
+    "famc": "@F317@",
+    "fams": [
+      "@F208@"
+    ],
+    "confidence": "B",
+    "score": 11,
+    "warnings": [],
+    "alerts": [
+      "EARLY-ERA: Birth 1635. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 10
+  },
+  {
+    "id": "@I292513302305@",
+    "name": "ROBERT S SUTCLIFFE",
+    "sex": "M",
+    "birth_year": 1540,
+    "birth_date": "1540",
+    "birth_place": "Stoodley York",
+    "death_date": "Jan 1624",
+    "death_place": "Stoodley, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F6@",
+    "fams": [
+      "@F17@"
+    ],
+    "confidence": "B",
+    "score": 11,
+    "warnings": [],
+    "alerts": [
+      "EARLY-ERA: Birth 1540. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 14
+  },
+  {
+    "id": "@I292123924852@",
+    "name": "Hannah Lee",
+    "sex": "F",
+    "birth_year": 1794,
+    "birth_date": "Abt. 1794",
+    "birth_place": "Armley West Yorkshire, England",
+    "death_date": "1873",
+    "death_place": "Drighlington, St Paul, West Yorkshire, England.",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F233@"
+    ],
+    "confidence": "B",
+    "score": 10,
+    "warnings": [
+      "Birth date is estimated"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1794. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 5
+  },
+  {
+    "id": "@I1825902676@",
+    "name": "Hannah Pickersgill",
+    "sex": "F",
+    "birth_year": 1825,
+    "birth_date": "Abt. 1825",
+    "birth_place": "Kippax, Yorkshire, England",
+    "death_date": "Sep 1903",
+    "death_place": "Yorkshire West Riding, United Kingdom",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F175@",
+    "fams": [
+      "@F37@"
+    ],
+    "confidence": "B",
+    "score": 10,
+    "warnings": [
+      "Birth date is estimated"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1825. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 5
+  },
+  {
+    "id": "@I1825902701@",
+    "name": "John Wainwright",
+    "sex": "M",
+    "birth_year": 1738,
+    "birth_date": "ABT 1738",
+    "birth_place": "Ferry Fryston",
+    "death_date": "24 JAN 1796",
+    "death_place": "Hillam, Monk Frystone",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F58@",
+    "fams": [
+      "@F66@"
+    ],
+    "confidence": "D",
+    "score": 8,
+    "warnings": [
+      "Sources are family tree entries only"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1738. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 7
+  },
+  {
+    "id": "@I292515693494@",
+    "name": "Isabella Walbank",
+    "sex": "F",
+    "birth_year": null,
+    "birth_date": "",
+    "birth_place": "",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F49@"
+    ],
+    "confidence": "C",
+    "score": 5,
+    "warnings": [
+      "No birth date recorded"
+    ],
+    "alerts": [],
+    "generation": 8
+  },
+  {
+    "id": "@I292519753236@",
+    "name": "Mary Watters",
+    "sex": "F",
+    "birth_year": 1644,
+    "birth_date": "27 Oct 1644",
+    "birth_place": "Keighley, Yorkshire, England",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F182@"
+    ],
+    "confidence": "C",
+    "score": 5,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [
+      "EARLY-ERA: Birth 1644. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 11
+  },
+  {
+    "id": "@I1825902682@",
+    "name": "Richard Matthews",
+    "sex": "M",
+    "birth_year": 1878,
+    "birth_date": "24 Apr 1878",
+    "birth_place": "Leeds, Yorkshire, England",
+    "death_date": "Jun 1937",
+    "death_place": "Leeds North, Yorkshire West Riding, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F61@",
+    "fams": [
+      "@F46@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [],
+    "generation": 4
+  },
+  {
+    "id": "@I1825902699@",
+    "name": "Richard Sweeting",
+    "sex": "M",
+    "birth_year": 1759,
+    "birth_date": "1/1/1759",
+    "birth_place": "Brayton",
+    "death_date": "1/1/1807",
+    "death_place": "Monk Frystone",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F67@"
+    ],
+    "confidence": "C",
+    "score": 6,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1759. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 6
+  },
+  {
+    "id": "@I1825902598@",
+    "name": "Denise Matthews",
+    "sex": "F",
+    "birth_year": 1951,
+    "birth_date": "12 Sep 1951",
+    "birth_place": "Leeds, West Yorkshire",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F87@",
+    "fams": [
+      "@F85@"
+    ],
+    "confidence": "A",
+    "score": 10,
+    "warnings": [],
+    "alerts": [],
+    "generation": 1
+  },
+  {
+    "id": "@I292519759982@",
+    "name": "Grace Cockcraft",
+    "sex": "F",
+    "birth_year": 1588,
+    "birth_date": "2 June 1588",
+    "birth_place": "Ovenden, Yorkshire, England",
+    "death_date": "abt 1654",
+    "death_place": "Ribchester, Yorkshire",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F174@"
+    ],
+    "confidence": "D",
+    "score": 9,
+    "warnings": [
+      "Sources are family tree entries only"
+    ],
+    "alerts": [
+      "EARLY-ERA: Birth 1588. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 12
+  },
+  {
+    "id": "@I292516915849@",
+    "name": "Ackroyd Holroyd",
+    "sex": "",
+    "birth_year": 1834,
+    "birth_date": "2 Jan 1834",
+    "birth_place": "Adwalton, Yorkshire, England",
+    "death_date": "abt 1866",
+    "death_place": "",
+    "baptism_date": "25 May 1834",
+    "baptism_place": "Birstall,York,England",
+    "famc": "@F171@",
+    "fams": [
+      "@F163@"
+    ],
+    "confidence": "A",
+    "score": 12,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1834. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": null
+  },
+  {
+    "id": "@I292525419763@",
+    "name": "John Scott",
+    "sex": "M",
+    "birth_year": 1746,
+    "birth_date": "Feb 1746",
+    "birth_place": "Gildersome, Yorkshire-West Riding,",
+    "death_date": "14 July 1811",
+    "death_place": "Batley, All Saints, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F265@"
+    ],
+    "confidence": "C",
+    "score": 7,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1746. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 7
+  },
+  {
+    "id": "@I292511631506@",
+    "name": "John White",
+    "sex": "M",
+    "birth_year": 1787,
+    "birth_date": "4 Dec 1787",
+    "birth_place": "Leeds, Yorkshire, England",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F280@"
+    ],
+    "confidence": "C",
+    "score": 5,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1787. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 6
+  },
+  {
+    "id": "@I1825902698@",
+    "name": "Ann Sweeting",
+    "sex": "F",
+    "birth_year": 1802,
+    "birth_date": "Abt. 1802",
+    "birth_place": "Monks Frystone",
+    "death_date": "Abt. 1849",
+    "death_place": "Pontefract",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F67@",
+    "fams": [
+      "@F68@"
+    ],
+    "confidence": "D",
+    "score": 6,
+    "warnings": [
+      "Birth date is estimated",
+      "Sources are family tree entries only"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1802. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 5
+  },
+  {
+    "id": "@I292708275002@",
+    "name": "John Pickersgill",
+    "sex": "M",
+    "birth_year": 1800,
+    "birth_date": "21 June 1800",
+    "birth_place": "Methley, Yorkshire, England",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F175@"
+    ],
+    "confidence": "C",
+    "score": 5,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1800. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 6
+  },
+  {
+    "id": "@I1825902650@",
+    "name": "James Jackson",
+    "sex": "M",
+    "birth_year": 1862,
+    "birth_date": "9 Aug 1862",
+    "birth_place": "Bradford, Yorkshire, England",
+    "death_date": "September 1912",
+    "death_place": "Yorkshire West Riding, United Kingdom",
+    "baptism_date": "16 Aug 1863",
+    "baptism_place": "Bradford, St Peter (Bradford Cathedral), Yorkshire, England",
+    "famc": "@F32@",
+    "fams": [
+      "@F108@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [],
+    "generation": 4
+  },
+  {
+    "id": "@I292708274586@",
+    "name": "Francis Widdop",
+    "sex": "M",
+    "birth_year": 1550,
+    "birth_date": "1550",
+    "birth_place": "Keighley, Yorkshire, England",
+    "death_date": "1585",
+    "death_place": "Keighley, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F257@"
+    ],
+    "confidence": "D",
+    "score": 7,
+    "warnings": [
+      "Sources are family tree entries only"
+    ],
+    "alerts": [
+      "EARLY-ERA: Birth 1550. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 14
+  },
+  {
+    "id": "@I292708274575@",
+    "name": "Agnes Roland",
+    "sex": "F",
+    "birth_year": 1555,
+    "birth_date": "1555",
+    "birth_place": "Keighley, Yorkshire, England",
+    "death_date": "Jun 1622",
+    "death_place": "Keighley, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F257@"
+    ],
+    "confidence": "D",
+    "score": 7,
+    "warnings": [
+      "Sources are family tree entries only"
+    ],
+    "alerts": [
+      "EARLY-ERA: Birth 1555. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 14
+  },
+  {
+    "id": "@I292513273097@",
+    "name": "Martha Redman",
+    "sex": "F",
+    "birth_year": 1692,
+    "birth_date": "12 Jun 1692",
+    "birth_place": "Heptonstall, Yorkshire, England",
+    "death_date": "3 Jun 1763",
+    "death_place": "Yorkshire, England",
+    "baptism_date": "12 Jun 1692",
+    "baptism_place": "Heptonstall, St Thomas, Yorkshire, England",
+    "famc": "@F243@",
+    "fams": [
+      "@F216@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [
+      "EARLY-ERA: Birth 1692. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 9
+  },
+  {
+    "id": "@I292514011463@",
+    "name": "Catherine Walker",
+    "sex": "F",
+    "birth_year": 1880,
+    "birth_date": "2 Mar 1880",
+    "birth_place": "",
+    "death_date": "Mar 1963",
+    "death_place": "Barkston Ash, Yorkshire West Riding, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F111@"
+    ],
+    "confidence": "A",
+    "score": 12,
+    "warnings": [],
+    "alerts": [],
+    "generation": null
+  },
+  {
+    "id": "@I292123924619@",
+    "name": "William Cockerham",
+    "sex": "M",
+    "birth_year": 1807,
+    "birth_date": "1807",
+    "birth_place": "Woodlesford, Yorkshire, England",
+    "death_date": "Jan 1884",
+    "death_place": "Yorkshire West Riding, United Kingdom",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F262@"
+    ],
+    "confidence": "B",
+    "score": 11,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1807. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 5
+  },
+  {
+    "id": "@I292513302306@",
+    "name": "MARIA MARY MITCHELL",
+    "sex": "F",
+    "birth_year": 1540,
+    "birth_date": "1540",
+    "birth_place": "Stoodley, Yorkshire, England",
+    "death_date": "1598",
+    "death_place": "Stoodley, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F17@"
+    ],
+    "confidence": "D",
+    "score": 7,
+    "warnings": [
+      "Sources are family tree entries only"
+    ],
+    "alerts": [
+      "EARLY-ERA: Birth 1540. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 14
+  },
+  {
+    "id": "@I292515656078@",
+    "name": "Salley Halliwell",
+    "sex": "F",
+    "birth_year": 1750,
+    "birth_date": "1750",
+    "birth_place": "Yorkshire, England",
+    "death_date": "15 June 1792",
+    "death_place": "Reaps in Heptonstall",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F218@"
+    ],
+    "confidence": "B",
+    "score": 11,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1750. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 7
+  },
+  {
+    "id": "@I1826419885@",
+    "name": "James Jackson",
+    "sex": "M",
+    "birth_year": 1830,
+    "birth_date": "abt 1830",
+    "birth_place": "Eastoft, Yorkshire, England",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F32@"
+    ],
+    "confidence": "A",
+    "score": 9,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1830. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 5
+  },
+  {
+    "id": "@I292511631522@",
+    "name": "Rachel Simpson",
+    "sex": "F",
+    "birth_year": 1788,
+    "birth_date": "abt 1788",
+    "birth_place": "Leeds, Yorkshire, England, United Kingdom",
+    "death_date": "July 1869",
+    "death_place": "Leeds, Yorkshire West Riding",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F280@"
+    ],
+    "confidence": "C",
+    "score": 7,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1788. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 6
+  },
+  {
+    "id": "@I1825902628@",
+    "name": "Lily Anne Cockerham",
+    "sex": "F",
+    "birth_year": 1919,
+    "birth_date": "25 Dec 1919",
+    "birth_place": "Hunslet, Leeds",
+    "death_date": "24 Sep 1980",
+    "death_place": "Leeds, West Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F110@",
+    "fams": [
+      "@F95@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [],
+    "generation": 2
+  },
+  {
+    "id": "@I1825902599@",
+    "name": "Herbert Matthews",
+    "sex": "M",
+    "birth_year": 1930,
+    "birth_date": "11 Aug 1930",
+    "birth_place": "Leeds, Yorkshire, England",
+    "death_date": "5 Jan 2006",
+    "death_place": "Leeds, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F119@",
+    "fams": [
+      "@F87@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [],
+    "generation": 2
+  },
+  {
+    "id": "@I292519753055@",
+    "name": "Jane Dobson 5th x ggm Pauline",
+    "sex": "F",
+    "birth_year": 1740,
+    "birth_date": "1740",
+    "birth_place": "Coley, Halifax.Yorkshire",
+    "death_date": "16 Mar 1784",
+    "death_place": "Coley, York, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F226@"
+    ],
+    "confidence": "C",
+    "score": 6,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1740. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 7
+  },
+  {
+    "id": "@I292513289631@",
+    "name": "Joseph Sutcliffe",
+    "sex": "U",
+    "birth_year": 1579,
+    "birth_date": "1579",
+    "birth_place": "Halifax, Yorkshire, West Yorkshire, England, United Kingdom",
+    "death_date": "Abt. 1639",
+    "death_place": "Heptonstall, St Thomas, Yorkshire, England, United Kingdom",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F178@",
+    "fams": [
+      "@F183@",
+      "@F231@"
+    ],
+    "confidence": "B",
+    "score": 11,
+    "warnings": [],
+    "alerts": [
+      "EARLY-ERA: Birth 1579. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 12
+  },
+  {
+    "id": "@I292519753159@",
+    "name": "William Redman",
+    "sex": "M",
+    "birth_year": 1618,
+    "birth_date": "25 Oct 1618",
+    "birth_place": "Heptonstall, Yorkshire, England",
+    "death_date": "1690",
+    "death_place": "Halifax, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F192@"
+    ],
+    "confidence": "C",
+    "score": 8,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [
+      "EARLY-ERA: Birth 1618. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 11
+  },
+  {
+    "id": "@I292708256613@",
+    "name": "Henry James Barnes",
+    "sex": "M",
+    "birth_year": 1871,
+    "birth_date": "9 September 1871",
+    "birth_place": "Fulham, Middlesex, England",
+    "death_date": "Jan 1952",
+    "death_place": "Wharfedale, Yorkshire West Riding, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F301@",
+    "fams": [
+      "@F152@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [],
+    "generation": 4
+  },
+  {
+    "id": "@I1825902694@",
+    "name": "Elizabeth Ramsbottom",
+    "sex": "F",
+    "birth_year": null,
+    "birth_date": "",
+    "birth_place": "",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F61@"
+    ],
+    "confidence": "D",
+    "score": 0,
+    "warnings": [
+      "No birth date recorded",
+      "No source evidence attached"
+    ],
+    "alerts": [],
+    "generation": 5
+  },
+  {
+    "id": "@I292517173730@",
+    "name": "Mary Shan",
+    "sex": "F",
+    "birth_year": 1755,
+    "birth_date": "Abt. 1755",
+    "birth_place": "Pannal, Yorkshire, England, UK",
+    "death_date": "Aft. 1806",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F193@"
+    ],
+    "confidence": "B",
+    "score": 7,
+    "warnings": [
+      "Birth date is estimated"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1755. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 6
+  },
+  {
+    "id": "@I292525419652@",
+    "name": "Elizabeth Smales",
+    "sex": "F",
+    "birth_year": 1781,
+    "birth_date": "1781",
+    "birth_place": "Kippax Yorkshire",
+    "death_date": "September 1856",
+    "death_place": "Leeds, Yorkshire West Riding",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F260@"
+    ],
+    "confidence": "C",
+    "score": 6,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1781. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 7
+  },
+  {
+    "id": "@I292525963932@",
+    "name": "Elenor (Ellen)",
+    "sex": "F",
+    "birth_year": 1854,
+    "birth_date": "1854",
+    "birth_place": "Leeds, Yorkshire, England",
+    "death_date": "Sep 1927",
+    "death_place": "Bramley, Yorkshire West Riding, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F140@"
+    ],
+    "confidence": "D",
+    "score": 7,
+    "warnings": [
+      "Sources are family tree entries only"
+    ],
+    "alerts": [],
+    "generation": 5
+  },
+  {
+    "id": "@I1825902648@",
+    "name": "Wright Binns",
+    "sex": "M",
+    "birth_year": 1850,
+    "birth_date": "April 1850",
+    "birth_place": "Norland, Yorkshire, England",
+    "death_date": "5 November 1929",
+    "death_place": "Halifax, Metropolitan Borough of Calderdale, West Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F158@",
+    "fams": [
+      "@F107@"
+    ],
+    "confidence": "A",
+    "score": 12,
+    "warnings": [],
+    "alerts": [],
+    "generation": 4
+  },
+  {
+    "id": "@I1825902601@",
+    "name": "Dennis Sutcliffe",
+    "sex": "M",
+    "birth_year": 1909,
+    "birth_date": "7 Oct 1909",
+    "birth_place": "Gildersome, North Bierley, Yorkshire West Riding",
+    "death_date": "Aug 2003",
+    "death_place": "Leeds, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F36@",
+    "fams": [
+      "@F95@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [],
+    "generation": 2
+  },
+  {
+    "id": "@I292519753206@",
+    "name": "John Widdop",
+    "sex": "M",
+    "birth_year": 1647,
+    "birth_date": "01 Aug 1647",
+    "birth_place": "Keighley, Yorkshire, , England",
+    "death_date": "17 Jan 1684",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F182@"
+    ],
+    "confidence": "C",
+    "score": 7,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [
+      "EARLY-ERA: Birth 1647. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 11
+  },
+  {
+    "id": "@I292123924781@",
+    "name": "Luke Cooper",
+    "sex": "M",
+    "birth_year": 1830,
+    "birth_date": "13 Mar 1830",
+    "birth_place": "Birstal, Yorkshire, England",
+    "death_date": "7 Mar 1890",
+    "death_place": "Drighlington, Metropolitan Borough of Leeds, West Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F233@",
+    "fams": [
+      "@F219@",
+      "@F228@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1830. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 4
+  },
+  {
+    "id": "@I1825902668@",
+    "name": "Amy Farrar",
+    "sex": "F",
+    "birth_year": 1866,
+    "birth_date": "9 Oct 1866",
+    "birth_place": "Kippax, Yorkshire, England",
+    "death_date": "16 Feb 1940",
+    "death_place": "Leeds, West Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F50@",
+    "fams": [
+      "@F41@",
+      "@F51@",
+      "@F303@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [],
+    "generation": 4
+  },
+  {
+    "id": "@I292512775528@",
+    "name": "Mary Morris",
+    "sex": "F",
+    "birth_year": 1729,
+    "birth_date": "20 Apr 1729",
+    "birth_place": "Heyhouses Pendleton, Lancashire, England",
+    "death_date": "18 March 1786",
+    "death_place": "Whalley, Lancashire, England",
+    "baptism_date": "20 Apr 1729",
+    "baptism_place": "Whalley,Lancashire,England",
+    "famc": "@F255@",
+    "fams": [
+      "@F144@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1729. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 8
+  },
+  {
+    "id": "@I292519741489@",
+    "name": "Timothy Bentley 4th x ggf Pauline",
+    "sex": "M",
+    "birth_year": 1768,
+    "birth_date": "6 April 1768",
+    "birth_place": "Southowram Halifax Yorkshire, England",
+    "death_date": "31 Mar 1830",
+    "death_place": "Lockwood, Huddersfield, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F226@",
+    "fams": [
+      "@F273@"
+    ],
+    "confidence": "C",
+    "score": 8,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1768. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 6
+  },
+  {
+    "id": "@I1826683211@",
+    "name": "Sarah Smith",
+    "sex": "F",
+    "birth_year": 1813,
+    "birth_date": "abt 1813",
+    "birth_place": "Kippax, Yorkshire, England",
+    "death_date": "1 May 1852",
+    "death_place": "Halifax, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F170@"
+    ],
+    "confidence": "A",
+    "score": 12,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1813. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 6
+  },
+  {
+    "id": "@I292513289356@",
+    "name": "Sara Cockcroft",
+    "sex": "F",
+    "birth_year": 1611,
+    "birth_date": "22 December 1611",
+    "birth_place": "Heptonstall, Yorkshire, England",
+    "death_date": "Mar 1662",
+    "death_place": "Heptonstall, Yorkshire, England",
+    "baptism_date": "22 Dec 1611",
+    "baptism_place": "Heptonstall,York,England",
+    "famc": "@F174@",
+    "fams": [
+      "@F282@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [
+      "EARLY-ERA: Birth 1611. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 11
+  },
+  {
+    "id": "@I292708269089@",
+    "name": "Cicely Widdop",
+    "sex": "F",
+    "birth_year": 1595,
+    "birth_date": "1595",
+    "birth_place": "Heptonstall, Yorkshire, England",
+    "death_date": "Jan 1662",
+    "death_place": "Heptonstall, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F221@",
+    "fams": [
+      "@F231@"
+    ],
+    "confidence": "B",
+    "score": 11,
+    "warnings": [],
+    "alerts": [
+      "EARLY-ERA: Birth 1595. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 12
+  },
+  {
+    "id": "@I1826371172@",
+    "name": "Nathaniel Crawshaw",
+    "sex": "M",
+    "birth_year": 1821,
+    "birth_date": "1821",
+    "birth_place": "Dewsbury, Yorkshire, England",
+    "death_date": "1860",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F176@",
+    "fams": [
+      "@F37@"
+    ],
+    "confidence": "B",
+    "score": 10,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1821. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 5
+  },
+  {
+    "id": "@I1825902633@",
+    "name": "Herbert Matthews",
+    "sex": "M",
+    "birth_year": 1904,
+    "birth_date": "4 Feb 1904",
+    "birth_place": "Leeds, Yorkshire, England",
+    "death_date": "22 February 1974",
+    "death_place": "Leeds, Yorkshire West Riding, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F46@",
+    "fams": [
+      "@F119@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [],
+    "generation": 3
+  },
+  {
+    "id": "@I1863113460@",
+    "name": "Betty Greenwood",
+    "sex": "F",
+    "birth_year": 1813,
+    "birth_date": "Abt. 1813",
+    "birth_place": "Halifax, Yorkshire, England",
+    "death_date": "4 May 1893",
+    "death_place": "Eagle Street, Stansfield, Todmorden, Yorkshire",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F273@",
+    "fams": [
+      "@F190@"
+    ],
+    "confidence": "B",
+    "score": 10,
+    "warnings": [
+      "Birth date is estimated"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1813. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 5
+  },
+  {
+    "id": "@I1825902693@",
+    "name": "Peter Matthews",
+    "sex": "M",
+    "birth_year": 1851,
+    "birth_date": "abt 1851",
+    "birth_place": "Leeds",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F63@",
+    "fams": [
+      "@F61@"
+    ],
+    "confidence": "D",
+    "score": 4,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [],
+    "generation": 5
+  },
+  {
+    "id": "@I1825902600@",
+    "name": "Iris Binns",
+    "sex": "F",
+    "birth_year": 1933,
+    "birth_date": "10 Apr 1933",
+    "birth_place": "Leeds North, Yorkshire West Riding",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F101@",
+    "fams": [
+      "@F87@"
+    ],
+    "confidence": "A",
+    "score": 10,
+    "warnings": [],
+    "alerts": [],
+    "generation": 2
+  },
+  {
+    "id": "@I292519753383@",
+    "name": "Mary Smith 6th x ggm Pauline",
+    "sex": "F",
+    "birth_year": 1714,
+    "birth_date": "1714",
+    "birth_place": "Shelf.Halifax.Yorkshire",
+    "death_date": "1750",
+    "death_place": "Coley.near Halifax.Yorkshire",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F147@"
+    ],
+    "confidence": "C",
+    "score": 6,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1714. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 8
+  },
+  {
+    "id": "@I292519752991@",
+    "name": "Joseph Bentley 5th x ggf Pauline",
+    "sex": "M",
+    "birth_year": 1739,
+    "birth_date": "21 May 1739",
+    "birth_place": "Northowram & Coley St John Halifax",
+    "death_date": "26 March 1804",
+    "death_place": "Hazelhurst, Northowram, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F147@",
+    "fams": [
+      "@F226@"
+    ],
+    "confidence": "C",
+    "score": 8,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1739. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 7
+  },
+  {
+    "id": "@I292515657561@",
+    "name": "Elizabeth Cockcroft",
+    "sex": "F",
+    "birth_year": 1705,
+    "birth_date": "1705",
+    "birth_place": "Heptonstall, West Yorkshire, England",
+    "death_date": "9 Apr 1781",
+    "death_place": "Heptonstall, West Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F26@"
+    ],
+    "confidence": "D",
+    "score": 7,
+    "warnings": [
+      "Sources are family tree entries only"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1705. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 8
+  },
+  {
+    "id": "@I292511586164@",
+    "name": "Ann Halstead",
+    "sex": "F",
+    "birth_year": 1755,
+    "birth_date": "1755",
+    "birth_place": "Heptonstall, Yorkshire, England, United Kingdom",
+    "death_date": "14 Feb 1814",
+    "death_place": "London, England",
+    "baptism_date": "18 Nov 1759",
+    "baptism_place": "St Andrew of Gargrave, Gargrave, Yorkshire, England",
+    "famc": "@F49@",
+    "fams": [
+      "@F14@",
+      "@F294@"
+    ],
+    "confidence": "B",
+    "score": 11,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1755. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 7
+  },
+  {
+    "id": "@I292511572528@",
+    "name": "Annie White",
+    "sex": "F",
+    "birth_year": 1875,
+    "birth_date": "27 Apr 1875",
+    "birth_place": "Leeds, Yorkshire, England",
+    "death_date": "22 December 1952",
+    "death_place": "Wharfedale, Yorkshire West Riding, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F140@",
+    "fams": [
+      "@F152@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [],
+    "generation": 4
+  },
+  {
+    "id": "@I1826683209@",
+    "name": "Thomas Farrer",
+    "sex": "M",
+    "birth_year": 1812,
+    "birth_date": "abt 1812",
+    "birth_place": "Kippax, Yorkshire, England",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F170@"
+    ],
+    "confidence": "A",
+    "score": 9,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1812. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 6
+  },
+  {
+    "id": "@I292519753182@",
+    "name": "Mary Jackson",
+    "sex": "F",
+    "birth_year": 1620,
+    "birth_date": "1620",
+    "birth_place": "Horton-in-Ribblesdale, Yorkshire.",
+    "death_date": "Aft. 1669",
+    "death_place": "Wadsworth Yorkshire, England uk",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F192@"
+    ],
+    "confidence": "C",
+    "score": 6,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [
+      "EARLY-ERA: Birth 1620. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 11
+  },
+  {
+    "id": "@I1825902594@",
+    "name": "Michelle Carla Major",
+    "sex": "F",
+    "birth_year": 1974,
+    "birth_date": "16/9/1974",
+    "birth_place": "Leeds",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F69@",
+    "fams": [
+      "@F92@"
+    ],
+    "confidence": "B",
+    "score": 8,
+    "warnings": [],
+    "alerts": [],
+    "generation": null
+  },
+  {
+    "id": "@I292513273229@",
+    "name": "Martha Widdope",
+    "sex": "F",
+    "birth_year": 1656,
+    "birth_date": "1656",
+    "birth_place": "Heptonstall, Yorkshire, England, United Kingdom",
+    "death_date": "1 Nov 1740",
+    "death_place": "Heptonstall, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F182@",
+    "fams": [
+      "@F243@"
+    ],
+    "confidence": "D",
+    "score": 7,
+    "warnings": [
+      "Sources are family tree entries only"
+    ],
+    "alerts": [
+      "EARLY-ERA: Birth 1656. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 10
+  },
+  {
+    "id": "@I292513289710@",
+    "name": "Elizabeth Reyner",
+    "sex": "F",
+    "birth_year": 1580,
+    "birth_date": "1580",
+    "birth_place": "Halifax, Yorkshire, England",
+    "death_date": "1650",
+    "death_place": "Halifax, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F221@"
+    ],
+    "confidence": "B",
+    "score": 11,
+    "warnings": [],
+    "alerts": [
+      "EARLY-ERA: Birth 1580. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 13
+  },
+  {
+    "id": "@I292511585493@",
+    "name": "Joseph Sutcliffe",
+    "sex": "M",
+    "birth_year": 1774,
+    "birth_date": "Sep 1774",
+    "birth_place": "Heptonstall, Yorkshire, England",
+    "death_date": "22 Apr 1856",
+    "death_place": "Halifax, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F14@",
+    "fams": [
+      "@F275@",
+      "@F222@"
+    ],
+    "confidence": "A",
+    "score": 12,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1774. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 6
+  },
+  {
+    "id": "@I1825902651@",
+    "name": "Emily Jackson",
+    "sex": "F",
+    "birth_year": 1876,
+    "birth_date": "Abt. 1876",
+    "birth_place": "Bradford",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F108@"
+    ],
+    "confidence": "B",
+    "score": 7,
+    "warnings": [
+      "Birth date is estimated"
+    ],
+    "alerts": [],
+    "generation": 4
+  },
+  {
+    "id": "@I1825902700@",
+    "name": "Ann Wainwright",
+    "sex": "F",
+    "birth_year": 1766,
+    "birth_date": "ABT 1766",
+    "birth_place": "Hillam, Monk Frystone",
+    "death_date": "1/1/1833",
+    "death_place": "Monk Frystone",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F66@",
+    "fams": [
+      "@F67@"
+    ],
+    "confidence": "D",
+    "score": 8,
+    "warnings": [
+      "Sources are family tree entries only"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1766. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 6
+  },
+  {
+    "id": "@I292513279290@",
+    "name": "Joseph Sutcliffe",
+    "sex": "M",
+    "birth_year": 1635,
+    "birth_date": "28 Feb 1635",
+    "birth_place": "Heptonstall, Yorkshire, England",
+    "death_date": "Jan 1718",
+    "death_place": "Heptonstall Yorkshire, England",
+    "baptism_date": "28 Feb 1636",
+    "baptism_place": "Heptonstall,York,England",
+    "famc": "@F282@",
+    "fams": [
+      "@F208@",
+      "@F209@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [
+      "EARLY-ERA: Birth 1635. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 10
+  },
+  {
+    "id": "@I292515660806@",
+    "name": "John Morris",
+    "sex": "M",
+    "birth_year": 1691,
+    "birth_date": "19 March 1691",
+    "birth_place": "Whalley, Lancashire, England, United Kingdom",
+    "death_date": "1 July 1763",
+    "death_place": "Clitheroe, Lancashire, England, United Kingdom",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F255@"
+    ],
+    "confidence": "B",
+    "score": 11,
+    "warnings": [],
+    "alerts": [
+      "EARLY-ERA: Birth 1691. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 9
+  },
+  {
+    "id": "@I292516915681@",
+    "name": "Lydia Gillon",
+    "sex": "F",
+    "birth_year": null,
+    "birth_date": "",
+    "birth_place": "",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F134@"
+    ],
+    "confidence": "C",
+    "score": 3,
+    "warnings": [
+      "No birth date recorded"
+    ],
+    "alerts": [],
+    "generation": 5
+  },
+  {
+    "id": "@I292513289910@",
+    "name": "Robert Sutcliffe",
+    "sex": "M",
+    "birth_year": 1558,
+    "birth_date": "1558",
+    "birth_place": "Accrington, Lancashire",
+    "death_date": "9 Jun 1627",
+    "death_place": "Accrington, Lancashire",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F17@",
+    "fams": [
+      "@F178@"
+    ],
+    "confidence": "B",
+    "score": 11,
+    "warnings": [],
+    "alerts": [
+      "EARLY-ERA: Birth 1558. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 13
+  },
+  {
+    "id": "@I292513303399@",
+    "name": "Thomas Henry Sutcliffe",
+    "sex": "M",
+    "birth_year": 1500,
+    "birth_date": "1500",
+    "birth_place": "Lancashire, England",
+    "death_date": "1578",
+    "death_place": "Lancashire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F261@",
+    "fams": [
+      "@F1@"
+    ],
+    "confidence": "D",
+    "score": 9,
+    "warnings": [],
+    "alerts": [
+      "PRE-PARISH: Birth 1500 pre-dates English parish registers (1538). No documentary evidence possible."
+    ],
+    "generation": 16
+  },
+  {
+    "id": "@I292513303616@",
+    "name": "Elizabeth Senior",
+    "sex": "F",
+    "birth_year": null,
+    "birth_date": "1470",
+    "birth_place": "Yorkshire, England",
+    "death_date": "Abt. 1529",
+    "death_place": "Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F261@"
+    ],
+    "confidence": "D",
+    "score": 7,
+    "warnings": [
+      "Sources are family tree entries only"
+    ],
+    "alerts": [
+      "PRE-PARISH: Birth 1470 pre-dates English parish registers (1538). No documentary evidence possible."
+    ],
+    "generation": 17
+  },
+  {
+    "id": "@I292519759126@",
+    "name": "William Cockcroft",
+    "sex": "M",
+    "birth_year": null,
+    "birth_date": "",
+    "birth_place": "",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F317@"
+    ],
+    "confidence": "C",
+    "score": 3,
+    "warnings": [
+      "No birth date recorded"
+    ],
+    "alerts": [],
+    "generation": 11
+  },
+  {
+    "id": "@I292513303047@",
+    "name": "Robert Sutcliffe",
+    "sex": "M",
+    "birth_year": 1517,
+    "birth_date": "1517",
+    "birth_place": "Northowram, Halifax, Yorkshire, West Yorkshire, England, United Kingdom",
+    "death_date": "1587",
+    "death_place": "Leeds, St Peter, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F1@",
+    "fams": [
+      "@F6@"
+    ],
+    "confidence": "D",
+    "score": 11,
+    "warnings": [],
+    "alerts": [
+      "PRE-PARISH: Birth 1517 pre-dates English parish registers (1538). No documentary evidence possible."
+    ],
+    "generation": 15
+  },
+  {
+    "id": "@I292511586163@",
+    "name": "John Sutcliffe",
+    "sex": "M",
+    "birth_year": 1754,
+    "birth_date": "13 Jan 1754",
+    "birth_place": "Midgley, Yorkshire, England, United Kingdom",
+    "death_date": "5 Jun 1821",
+    "death_place": "Pendleton, Lancashire, England, United Kingdom",
+    "baptism_date": "27 Dec 1786",
+    "baptism_place": "Thrapston, Northamptonshire, England",
+    "famc": "@F144@",
+    "fams": [
+      "@F14@",
+      "@F15@",
+      "@F16@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1754. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 7
+  },
+  {
+    "id": "@I1825902697@",
+    "name": "Peter Robinson",
+    "sex": "M",
+    "birth_year": 1798,
+    "birth_date": "abt 1798",
+    "birth_place": "Abberford, Yorkshire, England",
+    "death_date": "Dec 1872",
+    "death_place": "Pontefract",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F68@"
+    ],
+    "confidence": "A",
+    "score": 12,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1798. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 5
+  },
+  {
+    "id": "@I292511586637@",
+    "name": "Joseph White",
+    "sex": "M",
+    "birth_year": 1833,
+    "birth_date": "23 Jul 1833",
+    "birth_place": "Leeds, Yorkshire, England",
+    "death_date": "1905",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F280@",
+    "fams": [
+      "@F140@"
+    ],
+    "confidence": "D",
+    "score": 8,
+    "warnings": [
+      "Sources are family tree entries only"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1833. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 5
+  },
+  {
+    "id": "@I1825902647@",
+    "name": "Thomas Binns",
+    "sex": "M",
+    "birth_year": 1899,
+    "birth_date": "31 Oct 1899",
+    "birth_place": "Leeds, Yorkshire, England",
+    "death_date": "1 Oct 1977",
+    "death_place": "Leeds, Yorkshire West Riding, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F107@",
+    "fams": [
+      "@F101@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [],
+    "generation": 3
+  },
+  {
+    "id": "@I292515657560@",
+    "name": "Joseph Robert Stansfield",
+    "sex": "M",
+    "birth_year": 1704,
+    "birth_date": "March 1704",
+    "birth_place": "Heptonstall, West Yorkshire, England",
+    "death_date": "1769",
+    "death_place": "Heptonstall, West Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F26@"
+    ],
+    "confidence": "D",
+    "score": 8,
+    "warnings": [
+      "Sources are family tree entries only"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1704. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 8
+  },
+  {
+    "id": "@I292709159763@",
+    "name": "William Balmforth",
+    "sex": "M",
+    "birth_year": null,
+    "birth_date": "",
+    "birth_place": "",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F311@"
+    ],
+    "confidence": "C",
+    "score": 3,
+    "warnings": [
+      "No birth date recorded"
+    ],
+    "alerts": [],
+    "generation": 7
+  },
+  {
+    "id": "@I292515693464@",
+    "name": "John Halstead",
+    "sex": "M",
+    "birth_year": 1734,
+    "birth_date": "Abt. 1734",
+    "birth_place": "Halton West, Gargrave, Yorkshire, England",
+    "death_date": "Abt. 1802",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F49@"
+    ],
+    "confidence": "B",
+    "score": 9,
+    "warnings": [
+      "Birth date is estimated"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1734. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 8
+  },
+  {
+    "id": "@I292511631884@",
+    "name": "Isaac Sutcliffe",
+    "sex": "M",
+    "birth_year": 1725,
+    "birth_date": "1725",
+    "birth_place": "Padiham Whalley, Lancashire, England",
+    "death_date": "18 Mar 1786",
+    "death_place": "Pendleton, Ribble Valley Borough, Lancashire, England, United Kingdom",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F216@",
+    "fams": [
+      "@F144@",
+      "@F291@"
+    ],
+    "confidence": "B",
+    "score": 11,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1725. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 8
+  },
+  {
+    "id": "@I1825902703@",
+    "name": "Jeremiah Wainwright",
+    "sex": "M",
+    "birth_year": null,
+    "birth_date": "",
+    "birth_place": "",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F58@"
+    ],
+    "confidence": "D",
+    "score": 1,
+    "warnings": [
+      "No birth date recorded",
+      "Sources are family tree entries only"
+    ],
+    "alerts": [],
+    "generation": 8
+  },
+  {
+    "id": "@I1825902597@",
+    "name": "David Sutcliffe",
+    "sex": "M",
+    "birth_year": 1949,
+    "birth_date": "14 Mar 1949",
+    "birth_place": "Leeds, West Yorkshire",
+    "death_date": "1 Jun 2023",
+    "death_place": "3 Church Garth, Pool in Wharfedale, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F95@",
+    "fams": [
+      "@F85@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [],
+    "generation": 1
+  },
+  {
+    "id": "@I292519741530@",
+    "name": "Richard Buttery",
+    "sex": "M",
+    "birth_year": 1779,
+    "birth_date": "21 Oct 1779",
+    "birth_place": "Gildersome, West Yorkshire, England",
+    "death_date": "Jul 1854",
+    "death_place": "Gildersome",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F274@"
+    ],
+    "confidence": "C",
+    "score": 8,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1779. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 6
+  },
+  {
+    "id": "@I1863113457@",
+    "name": "John Sutcliffe",
+    "sex": "M",
+    "birth_year": 1796,
+    "birth_date": "Abt. 1796",
+    "birth_place": "Heptonstall, Yorkshire",
+    "death_date": "22 Oct 1882",
+    "death_place": "Eagle Street, Stansfield, Todmorden, Yorkshire",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F275@",
+    "fams": [
+      "@F190@",
+      "@F307@"
+    ],
+    "confidence": "B",
+    "score": 10,
+    "warnings": [
+      "Birth date is estimated"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1796. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 5
+  },
+  {
+    "id": "@I1825902637@",
+    "name": "Eliza Robinson",
+    "sex": "F",
+    "birth_year": 1846,
+    "birth_date": "abt 1846",
+    "birth_place": "Monk Fryston, Yorkshire, England",
+    "death_date": "21 Nov 1926",
+    "death_place": "Tadcaster, Yorkshire West Riding, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F68@",
+    "fams": [
+      "@F116@"
+    ],
+    "confidence": "A",
+    "score": 12,
+    "warnings": [],
+    "alerts": [],
+    "generation": 4
+  },
+  {
+    "id": "@I292123924788@",
+    "name": "Eliza Oldroyd",
+    "sex": "F",
+    "birth_year": 1831,
+    "birth_date": "21 Jan 1831",
+    "birth_place": "Drighlington, St Paul, West Yorkshire, England",
+    "death_date": "4 Dec 1866",
+    "death_place": "Drighlington  Yorkshire",
+    "baptism_date": "29 May 1831",
+    "baptism_place": "Birstall, St Peter, Yorkshire, England",
+    "famc": "@F171@",
+    "fams": [
+      "@F219@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1831. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": null
+  },
+  {
+    "id": "@I292513303409@",
+    "name": "Elizabeth Heliwell",
+    "sex": "F",
+    "birth_year": 1520,
+    "birth_date": "1520",
+    "birth_place": "Yorkshire, England",
+    "death_date": "unknown",
+    "death_place": "Yorkshire",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F6@"
+    ],
+    "confidence": "D",
+    "score": 11,
+    "warnings": [],
+    "alerts": [
+      "PRE-PARISH: Birth 1520 pre-dates English parish registers (1538). No documentary evidence possible."
+    ],
+    "generation": 15
+  },
+  {
+    "id": "@I1825902670@",
+    "name": "Mary Norling",
+    "sex": "F",
+    "birth_year": 1841,
+    "birth_date": "abt 1841",
+    "birth_place": "Kippax",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F50@"
+    ],
+    "confidence": "A",
+    "score": 9,
+    "warnings": [],
+    "alerts": [],
+    "generation": 5
+  },
+  {
+    "id": "@I292513273228@",
+    "name": "Simeon Redman",
+    "sex": "M",
+    "birth_year": 1664,
+    "birth_date": "25/09/1664",
+    "birth_place": "Heptonstall, St Thomas, Yorkshire, England",
+    "death_date": "5/06/1749",
+    "death_place": "Wadsworth Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F192@",
+    "fams": [
+      "@F243@"
+    ],
+    "confidence": "B",
+    "score": 11,
+    "warnings": [],
+    "alerts": [
+      "EARLY-ERA: Birth 1664. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 10
+  },
+  {
+    "id": "@I292513289360@",
+    "name": "Mary Cockcroft",
+    "sex": "F",
+    "birth_year": 1678,
+    "birth_date": "11 Nov 1678",
+    "birth_place": "",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F209@"
+    ],
+    "confidence": "D",
+    "score": 5,
+    "warnings": [
+      "Sources are family tree entries only"
+    ],
+    "alerts": [
+      "EARLY-ERA: Birth 1678. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": null
+  },
+  {
+    "id": "@I1825902677@",
+    "name": "Albert Sutcliffe",
+    "sex": "M",
+    "birth_year": 1875,
+    "birth_date": "22 Apr 1875",
+    "birth_place": "Cockersdale, York, England",
+    "death_date": "2 Jan 1957",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F40@",
+    "fams": [
+      "@F36@"
+    ],
+    "confidence": "A",
+    "score": 12,
+    "warnings": [],
+    "alerts": [],
+    "generation": 3
+  },
+  {
+    "id": "@I1825902669@",
+    "name": "William Farrar",
+    "sex": "M",
+    "birth_year": 1836,
+    "birth_date": "abt 1836",
+    "birth_place": "Kippax, Yorkshire, England",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F170@",
+    "fams": [
+      "@F50@"
+    ],
+    "confidence": "A",
+    "score": 9,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1836. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 5
+  },
+  {
+    "id": "@I292515656077@",
+    "name": "John Stansfield",
+    "sex": "M",
+    "birth_year": 1744,
+    "birth_date": "1744",
+    "birth_place": "Heptonstall Yorkshire",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "24 Feb 1744",
+    "baptism_place": "Heptonstall,York,England",
+    "famc": "@F26@",
+    "fams": [
+      "@F218@"
+    ],
+    "confidence": "B",
+    "score": 8,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1744. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 7
+  },
+  {
+    "id": "@I1825902683@",
+    "name": "Hetty Broadbent",
+    "sex": "F",
+    "birth_year": 1879,
+    "birth_date": "1 Sep 1879",
+    "birth_place": "Leeds, Yorkshire, England",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F46@"
+    ],
+    "confidence": "A",
+    "score": 8,
+    "warnings": [],
+    "alerts": [],
+    "generation": 4
+  },
+  {
+    "id": "@I1825902702@",
+    "name": "Mary Beardshaw",
+    "sex": "F",
+    "birth_year": 1743,
+    "birth_date": "ABT 1743",
+    "birth_place": "Monk Frystone",
+    "death_date": "07 JAN 1808",
+    "death_place": "Hillam, Monk Frystone",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F66@"
+    ],
+    "confidence": "D",
+    "score": 8,
+    "warnings": [
+      "Sources are family tree entries only"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1743. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 7
+  },
+  {
+    "id": "@I1826118939@",
+    "name": "Elizabeth Catherine Crooker Whitley",
+    "sex": "F",
+    "birth_year": 1844,
+    "birth_date": "21 Jan 1844",
+    "birth_place": "Boston Spa, Yorkshire, England",
+    "death_date": "11 July 1924",
+    "death_place": "Leeds, Yorkshire West Riding, England",
+    "baptism_date": "3 Mar 1844",
+    "baptism_place": "Holbeck, St Matthew and New Wortley, St John the Baptist, Yorkshire, England",
+    "famc": "@F246@",
+    "fams": [
+      "@F40@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [],
+    "generation": 4
+  },
+  {
+    "id": "@I292512738635@",
+    "name": "John Cooper",
+    "sex": "M",
+    "birth_year": 1759,
+    "birth_date": "Abt. 1759",
+    "birth_place": "Guiseley, Leeds, West Yorkshire West Riding, England, UK",
+    "death_date": "Jan 1829",
+    "death_place": "Guiseley, Leeds, West Yorkshire West Riding, England, UK",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F193@"
+    ],
+    "confidence": "B",
+    "score": 10,
+    "warnings": [
+      "Birth date is estimated"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1759. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 6
+  },
+  {
+    "id": "@I292525419602@",
+    "name": "Elizabeth Smales",
+    "sex": "F",
+    "birth_year": 1803,
+    "birth_date": "Jun 1803",
+    "birth_place": "Kippax, Yorkshire, England",
+    "death_date": "Sep 1871",
+    "death_place": "Tadcaster, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F260@",
+    "fams": [
+      "@F175@"
+    ],
+    "confidence": "C",
+    "score": 7,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1803. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 6
+  },
+  {
+    "id": "@I292708275585@",
+    "name": "Sarah Balmforth",
+    "sex": "F",
+    "birth_year": 1776,
+    "birth_date": "abt 1776",
+    "birth_place": "Yorkshire, England",
+    "death_date": "8 May 1829",
+    "death_place": "Stones, Yorkshire, England",
+    "baptism_date": "19 Oct 1766",
+    "baptism_place": "Lightcliffe,York,England",
+    "famc": "@F311@",
+    "fams": [
+      "@F176@"
+    ],
+    "confidence": "A",
+    "score": 12,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1776. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 6
+  },
+  {
+    "id": "@I292515636498@",
+    "name": "Betty Worsick",
+    "sex": "F",
+    "birth_year": null,
+    "birth_date": "",
+    "birth_place": "",
+    "death_date": "abt 1812",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F16@"
+    ],
+    "confidence": "D",
+    "score": 3,
+    "warnings": [
+      "No birth date recorded",
+      "Sources are family tree entries only"
+    ],
+    "alerts": [],
+    "generation": null
+  },
+  {
+    "id": "@I1825902678@",
+    "name": "John Sutcliffe",
+    "sex": "M",
+    "birth_year": 1840,
+    "birth_date": "Jan 1840",
+    "birth_place": "Ovenden; Halifax, Yorkshire, England",
+    "death_date": "23 Feb 1923",
+    "death_place": "Beeston, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F190@",
+    "fams": [
+      "@F40@"
+    ],
+    "confidence": "A",
+    "score": 12,
+    "warnings": [],
+    "alerts": [],
+    "generation": 4
+  },
+  {
+    "id": "@I1826419887@",
+    "name": "Mary Jackson",
+    "sex": "F",
+    "birth_year": 1829,
+    "birth_date": "abt 1829",
+    "birth_place": "Swinefleet, Yorkshire, England",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F32@"
+    ],
+    "confidence": "A",
+    "score": 9,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1829. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 5
+  },
+  {
+    "id": "@I1825902672@",
+    "name": "Philip Crawshaw",
+    "sex": "M",
+    "birth_year": 1859,
+    "birth_date": "abt 1859",
+    "birth_place": "Kippax, Yorkshire, England",
+    "death_date": "14 May 1891",
+    "death_place": "Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F37@",
+    "fams": [
+      "@F41@"
+    ],
+    "confidence": "A",
+    "score": 12,
+    "warnings": [],
+    "alerts": [],
+    "generation": 4
+  },
+  {
+    "id": "@I292515636298@",
+    "name": "Lydia Shaw",
+    "sex": "F",
+    "birth_year": 1759,
+    "birth_date": "1759",
+    "birth_place": "Ovenden, Yorkshire, England",
+    "death_date": "October 1840",
+    "death_place": "Ovenden",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F146@",
+    "fams": [
+      "@F15@"
+    ],
+    "confidence": "B",
+    "score": 11,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1759. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": null
+  },
+  {
+    "id": "@I292519753346@",
+    "name": "Michael Bentley 6th x ggf Pauline",
+    "sex": "M",
+    "birth_year": 1710,
+    "birth_date": "1710",
+    "birth_place": "Coley, Halifax.Yorkshire",
+    "death_date": "7th July 1754",
+    "death_place": "R astrick Halifax Yorkshire",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F147@"
+    ],
+    "confidence": "C",
+    "score": 6,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1710. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 8
+  },
+  {
+    "id": "@I1825902630@",
+    "name": "Hannah Crawshaw",
+    "sex": "F",
+    "birth_year": 1890,
+    "birth_date": "24 Sep 1890",
+    "birth_place": "Kippax, Yorkshire, England",
+    "death_date": "Jan-Feb-Mar 1969",
+    "death_place": "Leeds, Yorkshire West Riding, England",
+    "baptism_date": "30 Sep 1890",
+    "baptism_place": "Kippax, St Mary, Yorkshire, England",
+    "famc": "@F41@",
+    "fams": [
+      "@F110@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [],
+    "generation": 3
+  },
+  {
+    "id": "@I292516893809@",
+    "name": "Elizabeth Ann Evans",
+    "sex": "F",
+    "birth_year": 1838,
+    "birth_date": "13 Nov 1838",
+    "birth_place": "Cardiff, Glamorgan, Wales",
+    "death_date": "24 Mar 1882",
+    "death_place": "Drighlington, Bradford, Yorkshire West Riding",
+    "baptism_date": "25 Nov 1838",
+    "baptism_place": "Norfolk Row Chapel (Roman Catholic), Sheffield, Yorkshire, England",
+    "famc": "@F134@",
+    "fams": [
+      "@F163@",
+      "@F228@",
+      "@F22@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [],
+    "generation": 4
+  },
+  {
+    "id": "@I292519741509@",
+    "name": "Betty Green",
+    "sex": "F",
+    "birth_year": 1780,
+    "birth_date": "1780",
+    "birth_place": "Northamptonshire, England",
+    "death_date": "Mar 1863",
+    "death_place": "Lockwood, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F273@"
+    ],
+    "confidence": "C",
+    "score": 6,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1780. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 6
+  },
+  {
+    "id": "@I292519759480@",
+    "name": "Thomas Cockroft",
+    "sex": "M",
+    "birth_year": 1586,
+    "birth_date": "1586",
+    "birth_place": "Yorkshire",
+    "death_date": "1654",
+    "death_place": "Heponstall, York, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F174@"
+    ],
+    "confidence": "B",
+    "score": 9,
+    "warnings": [],
+    "alerts": [
+      "EARLY-ERA: Birth 1586. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 12
+  },
+  {
+    "id": "@I1825902695@",
+    "name": "Peter Matthews",
+    "sex": "M",
+    "birth_year": 1797,
+    "birth_date": "abt 1797",
+    "birth_place": "Ireland",
+    "death_date": "abt 1861",
+    "death_place": "Leeds",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F63@"
+    ],
+    "confidence": "C",
+    "score": 7,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1797. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 6
+  },
+  {
+    "id": "@I1825902635@",
+    "name": "Alice Maud Jackson",
+    "sex": "F",
+    "birth_year": 1900,
+    "birth_date": "2 Oct 1900",
+    "birth_place": "Normanton, Wakefield",
+    "death_date": "Mar 1980",
+    "death_place": "Horbury",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F108@",
+    "fams": [
+      "@F101@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [],
+    "generation": 3
+  },
+  {
+    "id": "@I1825902696@",
+    "name": "Jane Harris",
+    "sex": "F",
+    "birth_year": 1815,
+    "birth_date": "abt 1815",
+    "birth_place": "Dublin",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F63@"
+    ],
+    "confidence": "D",
+    "score": 4,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1815. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 6
+  },
+  {
+    "id": "@I292516915024@",
+    "name": "Holdroyd",
+    "sex": "M",
+    "birth_year": null,
+    "birth_date": "",
+    "birth_place": "",
+    "death_date": "",
+    "death_place": "",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F22@"
+    ],
+    "confidence": "D",
+    "score": 0,
+    "warnings": [
+      "No birth date recorded",
+      "No source evidence attached"
+    ],
+    "alerts": [],
+    "generation": null
+  },
+  {
+    "id": "@I292513289707@",
+    "name": "John Widdop",
+    "sex": "M",
+    "birth_year": 1575,
+    "birth_date": "1575",
+    "birth_place": "Halifax, York",
+    "death_date": "abt 1647",
+    "death_place": "Halifax, York",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F257@",
+    "fams": [
+      "@F221@"
+    ],
+    "confidence": "B",
+    "score": 11,
+    "warnings": [],
+    "alerts": [
+      "EARLY-ERA: Birth 1575. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 13
+  },
+  {
+    "id": "@I1825902636@",
+    "name": "Joseph Cockerham",
+    "sex": "M",
+    "birth_year": 1843,
+    "birth_date": "abt 1843",
+    "birth_place": "Sherburn in Elmet, Yorkshire, England",
+    "death_date": "16 Jan 1904",
+    "death_place": "Yorkshire West Riding, United Kingdom",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F262@",
+    "fams": [
+      "@F116@"
+    ],
+    "confidence": "A",
+    "score": 12,
+    "warnings": [],
+    "alerts": [],
+    "generation": 4
+  },
+  {
+    "id": "@I292513273061@",
+    "name": "Joseph Sutcliffe",
+    "sex": "M",
+    "birth_year": 1661,
+    "birth_date": "18 Jan 1661",
+    "birth_place": "Heptonstall, St Thomas, Yorkshire, England",
+    "death_date": "7 Feb 1751",
+    "death_place": "Heptonstall Yorkshire, England",
+    "baptism_date": "13 Mar 1881",
+    "baptism_place": "Charlestown (Halifax), St Thomas, Yorkshire, England",
+    "famc": "@F208@",
+    "fams": [
+      "@F196@",
+      "@F216@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [
+      "EARLY-ERA: Birth 1661. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 9
+  },
+  {
+    "id": "@I1825902634@",
+    "name": "Emily Barnes",
+    "sex": "F",
+    "birth_year": 1906,
+    "birth_date": "3 Mar 1906",
+    "birth_place": "Leeds, Yorkshire, England",
+    "death_date": "9 January 1985",
+    "death_place": "Leeds, West Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F152@",
+    "fams": [
+      "@F119@"
+    ],
+    "confidence": "A",
+    "score": 13,
+    "warnings": [],
+    "alerts": [],
+    "generation": 3
+  },
+  {
+    "id": "@I292515660807@",
+    "name": "Jennet Fearnside",
+    "sex": "F",
+    "birth_year": 1700,
+    "birth_date": "Abt. 1700",
+    "birth_place": "Clitheroe, Lancashire, England, United Kingdom",
+    "death_date": "5 Dec 1761",
+    "death_place": "anglezarke, Lancashire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F255@"
+    ],
+    "confidence": "D",
+    "score": 6,
+    "warnings": [
+      "Birth date is estimated",
+      "Sources are family tree entries only"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1700. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 9
+  },
+  {
+    "id": "@I292512774564@",
+    "name": "Martha Whitley",
+    "sex": "F",
+    "birth_year": 1807,
+    "birth_date": "abt 1807",
+    "birth_place": "Dewsbury, Yorkshire, England",
+    "death_date": "6 Jun 1882",
+    "death_place": "Beeston, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F274@",
+    "fams": [
+      "@F246@"
+    ],
+    "confidence": "A",
+    "score": 12,
+    "warnings": [],
+    "alerts": [
+      "PRE-GRO: Birth 1807. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 5
+  },
+  {
+    "id": "@I292513289354@",
+    "name": "Mathew Sutcliffe",
+    "sex": "M",
+    "birth_year": 1608,
+    "birth_date": "1608",
+    "birth_place": "Heptonstall Yorkshire",
+    "death_date": "Mar 1673",
+    "death_place": "Heptonstall, Yorkshire, England, United Kingdom",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F231@",
+    "fams": [
+      "@F282@"
+    ],
+    "confidence": "B",
+    "score": 11,
+    "warnings": [],
+    "alerts": [
+      "EARLY-ERA: Birth 1608. Pre-civil registration. Verify against surviving parish records."
+    ],
+    "generation": 11
+  },
+  {
+    "id": "@I292513303614@",
+    "name": "Henry Sutcliffe",
+    "sex": "M",
+    "birth_year": null,
+    "birth_date": "16 Apr 1470",
+    "birth_place": "Heptonstall, Yorkshire, England",
+    "death_date": "11 Aug 1526",
+    "death_place": "Heptonstall, Yorkshire, England",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": null,
+    "fams": [
+      "@F261@"
+    ],
+    "confidence": "D",
+    "score": 9,
+    "warnings": [
+      "Sources are family tree entries only"
+    ],
+    "alerts": [
+      "PRE-PARISH: Birth 1470 pre-dates English parish registers (1538). No documentary evidence possible."
+    ],
+    "generation": 17
+  },
+  {
+    "id": "@I292519741543@",
+    "name": "Ann Scott",
+    "sex": "F",
+    "birth_year": 1776,
+    "birth_date": "22 Dec 1776",
+    "birth_place": "Gildersome, Yorkshire, England",
+    "death_date": "April 1857",
+    "death_place": "Hunslet, Yorkshire West Riding",
+    "baptism_date": "",
+    "baptism_place": "",
+    "famc": "@F265@",
+    "fams": [
+      "@F274@"
+    ],
+    "confidence": "C",
+    "score": 8,
+    "warnings": [
+      "No source evidence attached"
+    ],
+    "alerts": [
+      "PRE-GRO: Birth 1776. No GRO certificate available. Verify against parish records."
+    ],
+    "generation": 6
+  }
+]

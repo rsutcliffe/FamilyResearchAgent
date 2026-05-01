@@ -1,0 +1,625 @@
+/* Tree view — dark canvas, light cards (matches the user's reference screenshot). */
+
+body.tree-mode {
+  background: #353a45;
+  color: #e8e9ec;
+  overflow: hidden;
+}
+
+#topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 52px;
+  background: #1f232b;
+  border-bottom: 1px solid #11141a;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 0 18px;
+  z-index: 10;
+  font-size: 13px;
+}
+
+#topbar .brand {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+#topbar .brand strong {
+  font-size: 14px;
+}
+#topbar .brand .muted {
+  font-size: 11px;
+  color: #8a8f9b;
+}
+
+#topbar #stats {
+  font-variant-numeric: tabular-nums;
+  color: #b0b4be;
+  font-size: 12px;
+}
+
+#topbar .controls {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+#topbar select,
+#topbar button,
+#topbar .link {
+  background: #2c313b;
+  color: #e8e9ec;
+  border: 1px solid #3d434f;
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+#topbar button:hover,
+#topbar .link:hover {
+  background: #3d434f;
+}
+
+.depth-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #b0b4be;
+}
+
+#canvas {
+  position: fixed;
+  top: 52px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  cursor: grab;
+}
+
+#canvas.panning {
+  cursor: grabbing;
+}
+
+#tree-pan {
+  position: absolute;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+#connections {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+#cards {
+  position: relative;
+}
+
+.card {
+  position: absolute;
+  width: 140px;
+  background: #f5f5f4;
+  color: #1a1f2c;
+  border-radius: 8px;
+  padding: 8px 10px 9px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  user-select: none;
+}
+
+.card:hover {
+  transform: translate(-50%, -50%) scale(1.04);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  z-index: 3;
+}
+
+.card.selected {
+  outline: 2px solid #4a90e2;
+  outline-offset: 2px;
+}
+
+.card.researched::after {
+  content: "✓";
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 18px;
+  height: 18px;
+  background: #1f6b3a;
+  color: white;
+  border-radius: 50%;
+  font-size: 11px;
+  text-align: center;
+  line-height: 18px;
+  font-weight: 700;
+}
+
+.card.decision-tag::before {
+  content: attr(data-decision);
+  position: absolute;
+  top: -7px;
+  left: -7px;
+  background: #bf6f00;
+  color: white;
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-size: 9px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.card.decision-accepted::before {
+  background: #1f6b3a;
+}
+.card.decision-rejected::before {
+  background: #6b7280;
+}
+.card.decision-flagged::before {
+  background: #bf6f00;
+}
+
+/* Confidence-band colouring: top stripe + tinted background. */
+.card.A {
+  background: #e2efda;
+  border-color: #1f6b3a;
+}
+.card.B {
+  background: #deeaf1;
+  border-color: #1f497d;
+}
+.card.C {
+  background: #fff2cc;
+  border-color: #bf6f00;
+  border-style: dashed;
+}
+.card.D {
+  background: #fce4d6;
+  border-color: #c00000;
+  border-style: dashed;
+}
+
+.card .name {
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.card .dates {
+  font-size: 11px;
+  color: #4b5563;
+  font-variant-numeric: tabular-nums;
+}
+
+.card .place {
+  font-size: 10px;
+  color: #6b7280;
+  line-height: 1.25;
+  /* Clamp to 2 lines */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card .role-tag {
+  position: absolute;
+  bottom: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  color: #b0b4be;
+  white-space: nowrap;
+}
+
+/* Placeholder card — clearly different from real individuals. */
+.card.placeholder {
+  background: rgba(255, 255, 255, 0.06);
+  color: #b0b4be;
+  border: 2px dashed #5a6170;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 72px;
+  box-shadow: none;
+}
+
+.card.placeholder:hover {
+  background: rgba(74, 144, 226, 0.18);
+  border-color: #4a90e2;
+  color: #e8e9ec;
+}
+
+.card.placeholder.selected {
+  outline: 2px solid #4a90e2;
+  outline-offset: 2px;
+}
+
+.card.placeholder .placeholder-icon {
+  font-size: 24px;
+  font-weight: 700;
+  color: #6b7280;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.card.placeholder .name {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.card.placeholder .dates {
+  font-size: 10px;
+  color: #6b7280;
+}
+
+/* Connection line styling — colour matches the parent's confidence band. */
+#connections path {
+  fill: none;
+  stroke-width: 2;
+  opacity: 0.65;
+}
+
+#connections path.A { stroke: #1f6b3a; }
+#connections path.B { stroke: #1f497d; }
+#connections path.C { stroke: #bf6f00; stroke-dasharray: 4 3; }
+#connections path.D { stroke: #c00000; stroke-dasharray: 4 3; }
+#connections path.placeholder { stroke: #5a6170; stroke-dasharray: 2 4; opacity: 0.4; }
+
+/* Highlight the single weakest link in each ancestor chain. */
+#connections path.weakest {
+  stroke: #ff5252;
+  stroke-width: 4;
+  opacity: 1;
+  filter: drop-shadow(0 0 4px rgba(255, 82, 82, 0.6));
+}
+
+/* Cards on a chain that contains a sub-threshold link get a subtle marker. */
+.card .chain-warning {
+  position: absolute;
+  bottom: 4px;
+  right: 6px;
+  font-size: 9px;
+  font-weight: 700;
+  color: #c00000;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+.card.cascade-risk {
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 2px rgba(192, 0, 0, 0.15);
+}
+
+.card.on-weak-chain {
+  outline: 1px dashed rgba(255, 82, 82, 0.6);
+  outline-offset: 1px;
+}
+
+.card.reresearch-recommended::after {
+  /* Override the green tick for the re-research case */
+  content: "↻";
+  background: #4a90e2;
+  color: white;
+}
+
+.reresearch-banner {
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: #ebf3fb;
+  border-left: 3px solid #4a90e2;
+  border-radius: 3px;
+  font-size: 12px;
+  color: #1f497d;
+}
+
+#topbar #toggle-weak.active {
+  background: #c00000;
+  border-color: #c00000;
+  color: white;
+}
+
+#candidate-picker {
+  margin-top: 12px;
+}
+
+.external-lookup {
+  background: #fff8e1;
+  border: 1px solid #f5c66a;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin: 6px 0;
+  font-family: -apple-system, system-ui, sans-serif;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.external-lookup-head {
+  flex: 1;
+  min-width: 0;
+}
+
+.external-lookup-head strong {
+  display: block;
+  font-size: 13px;
+}
+
+.external-lookup-head .muted {
+  display: block;
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.external-lookup-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.lookup-open-btn {
+  display: inline-block;
+  padding: 5px 12px;
+  background: var(--accent);
+  color: white !important;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.lookup-open-btn:hover {
+  background: var(--accent-hover);
+}
+
+.lookup-record-btn {
+  font-size: 12px;
+  padding: 5px 10px;
+}
+
+button.add-manual {
+  font-size: 12px;
+  padding: 6px 12px;
+  background: #fff;
+  border: 1px dashed var(--border);
+  color: var(--accent);
+}
+
+.candidate-card {
+  background: #f0f5fb;
+  border: 1px solid #d4e3f1;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin: 8px 0;
+  font-family: -apple-system, system-ui, sans-serif;
+  font-size: 13px;
+}
+
+.candidate-card strong {
+  font-size: 14px;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.accept-candidate-btn {
+  font-size: 12px;
+  padding: 6px 12px;
+}
+
+/* Detail panel — slides in from right. */
+#detail-panel {
+  position: fixed;
+  top: 52px;
+  right: 0;
+  bottom: 0;
+  width: 540px;
+  max-width: 60vw;
+  background: var(--panel);
+  color: var(--text);
+  border-left: 1px solid var(--border);
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.25);
+  overflow-y: auto;
+  padding: 22px 26px;
+  z-index: 5;
+}
+
+#detail-panel[hidden] {
+  display: none;
+}
+
+#detail-panel #detail-header h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  color: #1f3864;
+}
+
+#detail-panel .meta {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+#detail-panel .warnings {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--c-c);
+}
+
+#detail-panel .alerts {
+  font-size: 12px;
+  color: var(--c-d);
+}
+
+/* Note: scope display:flex to non-hidden so the [hidden] attribute wins. */
+#detail-panel #status:not([hidden]) {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 16px 0;
+  padding: 12px 14px;
+  background: #f0f5fb;
+  border: 1px solid #d4e3f1;
+  border-radius: 8px;
+}
+
+#detail-panel #status .spinner {
+  box-sizing: border-box;
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  border: 3px solid #cfdcea;
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+#detail-panel #status > div:not(.spinner) {
+  flex: 1;
+  min-width: 0;
+}
+
+#detail-panel #status p {
+  margin: 2px 0 0;
+  font-size: 12px;
+}
+
+#detail-panel #result {
+  margin: 16px 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  min-height: 80px;
+}
+
+#detail-panel #result {
+  white-space: normal; /* override the global pre-wrap once we render markdown */
+}
+
+#detail-panel #result h2 {
+  font-family: -apple-system, system-ui, sans-serif;
+  margin-top: 18px;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #1f3864;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 3px;
+}
+
+#detail-panel #result h3 {
+  font-family: -apple-system, system-ui, sans-serif;
+  margin: 14px 0 4px;
+  font-size: 13px;
+  color: #1f3864;
+}
+
+#detail-panel #result h4 {
+  font-family: -apple-system, system-ui, sans-serif;
+  margin: 12px 0 4px;
+  font-size: 12px;
+  color: #1f497d;
+}
+
+#detail-panel #result p {
+  margin: 8px 0;
+}
+
+#detail-panel #result ul,
+#detail-panel #result ol {
+  margin: 8px 0;
+  padding-left: 22px;
+}
+
+#detail-panel #result li {
+  margin: 3px 0;
+}
+
+#detail-panel #result table {
+  border-collapse: collapse;
+  margin: 10px 0;
+  font-family: -apple-system, system-ui, sans-serif;
+  font-size: 12px;
+  width: 100%;
+}
+
+#detail-panel #result table th,
+#detail-panel #result table td {
+  border: 1px solid var(--border);
+  padding: 5px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+#detail-panel #result table th {
+  background: #f3f4f6;
+  font-weight: 600;
+}
+
+#detail-panel #result code {
+  background: #f3f4f6;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-family: "SF Mono", Menlo, Monaco, monospace;
+  font-size: 12px;
+}
+
+#detail-panel #result blockquote {
+  margin: 10px 0;
+  padding: 6px 12px;
+  border-left: 3px solid var(--accent);
+  background: #f0f5fb;
+  font-style: italic;
+}
+
+#detail-panel #result a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+#detail-panel #result hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 14px 0;
+}
+
+#detail-panel #result strong {
+  font-weight: 700;
+}
+
+#detail-panel #decision-bar {
+  display: flex;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+#detail-panel button {
+  font-size: 12px;
+  padding: 7px 13px;
+}

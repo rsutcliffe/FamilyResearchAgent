@@ -1,0 +1,384 @@
+:root {
+  --c-a: #1f6b3a;
+  --c-a-bg: #e2efda;
+  --c-b: #1f497d;
+  --c-b-bg: #deeaf1;
+  --c-c: #bf6f00;
+  --c-c-bg: #fff2cc;
+  --c-d: #c00000;
+  --c-d-bg: #fce4d6;
+  --bg: #f5f6fa;
+  --panel: #ffffff;
+  --border: #e1e3e8;
+  --text: #1a1f2c;
+  --muted: #6b7280;
+  --accent: #2e75b6;
+  --accent-hover: #1f5e9c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+#app {
+  display: flex;
+  height: 100vh;
+}
+
+#sidebar {
+  width: 340px;
+  flex-shrink: 0;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+#sidebar header {
+  padding: 18px 16px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+#sidebar h1 {
+  margin: 0;
+  font-size: 16px;
+  color: #1f3864;
+}
+
+.subtitle {
+  margin: 2px 0 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+#filters {
+  display: flex;
+  gap: 6px;
+}
+
+#filters button {
+  flex: 1;
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+#filters button.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+#people {
+  list-style: none;
+  margin: 0;
+  padding: 8px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+#people li {
+  padding: 10px 12px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+#people li:hover {
+  background: #f9fafb;
+}
+
+#people li.selected {
+  background: #ebf3fb;
+  border-color: var(--accent);
+}
+
+.person-name {
+  font-weight: 600;
+}
+
+.person-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.4px;
+  margin-left: 6px;
+}
+
+.badge.A {
+  background: var(--c-a-bg);
+  color: var(--c-a);
+}
+.badge.B {
+  background: var(--c-b-bg);
+  color: var(--c-b);
+}
+.badge.C {
+  background: var(--c-c-bg);
+  color: var(--c-c);
+}
+.badge.D {
+  background: var(--c-d-bg);
+  color: var(--c-d);
+}
+
+.tick {
+  font-size: 11px;
+  color: var(--c-a);
+  margin-left: 6px;
+}
+
+.decision-tag {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: 6px;
+  font-weight: 700;
+}
+.decision-tag.accepted {
+  color: var(--c-a);
+}
+.decision-tag.rejected {
+  color: var(--muted);
+}
+.decision-tag.flagged {
+  color: var(--c-c);
+}
+
+#main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+#empty-state {
+  text-align: center;
+  margin-top: 80px;
+  color: var(--muted);
+}
+
+#empty-state h2 {
+  font-weight: 500;
+  color: #4b5563;
+}
+
+#detail {
+  max-width: 880px;
+  margin: 0 auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 22px 26px;
+}
+
+#detail-header h2 {
+  margin: 0 0 4px;
+  font-size: 20px;
+  color: #1f3864;
+}
+
+#detail-header .meta {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+#detail-header .warnings {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--c-c);
+}
+
+#detail-header .alerts {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--c-d);
+}
+
+#status {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 18px 0;
+  padding: 14px 16px;
+  background: #f0f5fb;
+  border: 1px solid #d4e3f1;
+  border-radius: 8px;
+}
+
+#status .spinner {
+  box-sizing: border-box;
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  border: 3px solid #cfdcea;
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+#status > div:not(.spinner) {
+  flex: 1;
+  min-width: 0;
+}
+
+#status p {
+  margin: 2px 0 0;
+  font-size: 12px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+#result {
+  margin: 18px 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14.5px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  min-height: 120px;
+}
+
+#result h2 {
+  font-family: -apple-system, system-ui, sans-serif;
+  margin-top: 22px;
+  font-size: 15px;
+  color: #1f3864;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 4px;
+}
+
+#result table {
+  border-collapse: collapse;
+  font-size: 12.5px;
+  margin: 8px 0;
+}
+
+#result table th,
+#result table td {
+  border: 1px solid var(--border);
+  padding: 4px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+#decision-bar {
+  display: flex;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+}
+
+button:hover:not(:disabled) {
+  background: #f3f4f6;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button.primary {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+button.primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+button.ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--muted);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+dialog {
+  border: none;
+  border-radius: 10px;
+  padding: 24px 28px;
+  max-width: 520px;
+  width: 90vw;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+}
+
+dialog::backdrop {
+  background: rgba(15, 23, 42, 0.4);
+}
+
+dialog h3 {
+  margin: 0 0 4px;
+  color: #1f3864;
+}
+
+dialog label {
+  display: block;
+  margin-top: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+}
+
+dialog input,
+dialog select,
+dialog textarea {
+  width: 100%;
+  margin-top: 4px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font: inherit;
+  font-weight: 400;
+}
+
+dialog menu {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 18px 0 0;
+  padding: 0;
+}

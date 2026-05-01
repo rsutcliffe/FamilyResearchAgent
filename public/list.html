@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sutcliffe Family Research Agent</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <aside id="sidebar">
+        <header>
+          <h1>Record Discovery</h1>
+          <p class="subtitle">Sutcliffe Family Tree</p>
+          <div id="filters">
+            <button data-filter="all" class="active">All</button>
+            <button data-filter="C">C Uncertain</button>
+            <button data-filter="D">D Unverified</button>
+          </div>
+        </header>
+        <ul id="people"></ul>
+      </aside>
+      <main id="main">
+        <div id="empty-state">
+          <h2>Select an individual</h2>
+          <p>
+            Pick a person from the list to view what we know, run the research
+            agent, and record a decision.
+          </p>
+        </div>
+        <article id="detail" hidden>
+          <header id="detail-header"></header>
+          <section id="status" hidden>
+            <div class="spinner"></div>
+            <div>
+              <strong id="status-text">Searching public records…</strong>
+              <p id="status-query" class="muted"></p>
+              <p id="status-meta" class="muted"></p>
+            </div>
+            <button id="stop-btn" class="ghost">Stop</button>
+          </section>
+          <section id="result"></section>
+          <section id="decision-bar" hidden>
+            <button id="run-btn">Run Agent</button>
+            <button id="accept-btn" class="primary" hidden>Accept Match</button>
+            <button id="reject-btn" hidden>Reject — No Match</button>
+            <button id="flag-btn" hidden>Flag for Investigation</button>
+          </section>
+        </article>
+      </main>
+    </div>
+
+    <dialog id="accept-dialog">
+      <form method="dialog">
+        <h3>Confirm match citation</h3>
+        <p class="muted">
+          All fields except URL are required. Choose the confidence band you are
+          accepting; A requires a Tier 1 source.
+        </p>
+        <label>Source title<input name="title" required /></label>
+        <label>Repository<input name="repository" required /></label>
+        <label
+          >Reference / folio<input name="reference" required /></label
+        >
+        <label>URL <input name="url" type="url" /></label>
+        <label
+          >New confidence band
+          <select name="new_confidence" required>
+            <option value="">—</option>
+            <option value="A">A — Verified</option>
+            <option value="B">B — Probable</option>
+            <option value="C">C — Uncertain</option>
+          </select>
+        </label>
+        <label
+          >Notes (optional)
+          <textarea name="note" rows="3"></textarea>
+        </label>
+        <menu>
+          <button value="cancel">Cancel</button>
+          <button id="accept-confirm" class="primary" value="confirm">
+            Confirm Accept
+          </button>
+        </menu>
+      </form>
+    </dialog>
+
+    <dialog id="flag-dialog">
+      <form method="dialog">
+        <h3>Flag for further investigation</h3>
+        <p class="muted">Describe what needs more work.</p>
+        <label
+          >Note (required)
+          <textarea name="note" rows="4" required></textarea>
+        </label>
+        <menu>
+          <button value="cancel">Cancel</button>
+          <button class="primary" value="confirm">Save Flag</button>
+        </menu>
+      </form>
+    </dialog>
+
+    <script src="/list.js" type="module"></script>
+  </body>
+</html>

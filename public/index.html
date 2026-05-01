@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sutcliffe Family Tree</title>
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/tree.css" />
+  </head>
+  <body class="tree-mode">
+    <header id="topbar">
+      <div class="brand">
+        <strong>Sutcliffe Family Tree</strong>
+        <span class="muted">Record Discovery</span>
+      </div>
+      <div id="stats" class="muted"></div>
+      <div id="spend" class="muted" title="Session and lifetime API spend"></div>
+      <div class="controls">
+        <label class="depth-label"
+          >Depth
+          <select id="depth">
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5" selected>5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+          </select>
+        </label>
+        <button id="toggle-weak" title="Highlight weakest link in each ancestor chain">⚠ Weak links</button>
+        <button id="zoom-out" title="Zoom out">−</button>
+        <button id="zoom-in" title="Zoom in">+</button>
+        <button id="reset-view" title="Reset view">Reset</button>
+        <button id="export-gedcom" title="Export an updated GEDCOM with confidence bands, accepted citations as SOUR records, and any agent-proposed individuals">Export .ged</button>
+        <a href="/list" class="link">List view</a>
+      </div>
+    </header>
+
+    <main id="canvas">
+      <div id="tree-pan">
+        <svg id="connections" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div id="cards"></div>
+      </div>
+    </main>
+
+    <aside id="detail-panel" hidden>
+      <header id="detail-header"></header>
+      <section id="status" hidden>
+        <div class="spinner"></div>
+        <div>
+          <strong id="status-text">Searching public records…</strong>
+          <p id="status-query" class="muted"></p>
+          <p id="status-meta" class="muted"></p>
+        </div>
+        <button id="stop-btn" class="ghost">Stop</button>
+      </section>
+      <section id="result"></section>
+      <section id="decision-bar" hidden>
+        <button id="run-btn">Run Agent</button>
+        <button id="accept-btn" class="primary" hidden>Accept Match</button>
+        <button id="reject-btn" hidden>Reject — No Match</button>
+        <button id="flag-btn" hidden>Flag for Investigation</button>
+        <button id="close-detail" class="ghost">Close</button>
+      </section>
+    </aside>
+
+    <dialog id="accept-dialog">
+      <form method="dialog">
+        <h3>Confirm match citation</h3>
+        <p class="muted">All fields except URL are required.</p>
+        <label>Source title<input name="title" required /></label>
+        <label>Repository<input name="repository" required /></label>
+        <label>Reference / folio<input name="reference" required /></label>
+        <label>URL <input name="url" type="url" /></label>
+        <label
+          >New confidence band
+          <select name="new_confidence" required>
+            <option value="">—</option>
+            <option value="A">A — Verified</option>
+            <option value="B">B — Probable</option>
+            <option value="C">C — Uncertain</option>
+          </select>
+        </label>
+        <label
+          >Notes (optional)
+          <textarea name="note" rows="3"></textarea>
+        </label>
+        <menu>
+          <button value="cancel" formnovalidate>Cancel</button>
+          <button class="primary" value="confirm">Confirm Accept</button>
+        </menu>
+      </form>
+    </dialog>
+
+    <dialog id="flag-dialog">
+      <form method="dialog">
+        <h3>Flag for further investigation</h3>
+        <label
+          >Note (required)
+          <textarea name="note" rows="4" required></textarea>
+        </label>
+        <menu>
+          <button value="cancel" formnovalidate>Cancel</button>
+          <button class="primary" value="confirm">Save Flag</button>
+        </menu>
+      </form>
+    </dialog>
+
+    <dialog id="manual-evidence-dialog">
+      <form method="dialog">
+        <h3>Add evidence from external lookup</h3>
+        <p class="muted">
+          Use this when you've checked a paywalled source (Ancestry, Findmypast,
+          etc.) yourself. The lookup is recorded so the agent knows it's been
+          done — duplicate suggestions will be suppressed.
+        </p>
+        <input type="hidden" name="service" />
+        <input type="hidden" name="url" />
+        <p style="font-size:13px;">
+          Source: <strong class="me-service-label"></strong>
+        </p>
+        <label>Outcome
+          <select name="outcome" required>
+            <option value="">—</option>
+            <option value="found">Found relevant evidence</option>
+            <option value="not_found">Checked, no relevant evidence</option>
+          </select>
+        </label>
+        <fieldset class="me-found-fields" style="border:none; padding:0; margin-top:6px;">
+          <label>Source title<input name="title" /></label>
+          <label>Repository<input name="repository" /></label>
+          <label>Reference / folio<input name="reference" /></label>
+          <label>URL <input name="url_field" type="url" /></label>
+          <label>New confidence band
+            <select name="new_confidence">
+              <option value="">—</option>
+              <option value="A">A — Verified</option>
+              <option value="B">B — Probable</option>
+              <option value="C">C — Uncertain</option>
+            </select>
+          </label>
+        </fieldset>
+        <label>Notes (optional)<textarea name="note" rows="2"></textarea></label>
+        <menu>
+          <button value="cancel" formnovalidate>Cancel</button>
+          <button class="primary" value="confirm">Save</button>
+        </menu>
+      </form>
+    </dialog>
+
+    <dialog id="link-dialog">
+      <form method="dialog">
+        <h3>Parent–child link</h3>
+        <p class="muted">
+          The link confidence describes how strongly the evidence supports
+          this specific parent-child relationship — separate from how well-evidenced
+          either individual is on their own.
+        </p>
+        <input type="hidden" name="link_id" />
+        <p style="margin:10px 0 0; font-size:13px;">
+          <strong class="parent-name"></strong>
+          → <span class="kind muted"></span> →
+          <strong class="child-name"></strong>
+        </p>
+        <p style="font-size:12px; color:#6b7280;">
+          Current link confidence: <strong class="current-confidence"></strong><br />
+          Current source: <span class="current-source"></span>
+        </p>
+        <label>New link confidence
+          <select name="new_confidence" required>
+            <option value="A">A — Verified (DIRECT Tier 1 evidence naming both)</option>
+            <option value="B">B — Probable (DIRECT Tier 2 or TRIANGULATED Tier 1)</option>
+            <option value="C">C — Uncertain (CIRCUMSTANTIAL only)</option>
+            <option value="D">D — Unverified</option>
+          </select>
+        </label>
+        <label>Evidence type
+          <select name="evidence_type">
+            <option value="">—</option>
+            <option value="DIRECT">DIRECT (single record names both)</option>
+            <option value="TRIANGULATED">TRIANGULATED (multiple records together)</option>
+            <option value="CIRCUMSTANTIAL">CIRCUMSTANTIAL (place + date + name only)</option>
+          </select>
+        </label>
+        <label>Citation (optional)
+          <textarea name="citation" rows="2" placeholder="e.g. St Wilfrid's Monk Fryston baptism register, 14 Mar 1802, names both parents"></textarea>
+        </label>
+        <menu>
+          <button value="cancel" formnovalidate>Cancel</button>
+          <button class="primary" value="confirm">Update link</button>
+        </menu>
+      </form>
+    </dialog>
+
+    <script src="/tree.js" type="module"></script>
+  </body>
+</html>

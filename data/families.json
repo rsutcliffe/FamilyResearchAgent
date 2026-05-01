@@ -1,0 +1,877 @@
+[
+  {
+    "id": "@F1@",
+    "husband": "@I292513303399@",
+    "wife": "@I292513303404@",
+    "children": [
+      "@I292513303047@"
+    ],
+    "marriage_date": "1517",
+    "marriage_place": "Marbury, Cheshire, England"
+  },
+  {
+    "id": "@F6@",
+    "husband": "@I292513303047@",
+    "wife": "@I292513303409@",
+    "children": [
+      "@I292513302305@"
+    ],
+    "marriage_date": "1537",
+    "marriage_place": "Yorkshire"
+  },
+  {
+    "id": "@F14@",
+    "husband": "@I292511586163@",
+    "wife": "@I292511586164@",
+    "children": [
+      "@I292511585493@"
+    ],
+    "marriage_date": "5 Dec 1776",
+    "marriage_place": "Heptonstall, St Thomas, Yorkshire, England, United Kingdom"
+  },
+  {
+    "id": "@F15@",
+    "husband": "@I292511586163@",
+    "wife": "@I292515636298@",
+    "children": [],
+    "marriage_date": "6 Feb 1780",
+    "marriage_place": "Halifax, St John the Baptist, Yorkshire, England"
+  },
+  {
+    "id": "@F16@",
+    "husband": "@I292511586163@",
+    "wife": "@I292515636498@",
+    "children": [],
+    "marriage_date": "23 Mar 1787",
+    "marriage_place": "Whalley, Lancashire, England"
+  },
+  {
+    "id": "@F17@",
+    "husband": "@I292513302305@",
+    "wife": "@I292513302306@",
+    "children": [
+      "@I292513289910@"
+    ],
+    "marriage_date": "7 May 1594",
+    "marriage_place": "Stoodley, Yorkshire, England"
+  },
+  {
+    "id": "@F22@",
+    "husband": "@I292516915024@",
+    "wife": "@I292516893809@",
+    "children": [],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F26@",
+    "husband": "@I292515657560@",
+    "wife": "@I292515657561@",
+    "children": [
+      "@I292515656077@"
+    ],
+    "marriage_date": "5 June 1733",
+    "marriage_place": "Heptonstall, West Yorkshire, England"
+  },
+  {
+    "id": "@F32@",
+    "husband": "@I1826419885@",
+    "wife": "@I1826419887@",
+    "children": [
+      "@I1825902650@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F36@",
+    "husband": "@I1825902677@",
+    "wife": "@I1825902681@",
+    "children": [
+      "@I1825902601@"
+    ],
+    "marriage_date": "18 Dec 1897",
+    "marriage_place": "Drighlington, St Paul, Yorkshire, England"
+  },
+  {
+    "id": "@F37@",
+    "husband": "@I1826371172@",
+    "wife": "@I1825902676@",
+    "children": [
+      "@I1825902672@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F40@",
+    "husband": "@I1825902678@",
+    "wife": "@I1826118939@",
+    "children": [
+      "@I1825902677@"
+    ],
+    "marriage_date": "12 Sep 1870",
+    "marriage_place": "Rothwell, Holy Trinity, Yorkshire, England"
+  },
+  {
+    "id": "@F41@",
+    "husband": "@I1825902672@",
+    "wife": "@I1825902668@",
+    "children": [
+      "@I1825902630@"
+    ],
+    "marriage_date": "25 Dec 1886",
+    "marriage_place": "Kippax, St Mary, Yorkshire, England"
+  },
+  {
+    "id": "@F46@",
+    "husband": "@I1825902682@",
+    "wife": "@I1825902683@",
+    "children": [
+      "@I1825902633@"
+    ],
+    "marriage_date": "19 Mar 1899",
+    "marriage_place": "Leeds, Yorkshire, England"
+  },
+  {
+    "id": "@F49@",
+    "husband": "@I292515693464@",
+    "wife": "@I292515693494@",
+    "children": [
+      "@I292511586164@"
+    ],
+    "marriage_date": "20 Aug 1797",
+    "marriage_place": "Keighley, Yorkshire, England"
+  },
+  {
+    "id": "@F50@",
+    "husband": "@I1825902669@",
+    "wife": "@I1825902670@",
+    "children": [
+      "@I1825902668@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F51@",
+    "husband": "@I292513486431@",
+    "wife": "@I1825902668@",
+    "children": [],
+    "marriage_date": "7 Oct 1900",
+    "marriage_place": "Kippax, Yorkshire, England"
+  },
+  {
+    "id": "@F58@",
+    "husband": "@I1825902703@",
+    "wife": "@I1825902704@",
+    "children": [
+      "@I1825902701@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F61@",
+    "husband": "@I1825902693@",
+    "wife": "@I1825902694@",
+    "children": [
+      "@I1825902682@"
+    ],
+    "marriage_date": "1/1/73",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F63@",
+    "husband": "@I1825902695@",
+    "wife": "@I1825902696@",
+    "children": [
+      "@I1825902693@"
+    ],
+    "marriage_date": "Abt. 1843",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F66@",
+    "husband": "@I1825902701@",
+    "wife": "@I1825902702@",
+    "children": [
+      "@I1825902700@"
+    ],
+    "marriage_date": "23/4/64",
+    "marriage_place": "Hillam, Monk Frystone"
+  },
+  {
+    "id": "@F67@",
+    "husband": "@I1825902699@",
+    "wife": "@I1825902700@",
+    "children": [
+      "@I1825902698@"
+    ],
+    "marriage_date": "30/10/86",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F68@",
+    "husband": "@I1825902697@",
+    "wife": "@I1825902698@",
+    "children": [
+      "@I1825902637@"
+    ],
+    "marriage_date": "7 Mar 1833",
+    "marriage_place": "Monk Fryston, Yorkshire, England"
+  },
+  {
+    "id": "@F69@",
+    "husband": null,
+    "wife": null,
+    "children": [
+      "@I1825902594@"
+    ],
+    "marriage_date": "13 Jul 1974",
+    "marriage_place": "St Mark's, St Mark's Road, Leeds, West Yorkshire, United Kingdom"
+  },
+  {
+    "id": "@F85@",
+    "husband": "@I1825902597@",
+    "wife": "@I1825902598@",
+    "children": [
+      "@I1825902591@"
+    ],
+    "marriage_date": "26 Jun 1971",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F87@",
+    "husband": "@I1825902599@",
+    "wife": "@I1825902600@",
+    "children": [
+      "@I1825902598@"
+    ],
+    "marriage_date": "23 Dec 1950",
+    "marriage_place": "Leeds, Yorkshire - West Riding"
+  },
+  {
+    "id": "@F92@",
+    "husband": "@I1825902591@",
+    "wife": "@I1825902594@",
+    "children": [],
+    "marriage_date": "14/08/2017",
+    "marriage_place": "Gretna Green, Dumfries-shire, Scotland"
+  },
+  {
+    "id": "@F95@",
+    "husband": "@I1825902601@",
+    "wife": "@I1825902628@",
+    "children": [
+      "@I1825902597@"
+    ],
+    "marriage_date": "25 Dec 1940",
+    "marriage_place": "Leeds, Yorkshire West Riding"
+  },
+  {
+    "id": "@F101@",
+    "husband": "@I1825902647@",
+    "wife": "@I1825902635@",
+    "children": [
+      "@I1825902600@"
+    ],
+    "marriage_date": "Apr 1923",
+    "marriage_place": "Leeds, Yorkshire West Riding, United Kingdom"
+  },
+  {
+    "id": "@F107@",
+    "husband": "@I1825902648@",
+    "wife": "@I1825902649@",
+    "children": [
+      "@I1825902647@"
+    ],
+    "marriage_date": "17 Apr 1881",
+    "marriage_place": "Halifax, St John the Baptist, Yorkshire West Riding, England"
+  },
+  {
+    "id": "@F108@",
+    "husband": "@I1825902650@",
+    "wife": "@I1825902651@",
+    "children": [
+      "@I1825902635@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F110@",
+    "husband": "@I1825902629@",
+    "wife": "@I1825902630@",
+    "children": [
+      "@I1825902628@"
+    ],
+    "marriage_date": "10 Jul 1915",
+    "marriage_place": "Kippax, St Mary, Yorkshire, England"
+  },
+  {
+    "id": "@F111@",
+    "husband": "@I1825902629@",
+    "wife": "@I292514011463@",
+    "children": [],
+    "marriage_date": "Jan 1928",
+    "marriage_place": "Tadcaster, Yorkshire West Riding, United Kingdom"
+  },
+  {
+    "id": "@F116@",
+    "husband": "@I1825902636@",
+    "wife": "@I1825902637@",
+    "children": [
+      "@I1825902629@"
+    ],
+    "marriage_date": "15 Jun 1862",
+    "marriage_place": "Sherburn in Elmet, Yorkshire, England"
+  },
+  {
+    "id": "@F119@",
+    "husband": "@I1825902633@",
+    "wife": "@I1825902634@",
+    "children": [
+      "@I1825902599@"
+    ],
+    "marriage_date": "12 Apr 1924",
+    "marriage_place": "Leeds, St Simon, West Yorkshire, England"
+  },
+  {
+    "id": "@F134@",
+    "husband": "@I292516914743@",
+    "wife": "@I292516915681@",
+    "children": [
+      "@I292516893809@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F135@",
+    "husband": "@I292513486431@",
+    "wife": null,
+    "children": [],
+    "marriage_date": "12 Apr 1880",
+    "marriage_place": "Leeds, St Mary, Yorkshire, England"
+  },
+  {
+    "id": "@F140@",
+    "husband": "@I292511586637@",
+    "wife": "@I292525963932@",
+    "children": [
+      "@I292511572528@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F141@",
+    "husband": "@I292519760527@",
+    "wife": "@I292513289911@",
+    "children": [],
+    "marriage_date": "30 Jan 1585",
+    "marriage_place": "Burnley, Lancashire, England"
+  },
+  {
+    "id": "@F144@",
+    "husband": "@I292511631884@",
+    "wife": "@I292512775528@",
+    "children": [
+      "@I292511586163@"
+    ],
+    "marriage_date": "6 May 1749",
+    "marriage_place": "St Mary & All Saints, Whalley, Lancashire, England"
+  },
+  {
+    "id": "@F146@",
+    "husband": null,
+    "wife": null,
+    "children": [
+      "@I292515636298@"
+    ],
+    "marriage_date": "15 February 1745",
+    "marriage_place": "Halifax, Yorkshire, England"
+  },
+  {
+    "id": "@F147@",
+    "husband": "@I292519753346@",
+    "wife": "@I292519753383@",
+    "children": [
+      "@I292519752991@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F152@",
+    "husband": "@I292708256613@",
+    "wife": "@I292511572528@",
+    "children": [
+      "@I1825902634@"
+    ],
+    "marriage_date": "24 Mar 1894",
+    "marriage_place": "Upper Armley, Christ Church, Yorkshire, England"
+  },
+  {
+    "id": "@F158@",
+    "husband": "@I292515544718@",
+    "wife": "@I292515544719@",
+    "children": [
+      "@I1825902648@"
+    ],
+    "marriage_date": "1849",
+    "marriage_place": "Elland, St Mary, Yorkshire West Riding, England"
+  },
+  {
+    "id": "@F163@",
+    "husband": "@I292516915849@",
+    "wife": "@I292516893809@",
+    "children": [],
+    "marriage_date": "5 Feb 1860",
+    "marriage_place": "Bradford, St Peter (Bradford Cathedral), Yorkshire, England"
+  },
+  {
+    "id": "@F170@",
+    "husband": "@I1826683209@",
+    "wife": "@I1826683211@",
+    "children": [
+      "@I1825902669@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F171@",
+    "husband": null,
+    "wife": null,
+    "children": [
+      "@I292123924788@",
+      "@I292516915849@"
+    ],
+    "marriage_date": "24 Aug 1824",
+    "marriage_place": "Tong, St James, Yorkshire, England"
+  },
+  {
+    "id": "@F173@",
+    "husband": null,
+    "wife": null,
+    "children": [
+      "@I292513486431@"
+    ],
+    "marriage_date": "18 Jun 1848",
+    "marriage_place": "Barony, Lanark, Lanarkshire, Scotland"
+  },
+  {
+    "id": "@F174@",
+    "husband": "@I292519759480@",
+    "wife": "@I292519759982@",
+    "children": [
+      "@I292513289356@"
+    ],
+    "marriage_date": "20 Dec 1610",
+    "marriage_place": "Heptonstall, Yorkshire, England"
+  },
+  {
+    "id": "@F175@",
+    "husband": "@I292708275002@",
+    "wife": "@I292525419602@",
+    "children": [
+      "@I1825902676@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F176@",
+    "husband": "@I292709159723@",
+    "wife": "@I292708275585@",
+    "children": [
+      "@I1826371172@"
+    ],
+    "marriage_date": "4 Nov 1810",
+    "marriage_place": "Elland,York,England"
+  },
+  {
+    "id": "@F178@",
+    "husband": "@I292513289910@",
+    "wife": "@I292513289911@",
+    "children": [
+      "@I292513289631@"
+    ],
+    "marriage_date": "1611",
+    "marriage_place": "Accrington, Lancashire, England"
+  },
+  {
+    "id": "@F182@",
+    "husband": "@I292519753206@",
+    "wife": "@I292519753236@",
+    "children": [
+      "@I292513273229@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F183@",
+    "husband": "@I292513289631@",
+    "wife": null,
+    "children": [],
+    "marriage_date": "28 Jun 1607",
+    "marriage_place": "Heptonstall, Yorkshire, England"
+  },
+  {
+    "id": "@F190@",
+    "husband": "@I1863113457@",
+    "wife": "@I1863113460@",
+    "children": [
+      "@I1825902678@"
+    ],
+    "marriage_date": "31 Jul 1831",
+    "marriage_place": "Heptonstall, St Thomas, Yorkshire, England"
+  },
+  {
+    "id": "@F192@",
+    "husband": "@I292519753159@",
+    "wife": "@I292519753182@",
+    "children": [
+      "@I292513273228@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F193@",
+    "husband": "@I292512738635@",
+    "wife": "@I292517173730@",
+    "children": [
+      "@I292123924846@"
+    ],
+    "marriage_date": "9 Feb 1779",
+    "marriage_place": "Guiseley,York,England"
+  },
+  {
+    "id": "@F196@",
+    "husband": "@I292513273061@",
+    "wife": "@I292519741907@",
+    "children": [],
+    "marriage_date": "12 Jan 1687",
+    "marriage_place": "Heptonstall, St Thomas, Yorkshire, England"
+  },
+  {
+    "id": "@F208@",
+    "husband": "@I292513279290@",
+    "wife": "@I292513289358@",
+    "children": [
+      "@I292513273061@"
+    ],
+    "marriage_date": "12 Jan 1687",
+    "marriage_place": "Heptonstall,York,England"
+  },
+  {
+    "id": "@F209@",
+    "husband": "@I292513279290@",
+    "wife": "@I292513289360@",
+    "children": [],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F216@",
+    "husband": "@I292513273061@",
+    "wife": "@I292513273097@",
+    "children": [
+      "@I292511631884@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F218@",
+    "husband": "@I292515656077@",
+    "wife": "@I292515656078@",
+    "children": [
+      "@I292511585494@"
+    ],
+    "marriage_date": "14 May 1769",
+    "marriage_place": "Heptonstall, Yorkshire, England"
+  },
+  {
+    "id": "@F219@",
+    "husband": "@I292123924781@",
+    "wife": "@I292123924788@",
+    "children": [],
+    "marriage_date": "10 Jun 1851",
+    "marriage_place": "Birstall, St Peter, Yorkshire, England"
+  },
+  {
+    "id": "@F221@",
+    "husband": "@I292513289707@",
+    "wife": "@I292513289710@",
+    "children": [
+      "@I292708269089@"
+    ],
+    "marriage_date": "18 Sep 1598",
+    "marriage_place": "Halifax, St John the Baptist, Yorkshire, England"
+  },
+  {
+    "id": "@F222@",
+    "husband": "@I292511585493@",
+    "wife": "@I292519755076@",
+    "children": [],
+    "marriage_date": "8 Apr 1823",
+    "marriage_place": "Halifax, St John the Baptist, Yorkshire, England"
+  },
+  {
+    "id": "@F226@",
+    "husband": "@I292519752991@",
+    "wife": "@I292519753055@",
+    "children": [
+      "@I292519741489@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F228@",
+    "husband": "@I292123924781@",
+    "wife": "@I292516893809@",
+    "children": [
+      "@I1825902681@"
+    ],
+    "marriage_date": "8 Aug 1869",
+    "marriage_place": "Hunslet Moor, St Peter, Yorkshire, England"
+  },
+  {
+    "id": "@F231@",
+    "husband": "@I292513289631@",
+    "wife": "@I292708269089@",
+    "children": [
+      "@I292513289354@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F233@",
+    "husband": "@I292123924846@",
+    "wife": "@I292123924852@",
+    "children": [
+      "@I292123924781@"
+    ],
+    "marriage_date": "19 Apr 1813",
+    "marriage_place": "Dewsbury, All Saints, Yorkshire, England"
+  },
+  {
+    "id": "@F237@",
+    "husband": "@I292513303983@",
+    "wife": "@I292513303984@",
+    "children": [
+      "@I292513303404@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F243@",
+    "husband": "@I292513273228@",
+    "wife": "@I292513273229@",
+    "children": [
+      "@I292513273097@"
+    ],
+    "marriage_date": "Jul 1689",
+    "marriage_place": "Heptonstall,York,England"
+  },
+  {
+    "id": "@F246@",
+    "husband": "@I292512774562@",
+    "wife": "@I292512774564@",
+    "children": [
+      "@I1826118939@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F255@",
+    "husband": "@I292515660806@",
+    "wife": "@I292515660807@",
+    "children": [
+      "@I292512775528@"
+    ],
+    "marriage_date": "2 Feb 1724",
+    "marriage_place": "Whalley, Lancashire, England"
+  },
+  {
+    "id": "@F257@",
+    "husband": "@I292708274586@",
+    "wife": "@I292708274575@",
+    "children": [
+      "@I292513289707@"
+    ],
+    "marriage_date": "12 Jun 1575",
+    "marriage_place": "Keighley, York, England"
+  },
+  {
+    "id": "@F260@",
+    "husband": "@I292525419632@",
+    "wife": "@I292525419652@",
+    "children": [
+      "@I292525419602@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F261@",
+    "husband": "@I292513303614@",
+    "wife": "@I292513303616@",
+    "children": [
+      "@I292513303399@"
+    ],
+    "marriage_date": "Abt. 1490",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F262@",
+    "husband": "@I292123924619@",
+    "wife": "@I292123924625@",
+    "children": [
+      "@I1825902636@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F265@",
+    "husband": "@I292525419763@",
+    "wife": "@I292525419737@",
+    "children": [
+      "@I292519741543@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F273@",
+    "husband": "@I292519741489@",
+    "wife": "@I292519741509@",
+    "children": [
+      "@I1863113460@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F274@",
+    "husband": "@I292519741530@",
+    "wife": "@I292519741543@",
+    "children": [
+      "@I292512774564@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F275@",
+    "husband": "@I292511585493@",
+    "wife": "@I292511585494@",
+    "children": [
+      "@I1863113457@"
+    ],
+    "marriage_date": "1 May 1794",
+    "marriage_place": "Heptonstall, St Thomas, Yorkshire, England"
+  },
+  {
+    "id": "@F280@",
+    "husband": "@I292511631506@",
+    "wife": "@I292511631522@",
+    "children": [
+      "@I292511586637@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F282@",
+    "husband": "@I292513289354@",
+    "wife": "@I292513289356@",
+    "children": [
+      "@I292513279290@"
+    ],
+    "marriage_date": "04 Feb 1644",
+    "marriage_place": "Heptonstall, Yorkshire, England"
+  },
+  {
+    "id": "@F291@",
+    "husband": "@I292511631884@",
+    "wife": null,
+    "children": [],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F294@",
+    "husband": null,
+    "wife": "@I292511586164@",
+    "children": [],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F301@",
+    "husband": null,
+    "wife": "@I292511586593@",
+    "children": [
+      "@I292708256613@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F303@",
+    "husband": null,
+    "wife": "@I1825902668@",
+    "children": [],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F306@",
+    "husband": null,
+    "wife": null,
+    "children": [
+      "@I292515656077@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F307@",
+    "husband": "@I1863113457@",
+    "wife": null,
+    "children": [],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F311@",
+    "husband": "@I292709159763@",
+    "wife": null,
+    "children": [
+      "@I292708275585@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  },
+  {
+    "id": "@F317@",
+    "husband": "@I292519759126@",
+    "wife": null,
+    "children": [
+      "@I292513289358@"
+    ],
+    "marriage_date": "",
+    "marriage_place": ""
+  }
+]
