@@ -480,13 +480,67 @@ const selectPlaceholder = (pos) => {
   const otherParentId = fam ? (pos.role === "father" ? fam.wife : fam.husband) : null;
   const otherParent = otherParentId ? state.byId.get(otherParentId) : null;
 
+  // Strategic considerations the user should weigh before spending. Most
+  // important: if BOTH parents are unknown, a single record often names both
+  // — running two separate searches typically pays for the same record twice.
+  const strategyTips = [];
+  const bothUnknown = !otherParent;
+  const otherRoleLabel = pos.role === "father" ? "mother" : "father";
+
+  if (bothUnknown) {
+    const eraTip =
+      child.birth_year && child.birth_year >= 1837
+        ? `Post-1837: a GRO birth certificate for ${escapeHtml(child.name)} (~£11 from gro.gov.uk) names both parents directly — including mother's maiden name from 1911. That single document often resolves both parents at once.`
+        : child.birth_year
+          ? `Pre-1837: parish baptism registers usually name both parents on the same line. A marriage record (parish register or bishop's transcript) names both partners — equally good for resolving both at once.`
+          : `Without a birth year on the child it's hard to pick a strategy; consider verifying the child's birth before researching parents.`;
+    strategyTips.push({
+      kind: "warn",
+      title: "Both parents are unknown",
+      body: `Records that identify ${escapeHtml(child.name)}'s ${role.toLowerCase()} (baptism, marriage cert, GRO cert) typically name the ${otherRoleLabel} too. Running this search may surface a candidate whose evidence ALSO identifies the ${otherRoleLabel} — saving a second run. ${eraTip} Check the agent's citation when results arrive: if it names both parents, you can accept the ${otherRoleLabel} via the manual evidence form rather than spawning another agent run.`,
+    });
+  } else if (otherParent && (otherParent.confidence === "C" || otherParent.confidence === "D")) {
+    strategyTips.push({
+      kind: "warn",
+      title: `The known ${otherParent.sex === "M" ? "father" : "mother"} is weakly anchored`,
+      body: `${escapeHtml(otherParent.name)} is band ${otherParent.confidence} (${(CONF_LABEL[otherParent.confidence] ?? "").toLowerCase()}). Triangulating against a weak anchor produces only weak link evidence. Consider verifying ${escapeHtml(otherParent.name)} to band B+ first — that strengthens the anchor for THIS search and any other search referencing them.`,
+    });
+  }
+
+  // Sibling triangulation hint — when at least one A/B-band sibling exists
+  const fsKids = (fam?.children ?? []).filter((cid) => cid !== child.id);
+  const strongSiblings = fsKids
+    .map((cid) => state.byId.get(cid))
+    .filter((s) => s && (s.confidence === "A" || s.confidence === "B"));
+  if (strongSiblings.length > 0) {
+    strategyTips.push({
+      kind: "info",
+      title: `${strongSiblings.length} well-anchored sibling${strongSiblings.length === 1 ? "" : "s"} available for triangulation`,
+      body: `${strongSiblings
+        .slice(0, 3)
+        .map((s) => `${escapeHtml(s.name)} (${s.birth_year ?? "?"})`)
+        .join(", ")}${strongSiblings.length > 3 ? ", and others" : ""}. The agent will use these to triangulate. A baptism naming this missing ${role.toLowerCase()} as parent of any one of them is direct link evidence.`,
+    });
+  }
+
+  const tipsHtml = strategyTips
+    .map(
+      (t) => `
+    <div class="strategy-tip ${t.kind}">
+      <strong>${escapeHtml(t.title)}</strong>
+      <div>${t.body}</div>
+    </div>`,
+    )
+    .join("");
+
   $("#result").innerHTML = `
-    <h2>Anchors available for this search</h2>
+    ${tipsHtml ? `<h2 style="margin-top:0;">Before you spend</h2>${tipsHtml}` : ""}
+    <h2 style="${tipsHtml ? "" : "margin-top:0;"}">Anchors available for this search</h2>
     <ul style="margin:8px 0; padding-left:20px;">
       <li>Child <strong>${escapeHtml(child.name)}</strong>, b.${childYear}, ${escapeHtml(childPlace)}, confidence <strong>${child.confidence}</strong></li>
       ${otherParent ? `<li>Spouse <strong>${escapeHtml(otherParent.name)}</strong>, b.${otherParent.birth_year ?? "?"}, ${escapeHtml(otherParent.birth_place || "place unknown")}, confidence <strong>${otherParent.confidence}</strong></li>` : `<li class="muted">No spouse record (the other parent is also unknown)</li>`}
     </ul>
-    <p class="muted">Clicking <strong>Find this Ancestor</strong> spawns the Ancestor Discovery agent. The agent will propose a candidate parent and quote the evidence linking them to ${escapeHtml(child.name)}. Acceptance creates a new individual and a new parent-child relationship in the tree.</p>
+    <p class="muted">Clicking <strong>Find this ${role}</strong> spawns the Ancestor Discovery agent. Acceptance creates a new individual and a new parent-child relationship in the tree.</p>
   `;
 
   // Reuse the run button — re-label and rewire to ancestor discovery
@@ -496,6 +550,24 @@ const selectPlaceholder = (pos) => {
   $("#accept-btn").hidden = true;
   $("#reject-btn").hidden = true;
   $("#flag-btn").hidden = true;
+
+  // When both parents are unknown, offer the more cost-efficient
+  // "Find both parents" button alongside the single-parent option.
+  let bothBtn = $("#run-both-btn");
+  if (bothUnknown) {
+    if (!bothBtn) {
+      bothBtn = document.createElement("button");
+      bothBtn.id = "run-both-btn";
+      bothBtn.className = "primary";
+      bothBtn.style.marginLeft = "6px";
+      $("#run-btn").after(bothBtn);
+    }
+    bothBtn.textContent = "Find both parents (recommended)";
+    bothBtn.hidden = false;
+    bothBtn.onclick = () => runAncestorDiscoveryBoth(pos);
+  } else if (bothBtn) {
+    bothBtn.hidden = true;
+  }
 };
 
 // Reset every transient UI element of the detail panel so leftover state
@@ -820,13 +892,16 @@ const runAgent = () => {
     } else if (event.type === "done") {
       const u = event.result.usage;
       $("#status-meta").textContent = `Done. ${event.result.search_count} searches · ${u.input_tokens + u.output_tokens} tokens`;
-      // Reconcile the displayed counter with the server's truth.
       accumulated.searches = event.result.search_count;
       $("#status-text").textContent = `Web search ${accumulated.searches} complete.`;
       if (state.streaming) state.streaming.completed = true;
+      // Hide the spinner section the moment the run is logically complete
+      // — don't wait for the saved event in case it never arrives.
+      $("#status").hidden = true;
+      $("#run-btn").disabled = false;
+      showDecisionButtons(true, null);
     } else if (event.type === "saved") {
       cleanupStream();
-      // Show decision buttons immediately — don't wait for the data refresh.
       $("#status").hidden = true;
       showDecisionButtons(true, null);
       refreshAndReselect(id);
@@ -845,6 +920,43 @@ const runAgent = () => {
       cleanupStream();
     }
   };
+};
+
+// Parse the Ancestor Discovery <<CANDIDATE_PARENTS>> block for PAIR candidates.
+// Format per line:
+//   CANDIDATE_PAIR_N_FATHER||name||birth_year||birth_place||link_band||link_tier||link_citation
+//   CANDIDATE_PAIR_N_MOTHER||name||birth_year||birth_place||link_band||link_tier||link_citation
+// Returns an array of { pairId, father, mother } where father/mother have the
+// same shape as single-parent candidates.
+const parseCandidatePairs = (text) => {
+  if (!text) return [];
+  const m = text.match(/<<CANDIDATE_PARENTS>>\s*([\s\S]*?)\s*<<\/CANDIDATE_PARENTS>>/);
+  if (!m) return [];
+  const pairs = new Map();
+  const lines = m[1]
+    .split(/\n/)
+    .map((l) => l.trim())
+    .filter((l) => l.length && !/^NONE$/i.test(l));
+  for (const line of lines) {
+    const labelMatch = line.match(/^(CANDIDATE_PAIR_(\d+)_(FATHER|MOTHER))\|\|/i);
+    if (!labelMatch) continue;
+    const [, , idx, role] = labelMatch;
+    const parts = line.split("||").map((p) => p.trim());
+    if (parts.length < 7) continue;
+    const [, name, birth_year, birth_place, link_band, link_tier, link_citation] = parts;
+    if (!name || !["A", "B", "C"].includes(link_band)) continue;
+    const pair = pairs.get(idx) ?? { pairId: idx, father: null, mother: null };
+    pair[role.toLowerCase()] = {
+      name,
+      birth_year: birth_year && birth_year !== "?" ? Number(birth_year) : null,
+      birth_place,
+      link_band,
+      link_tier,
+      link_citation,
+    };
+    pairs.set(idx, pair);
+  }
+  return Array.from(pairs.values()).filter((p) => p.father && p.mother);
 };
 
 // Parse the Ancestor Discovery <<CANDIDATE_PARENTS>> block into structured
@@ -965,6 +1077,174 @@ const acceptCandidate = async (candidate, ph) => {
   selectPerson(newIndividualId);
 };
 
+const renderPairPicker = (pairs, ph) => {
+  const child = state.byId.get(ph.childId);
+  if (!child) return;
+  const html = pairs
+    .map(
+      (p, i) => `
+    <div class="candidate-card" data-idx="${i}">
+      <strong>Pair ${p.pairId}</strong>
+      <div style="margin-top:6px;">
+        <div><span class="muted">Father:</span> <strong>${escapeHtml(p.father.name)}</strong> (${p.father.birth_year ?? "?"} · ${escapeHtml(p.father.birth_place || "place unknown")}) · link <strong>${p.father.link_band}</strong></div>
+        <div><span class="muted">Mother:</span> <strong>${escapeHtml(p.mother.name)}</strong> (${p.mother.birth_year ?? "?"} · ${escapeHtml(p.mother.birth_place || "place unknown")}) · link <strong>${p.mother.link_band}</strong></div>
+      </div>
+      <div class="muted" style="margin-top:6px; font-size:11px;">
+        Citation: ${escapeHtml(p.father.link_citation)}${p.mother.link_citation !== p.father.link_citation ? " / " + escapeHtml(p.mother.link_citation) : ""}
+      </div>
+      <button class="primary accept-pair-btn" data-idx="${i}" style="margin-top:8px;">
+        Accept both as parents of ${escapeHtml(child.name)}
+      </button>
+    </div>`,
+    )
+    .join("");
+
+  const wrap = document.createElement("section");
+  wrap.id = "candidate-picker";
+  wrap.innerHTML = `
+    <h3 style="margin: 18px 0 8px; font-size: 14px; color: #1f3864;">
+      Proposed parent pairs (${pairs.length})
+    </h3>
+    <p class="muted" style="font-size: 12px;">
+      Each pair shares a single source citation that names both parents.
+      Accepting creates two new individuals (confidence C until further
+      Record Discovery), the family record, and both parent-child links
+      at the stated link confidences in one transaction.
+    </p>
+    ${html}
+  `;
+  $("#result").appendChild(wrap);
+
+  for (const btn of wrap.querySelectorAll(".accept-pair-btn")) {
+    btn.addEventListener("click", () => {
+      const idx = Number(btn.dataset.idx);
+      acceptPair(pairs[idx], ph);
+    });
+  }
+};
+
+const acceptPair = async (pair, ph) => {
+  const child = state.byId.get(ph.childId);
+  if (!child) return;
+  const ok = confirm(
+    `Accept both parents for ${child.name}?\n\n` +
+      `Father: ${pair.father.name} (${pair.father.birth_year ?? "?"})\n` +
+      `Mother: ${pair.mother.name} (${pair.mother.birth_year ?? "?"})\n\n` +
+      `Both at link confidence ${pair.father.link_band}/${pair.mother.link_band}.\n` +
+      `Two new individuals will be created (confidence C until separately verified).`,
+  );
+  if (!ok) return;
+
+  const body = {
+    father: {
+      name: pair.father.name,
+      birth_year: pair.father.birth_year,
+      birth_place: pair.father.birth_place,
+      link_confidence: pair.father.link_band,
+      link_evidence_type: pair.father.link_tier,
+      link_citation: pair.father.link_citation,
+    },
+    mother: {
+      name: pair.mother.name,
+      birth_year: pair.mother.birth_year,
+      birth_place: pair.mother.birth_place,
+      link_confidence: pair.mother.link_band,
+      link_evidence_type: pair.mother.link_tier,
+      link_citation: pair.mother.link_citation,
+    },
+  };
+  const res = await fetch(
+    `/api/ancestor/accept-pair/${encodeURIComponent(ph.childId)}`,
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+    },
+  );
+  if (!res.ok) {
+    const err = await res.json();
+    alert(`Could not accept pair: ${err.error}`);
+    return;
+  }
+  const { fatherId } = await res.json();
+  await fetchData();
+  computeLayout();
+  renderCards();
+  selectPerson(fatherId);
+};
+
+// Ancestor Discovery (both parents) — uses role=both
+const runAncestorDiscoveryBoth = (pos) => {
+  if (!capCheck()) return;
+  if (!cascadeCheck(pos.childId, "Ancestor Discovery (both parents)")) return;
+  state.selectedPlaceholder = { ...pos, role: "both" };
+  $("#run-btn").disabled = true;
+  $("#run-both-btn").disabled = true;
+  $("#status").hidden = false;
+  $("#status-text").textContent = "Searching for both parents…";
+  $("#status-query").textContent = "";
+  $("#status-meta").textContent = "";
+  $("#result").innerHTML = "";
+
+  const accumulated = { text: "", searches: 0 };
+  const url = `/api/ancestor/run/${encodeURIComponent(pos.childId)}/both`;
+  const es = new EventSource(url);
+  state.streaming = { es, accumulated };
+
+  es.onmessage = (e) => {
+    if (state.streaming?.es !== es) return;
+    const event = JSON.parse(e.data);
+    if (state.streaming?.completed && (event.type === "search" || event.type === "text")) {
+      return;
+    }
+    if (event.type === "start") {
+      $("#status-text").textContent = "Ancestor Discovery (both parents) running…";
+    } else if (event.type === "search") {
+      accumulated.searches += 1;
+      $("#status-text").textContent = `Web search ${accumulated.searches} running…`;
+      $("#status-query").textContent = event.query;
+    } else if (event.type === "text") {
+      accumulated.text += event.text;
+      renderResult(accumulated.text);
+    } else if (event.type === "done") {
+      const u = event.result.usage;
+      $("#status-meta").textContent = `Done. ${event.result.search_count} searches · ${u.input_tokens + u.output_tokens} tokens`;
+      accumulated.searches = event.result.search_count;
+      $("#status-text").textContent = `Web search ${accumulated.searches} complete.`;
+      if (state.streaming) state.streaming.completed = true;
+      // Hide spinner immediately on done — don't depend on saved to clean up.
+      $("#status").hidden = true;
+      $("#run-btn").disabled = false;
+    } else if (event.type === "saved") {
+      cleanupStream();
+      $("#status").hidden = true;
+      fetch("/api/spend").then((r) => r.json()).then((s) => {
+        state.spend = s;
+        renderSpend();
+      });
+      const pairs = parseCandidatePairs(accumulated.text);
+      if (pairs.length > 0) {
+        renderPairPicker(pairs, pos);
+      } else {
+        // Fallback: maybe the agent emitted single-parent candidates instead
+        const singles = parseCandidateParents(accumulated.text);
+        if (singles.length > 0) {
+          renderCandidatePicker(singles, pos);
+        }
+      }
+    } else if (event.type === "error") {
+      $("#status-text").textContent = `Error: ${event.message}`;
+      cleanupStream();
+    }
+  };
+  es.onerror = () => {
+    if (state.streaming && !state.streaming.completed) {
+      $("#status-text").textContent = "Connection lost.";
+      cleanupStream();
+    }
+  };
+};
+
 // Ancestor Discovery — uses /api/ancestor/run/:childId/:role
 const runAncestorDiscovery = () => {
   const ph = state.selectedPlaceholder;
@@ -1005,6 +1285,9 @@ const runAncestorDiscovery = () => {
       accumulated.searches = event.result.search_count;
       $("#status-text").textContent = `Web search ${accumulated.searches} complete.`;
       if (state.streaming) state.streaming.completed = true;
+      // Hide spinner immediately on done — don't depend on saved to clean up.
+      $("#status").hidden = true;
+      $("#run-btn").disabled = false;
     } else if (event.type === "saved") {
       cleanupStream();
       $("#status").hidden = true;
@@ -1417,6 +1700,76 @@ const wireDepth = () => {
     $("#toggle-weak").classList.toggle("active", state.highlightWeakLinks);
     renderCards();
   });
+  // GEDCOM import: read file as text on the client, POST as JSON to keep the
+  // server free of multipart deps. The dialog stays open after submit so the
+  // user sees the summary before dismissing.
+  $("#import-gedcom")?.addEventListener("click", () => {
+    // Reset to the "ready to import" state every time the dialog opens.
+    $("#import-summary").hidden = true;
+    $("#import-summary").innerHTML = "";
+    $("#import-progress").hidden = true;
+    $("#import-submit").hidden = false;
+    $("#import-submit").disabled = false;
+    const cancelBtn = $("#import-dialog button[value='cancel']");
+    if (cancelBtn) cancelBtn.textContent = "Cancel";
+    $("#import-dialog").querySelector("form").reset();
+    $("#import-dialog").showModal();
+  });
+
+  $("#import-submit")?.addEventListener("click", async () => {
+    const fileInput = $("#import-dialog input[type='file']");
+    const file = fileInput?.files?.[0];
+    if (!file) {
+      alert("Please pick a GEDCOM file first.");
+      return;
+    }
+    $("#import-submit").disabled = true;
+    $("#import-progress").hidden = false;
+    $("#import-summary").hidden = true;
+    try {
+      const text = await file.text();
+      const res = await fetch("/api/external/import", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ filename: file.name, text }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: res.statusText }));
+        throw new Error(err.error ?? "Import failed");
+      }
+      const { summary } = await res.json();
+      $("#import-progress").hidden = true;
+      $("#import-summary").hidden = false;
+      $("#import-summary").innerHTML = `
+        <h4 style="margin:0 0 6px; color:#1f6b3a;">✓ Import complete</h4>
+        <ul style="margin:0; padding-left:20px; font-size:13px; line-height:1.6;">
+          <li><strong>${escapeHtml(summary.filename)}</strong></li>
+          <li>${summary.individual_count} individuals · ${summary.family_count} families · ${summary.source_count} sources parsed</li>
+          <li><strong>${summary.matched_count}</strong> matched to existing tree (Tier 3 leads now in KB context)</li>
+          <li><strong>${summary.unmatched_count}</strong> unmatched (candidate ancestors for unknown-parent searches)</li>
+        </ul>
+        <p class="muted" style="margin-top:8px; font-size:12px;">
+          Re-running the agent on a matched individual will surface the new
+          <code>external_suggestions</code> section with their citations.
+        </p>
+      `;
+      // Switch dialog into "done" state so the user knows the work is finished.
+      // Hide the Import button (no second submission), relabel Cancel → Close.
+      $("#import-submit").hidden = true;
+      const cancelBtn = $("#import-dialog button[value='cancel']");
+      if (cancelBtn) cancelBtn.textContent = "Close";
+      // Refresh data so the topbar / cards update
+      await fetchData();
+      computeLayout();
+      renderCards();
+    } catch (e) {
+      $("#import-progress").hidden = true;
+      alert(`Import failed: ${e.message}`);
+    } finally {
+      $("#import-submit").disabled = false;
+    }
+  });
+
   $("#export-gedcom")?.addEventListener("click", async () => {
     const btn = $("#export-gedcom");
     btn.disabled = true;

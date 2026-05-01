@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { runAgent, runAncestorAgent } from "./agent/researchAgent.js";
 import { exportGedcom } from "./gedcom/writer.js";
+import { performImport } from "./agent/externalImport.js";
 import {
   buildKbContextBody,
   applyAgentRunToKb,
@@ -24,6 +25,7 @@ const EVIDENCE_LOG_FILE = path.join(DATA_DIR, "evidence_log.json");
 const DECISIONS_FILE = path.join(DATA_DIR, "decisions.json");
 const ANCESTOR_LOG_FILE = path.join(DATA_DIR, "ancestor_discovery_log.json");
 const RESEARCH_KB_FILE = path.join(DATA_DIR, "research_kb.json");
+const EXTERNAL_SUGGESTIONS_FILE = path.join(DATA_DIR, "external_suggestions.json");
 const SOURCE_GEDCOM = path.join(__dirname, "research", "Sutcliffe_CleanTree_v1.ged");
 const OUTPUTS_DIR = path.join(__dirname, "outputs");
 const PORT = Number(process.env.PORT) || 3000;
@@ -105,7 +107,7 @@ const writeJsonAtomic = async (file, data) => {
 };
 
 const app = express();
-app.use(express.json({ limit: "1mb" }));
+app.use(express.json({ limit: "50mb" })); // GEDCOM uploads can be large
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/api/individuals", async (_req, res) => {
@@ -228,6 +230,47 @@ app.get("/api/gedcom/download/:filename", (req, res) => {
   const safe = path.basename(req.params.filename); // prevent path traversal
   const file = path.join(OUTPUTS_DIR, safe);
   res.download(file);
+});
+
+// Import an external GEDCOM (e.g. Ancestry export). Body: { filename, text }.
+// Parses, matches against our tree, merges into data/external_suggestions.json.
+// External data is treated as Tier 3 leads — never raises a confidence band on
+// its own. The agent sees it as hypotheses to verify in the next KB context.
+app.post("/api/external/import", async (req, res) => {
+  const { filename, text } = req.body ?? {};
+  if (!filename || typeof text !== "string") {
+    res.status(400).json({ error: "filename and text are required" });
+    return;
+  }
+  try {
+    const [individuals, current] = await Promise.all([
+      readJson(INDIVIDUALS_FILE),
+      readJson(EXTERNAL_SUGGESTIONS_FILE),
+    ]);
+    const { suggestions, summary } = performImport({
+      gedcomText: text,
+      filename,
+      ourTree: individuals,
+      currentSuggestions: current,
+    });
+    await writeJsonAtomic(EXTERNAL_SUGGESTIONS_FILE, suggestions);
+    res.json({ ok: true, summary });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get("/api/external/summary", async (_req, res) => {
+  try {
+    const sugg = await readJson(EXTERNAL_SUGGESTIONS_FILE);
+    res.json({
+      imports: sugg.imports ?? [],
+      total_matched_individuals: Object.keys(sugg.by_individual ?? {}).length,
+      total_unmatched: (sugg.unmatched ?? []).length,
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 app.get("/api/kb", async (_req, res) => {
@@ -359,16 +402,19 @@ app.get("/api/agent/run/:id", async (req, res) => {
   const ac = new AbortController();
   req.on("close", () => ac.abort());
 
-  // Build KB context body for this individual using current KB state and
-  // any prior runs so the agent can build on its own history.
-  const [kb, families, allIndividuals, evidenceLog] = await Promise.all([
+  // Build KB context body for this individual using current KB state, prior
+  // runs, and any external GEDCOM suggestions so the agent can use them as
+  // Tier 3 leads to verify.
+  const [kb, families, allIndividuals, evidenceLog, externalSugg] = await Promise.all([
     readJson(RESEARCH_KB_FILE),
     readJson(FAMILIES_FILE),
     readJson(INDIVIDUALS_FILE),
     readJson(EVIDENCE_LOG_FILE),
+    readJson(EXTERNAL_SUGGESTIONS_FILE),
   ]);
+  const kbWithExternal = { ...kb, external_suggestions: externalSugg };
   const kbBody = buildKbContextBody(
-    kb,
+    kbWithExternal,
     profile,
     families,
     allIndividuals,
@@ -436,8 +482,8 @@ app.get("/api/ancestor/run/:childId/:role", async (req, res) => {
     return;
   }
   const { childId, role } = req.params;
-  if (!["father", "mother"].includes(role)) {
-    res.status(400).json({ error: "role must be father or mother" });
+  if (!["father", "mother", "both"].includes(role)) {
+    res.status(400).json({ error: "role must be father, mother, or both" });
     return;
   }
   const [individuals, families] = await Promise.all([
@@ -467,11 +513,19 @@ app.get("/api/ancestor/run/:childId/:role", async (req, res) => {
   req.on("close", () => ac.abort());
 
   // Build KB context for the ancestor search anchored on the child.
-  const [kb, evidenceLog] = await Promise.all([
+  const [kb, evidenceLog, externalSugg] = await Promise.all([
     readJson(RESEARCH_KB_FILE),
     readJson(EVIDENCE_LOG_FILE),
+    readJson(EXTERNAL_SUGGESTIONS_FILE),
   ]);
-  const kbBody = buildKbContextBody(kb, child, families, individuals, evidenceLog);
+  const kbWithExternal = { ...kb, external_suggestions: externalSugg };
+  const kbBody = buildKbContextBody(
+    kbWithExternal,
+    child,
+    families,
+    individuals,
+    evidenceLog,
+  );
 
   send({ type: "start", child, role, otherParent, siblings });
 
@@ -527,6 +581,176 @@ app.get("/api/ancestor/run/:childId/:role", async (req, res) => {
 // child, and creates a parent-child relationship record at the chosen link
 // confidence. All writes are atomic; the new individual gets an ID with a
 // distinguishing prefix so agent-proposed people are easy to spot.
+// Accept a PAIR of Ancestor Discovery candidates (father + mother together).
+// Creates two new individuals, the family record, and two parent-child
+// relationships atomically. Used after a role="both" agent run that
+// surfaced candidate pairs sharing a single source citation.
+app.post("/api/ancestor/accept-pair/:childId", async (req, res) => {
+  const { childId } = req.params;
+  const { father, mother } = req.body ?? {};
+
+  for (const [label, c] of [["father", father], ["mother", mother]]) {
+    if (!c?.name?.trim()) {
+      res.status(400).json({ error: `${label}.name is required` });
+      return;
+    }
+    if (!["A", "B", "C"].includes(c.link_confidence)) {
+      res.status(400).json({ error: `${label}.link_confidence must be A|B|C` });
+      return;
+    }
+    if (!c.link_citation?.trim()) {
+      res.status(400).json({ error: `${label}.link_citation is required` });
+      return;
+    }
+  }
+
+  try {
+    const [individuals, families, relationships] = await Promise.all([
+      readJson(INDIVIDUALS_FILE),
+      readJson(FAMILIES_FILE),
+      readJson(RELATIONSHIPS_FILE),
+    ]);
+    const child = individuals.find((p) => p.id === childId);
+    if (!child) {
+      res.status(404).json({ error: "child not found" });
+      return;
+    }
+
+    const ts = Date.now();
+    const fatherId = `@AGENT_${ts}_F@`;
+    const motherId = `@AGENT_${ts + 1}_M@`;
+    const buildIndividual = (data, sex, role, id) => ({
+      id,
+      name: data.name.trim(),
+      sex,
+      birth_year: Number(data.birth_year) || null,
+      birth_date: data.birth_year ? String(data.birth_year) : "",
+      birth_place: data.birth_place ?? "",
+      death_date: "",
+      death_place: "",
+      baptism_date: "",
+      baptism_place: "",
+      famc: null,
+      fams: [],
+      confidence: "C",
+      score: 0,
+      warnings: [
+        `Proposed by Ancestor Discovery agent (paired ${role}) — individual record not yet primary-verified`,
+      ],
+      alerts: [],
+      generation: child.generation != null ? child.generation + 1 : null,
+      provenance: "agent_proposed",
+      proposed_at: new Date().toISOString(),
+    });
+
+    const newFather = buildIndividual(father, "M", "father", fatherId);
+    const newMother = buildIndividual(mother, "F", "mother", motherId);
+
+    // Find or create the FAM linking child to these new parents
+    let fam = child.famc ? families.find((f) => f.id === child.famc) : null;
+    if (!fam) {
+      const newFamId = `@AGENT_F_${ts}@`;
+      fam = {
+        id: newFamId,
+        husband: null,
+        wife: null,
+        children: [childId],
+        marriage_date: "",
+        marriage_place: "",
+      };
+      families.push(fam);
+      child.famc = newFamId;
+    }
+    if (fam.husband && fam.husband !== fatherId) {
+      res.status(409).json({
+        error: `child already has a recorded father (${fam.husband}). Use single-parent accept for the missing slot only.`,
+      });
+      return;
+    }
+    if (fam.wife && fam.wife !== motherId) {
+      res.status(409).json({
+        error: `child already has a recorded mother (${fam.wife}). Use single-parent accept for the missing slot only.`,
+      });
+      return;
+    }
+    fam.husband = fatherId;
+    fam.wife = motherId;
+    newFather.fams = [fam.id];
+    newMother.fams = [fam.id];
+
+    individuals.push(newFather, newMother);
+
+    relationships.push(
+      {
+        id: `${fam.id}-${fatherId}-${childId}`,
+        family_id: fam.id,
+        parent_id: fatherId,
+        child_id: childId,
+        kind: "father",
+        confidence: father.link_confidence,
+        evidence_type: father.link_evidence_type ?? null,
+        source: father.link_citation.trim(),
+        verified_at: new Date().toISOString(),
+        evidence_id: null,
+        provenance: "agent_proposed_paired",
+      },
+      {
+        id: `${fam.id}-${motherId}-${childId}`,
+        family_id: fam.id,
+        parent_id: motherId,
+        child_id: childId,
+        kind: "mother",
+        confidence: mother.link_confidence,
+        evidence_type: mother.link_evidence_type ?? null,
+        source: mother.link_citation.trim(),
+        verified_at: new Date().toISOString(),
+        evidence_id: null,
+        provenance: "agent_proposed_paired",
+      },
+    );
+
+    await Promise.all([
+      writeJsonAtomic(INDIVIDUALS_FILE, individuals),
+      writeJsonAtomic(FAMILIES_FILE, families),
+      writeJsonAtomic(RELATIONSHIPS_FILE, relationships),
+    ]);
+
+    // KB writes for both new individuals
+    try {
+      const [evidenceLog, kbCurrent] = await Promise.all([
+        readJson(EVIDENCE_LOG_FILE),
+        readJson(RESEARCH_KB_FILE),
+      ]);
+      let kbNext = kbCurrent;
+      kbNext = applyAcceptedCandidateToKb(kbNext, {
+        newIndividual: newFather,
+        child,
+        role: "father",
+        linkCitation: father.link_citation.trim(),
+        families,
+        individuals,
+        evidenceLog,
+      });
+      kbNext = applyAcceptedCandidateToKb(kbNext, {
+        newIndividual: newMother,
+        child,
+        role: "mother",
+        linkCitation: mother.link_citation.trim(),
+        families,
+        individuals,
+        evidenceLog,
+      });
+      await writeJsonAtomic(RESEARCH_KB_FILE, kbNext);
+    } catch (kbErr) {
+      console.error("KB update failed on pair accept:", kbErr);
+    }
+
+    res.json({ ok: true, fatherId, motherId, familyId: fam.id });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.post("/api/ancestor/accept/:childId/:role", async (req, res) => {
   const { childId, role } = req.params;
   if (!["father", "mother"].includes(role)) {

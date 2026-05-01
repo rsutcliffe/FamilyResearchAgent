@@ -265,6 +265,37 @@ export const buildKbContextBody = (
     body += `  (no efficacy data yet — first runs)\n`;
   }
 
+  // External GEDCOM suggestions for THIS individual — Tier 3 only,
+  // explicitly flagged as leads to verify, never authoritative.
+  const extSugg = kb.external_suggestions?.by_individual?.[individual.id] ?? [];
+  if (extSugg.length > 0) {
+    body += `\nexternal_suggestions:\n`;
+    body += `  (Tier 3 — imported from external GEDCOM(s). These are LEADS to verify, not primary evidence. Never raises a band on its own. Use them as hypotheses to investigate via free or paywalled sources.)\n`;
+    for (const m of extSugg) {
+      const d = m.external_data ?? {};
+      body += `  - external_id: "${yamlEsc(m.external_id)}"\n`;
+      body += `    source_file: "${yamlEsc(m.external_source_file ?? "(unknown)")}"\n`;
+      body += `    match_confidence: ${m.confidence}\n`;
+      if (m.reasons?.length) {
+        body += `    match_reasons: [${m.reasons.map((r) => `"${yamlEsc(r)}"`).join(", ")}]\n`;
+      }
+      body += `    external_data:\n`;
+      if (d.name) body += `      name: "${yamlEsc(d.name)}"\n`;
+      if (d.birth_year) body += `      birth_year: ${d.birth_year}\n`;
+      if (d.birth_place) body += `      birth_place: "${yamlEsc(d.birth_place)}"\n`;
+      if (d.death_date) body += `      death_date: "${yamlEsc(d.death_date)}"\n`;
+      if (d.famc) body += `      famc: "${yamlEsc(d.famc)}"\n`;
+      if (d.citations?.length) {
+        body += `      citations:\n`;
+        for (const c of d.citations.slice(0, 5)) {
+          body += `        - source_id: "${yamlEsc(c.source_id)}"`;
+          if (c.page) body += `, page: "${yamlEsc(c.page)}"`;
+          body += `\n`;
+        }
+      }
+    }
+  }
+
   body += `\nalias_registry:\n`;
   const aliasKeys = Object.keys(aliases);
   const ALIASES_PER_KEY_CAP = 6;

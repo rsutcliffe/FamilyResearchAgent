@@ -368,6 +368,33 @@ body.tree-mode {
   margin-top: 12px;
 }
 
+.strategy-tip {
+  margin: 8px 0 12px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-family: -apple-system, system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.strategy-tip.warn {
+  background: #fff8e1;
+  border-left: 3px solid #f5c66a;
+  color: #5a4400;
+}
+
+.strategy-tip.info {
+  background: #e8f1fa;
+  border-left: 3px solid #4a90e2;
+  color: #1f3864;
+}
+
+.strategy-tip strong {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
 .external-lookup {
   background: #fff8e1;
   border: 1px solid #f5c66a;

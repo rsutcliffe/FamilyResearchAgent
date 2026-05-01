@@ -3,3 +3,9 @@
 node_modules/
 .DS_Store
 .claude/
+
+# Playwright artifacts
+playwright-report/
+test-results/
+tests/**/__screenshots__/
+

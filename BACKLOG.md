@@ -43,6 +43,10 @@ Estimated effort: 4–6 hours including OAuth, agent tool-loop changes,
 testing, and rate-limit handling. Probably worth doing as one focused
 session rather than slotting in piecemeal.
 
+## Production code investigation
+
+- **Saved-event refresh race.** When the agent run completes, `done` shows decision buttons; `saved` then triggers `refreshAndReselect` → `selectPerson` → `GET /api/evidence/:id`. If that GET races the file write or returns null for any reason, `showDecisionButtons(false, null)` hides the buttons we just made visible. Surfaced by the Playwright test fixture which omits the `saved` event for this reason. Worth tracing in production logs to see if it ever fires; the symptom would be "I just ran the agent and now decision buttons are gone."
+
 ## Other paywalled options
 
 - **Findmypast / TheGenealogist via browser automation.** Use Claude in Chrome / Playwright against the user's already-authenticated browser. Avoids credential handling. Brittle to UI changes; ToS implications for some services. Worth considering only if FamilySearch API + manual evidence flow leave a meaningful gap.
@@ -71,6 +75,10 @@ session rather than slotting in piecemeal.
 
 - **Periodic data backup.** Currently `data/*.json` deletion is unrecoverable. A simple cron-like timestamped snapshot would help. Or `git init` the project.
 
-- **Test suite.** No tests anywhere. As the codebase grows, regressions will start to bite. Start with: GEDCOM parser fixture tests, KB context builder snapshot tests, `parseRecommendedCitation` round-trip tests.
+- **Test coverage gaps.** Initial unit + Playwright suite is in place (see `TESTING.md`). Still missing:
+  - `buildKbContextBody` — large branchy string assembler; cover with snapshot tests once a bug surfaces in it
+  - Server endpoints — would need a supertest-style harness, useful for `/api/decision`, `/api/ancestor/accept-pair`, `/api/manual-evidence`
+  - GEDCOM writer round-trip — parse `Sutcliffe_CleanTree_v1.ged` → write → parse again → assert equivalence
+  - Visual baseline snapshots — run `npm run test:ui -- --update-snapshots` once the look is stable to lock in baselines
 
 - **Concurrent agent runs.** Currently one user, one run at a time. If two cards are clicked in quick succession, the second clobbers the first's UI state. Cheap to fix with a per-individual lock.

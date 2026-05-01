@@ -219,7 +219,10 @@ body {
   color: var(--c-d);
 }
 
-#status {
+/* Scope display:flex so the [hidden] HTML attribute wins. Without :not([hidden])
+   this rule overrode the browser's [hidden] { display: none } default and
+   left the spinner visible after navigation. Caught by Playwright regression. */
+#status:not([hidden]) {
   display: flex;
   align-items: center;
   gap: 14px;

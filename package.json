@@ -5,7 +5,16 @@
   "type": "module",
   "scripts": {
     "start": "node --env-file=.env server.js",
-    "smoke": "node --env-file=.env scripts/smoke-test.mjs"
+    "smoke": "node --env-file=.env scripts/smoke-test.mjs",
+    "import:gedcom": "node scripts/import-gedcom.mjs",
+    "test": "npm run test:unit && npm run test:ui",
+    "test:unit": "node --test tests/unit/*.test.js",
+    "test:unit:watch": "node --test --watch tests/unit/*.test.js",
+    "test:ui": "playwright test",
+    "test:ui:headed": "playwright test --headed",
+    "test:ui:ui": "playwright test --ui",
+    "debug:ui": "playwright codegen http://localhost:3001",
+    "prepare": "husky"
   },
   "engines": {
     "node": ">=20.6"
@@ -13,5 +22,9 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.40.0",
     "express": "^4.21.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "husky": "^9.1.0"
   }
 }

@@ -30,6 +30,7 @@
         <button id="zoom-out" title="Zoom out">−</button>
         <button id="zoom-in" title="Zoom in">+</button>
         <button id="reset-view" title="Reset view">Reset</button>
+        <button id="import-gedcom" title="Import an external GEDCOM (Ancestry export, etc.) as Tier 3 leads — never raises a band on its own; surfaced to agents as hypotheses to verify">Import .ged</button>
         <button id="export-gedcom" title="Export an updated GEDCOM with confidence bands, accepted citations as SOUR records, and any agent-proposed individuals">Export .ged</button>
         <a href="/list" class="link">List view</a>
       </div>
@@ -101,6 +102,33 @@
         <menu>
           <button value="cancel" formnovalidate>Cancel</button>
           <button class="primary" value="confirm">Save Flag</button>
+        </menu>
+      </form>
+    </dialog>
+
+    <dialog id="import-dialog">
+      <form method="dialog">
+        <h3>Import external GEDCOM</h3>
+        <p class="muted">
+          Imported data is treated as <strong>Tier 3 leads</strong> — never
+          raises a confidence band on its own. The agent uses it as
+          hypotheses to verify in subsequent runs. Multiple imports stack;
+          each is tagged with its filename so you can trace which lead came
+          from where.
+        </p>
+        <label
+          >GEDCOM file
+          <input type="file" accept=".ged,.gedcom,text/plain" required />
+        </label>
+        <div id="import-progress" class="muted" hidden style="margin-top:10px;">
+          Parsing and matching against your tree…
+        </div>
+        <div id="import-summary" hidden style="margin-top:10px;"></div>
+        <menu>
+          <button value="cancel" formnovalidate>Cancel</button>
+          <button type="button" id="import-submit" class="primary">
+            Import
+          </button>
         </menu>
       </form>
     </dialog>

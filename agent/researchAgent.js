@@ -74,7 +74,12 @@ const buildAncestorMessage = ({ child, role, otherParent, siblings, kbBody }) =>
           .join("\n")}`
       : `Known siblings: NONE in the tree.`;
 
-  return `Find the unknown ${role} of ${child.name}.
+  const headline =
+    role === "both"
+      ? `Find BOTH unknown parents of ${child.name}. Both parents are missing from the tree; prioritise records that name both parents together (GRO birth certificate, parish baptism register, parents' marriage record, census co-residence). Output candidate PAIRS in <<CANDIDATE_PARENTS>> using the CANDIDATE_PAIR_N_FATHER / CANDIDATE_PAIR_N_MOTHER format.`
+      : `Find the unknown ${role} of ${child.name}.`;
+
+  return `${headline}
 
 ${childPart}
 

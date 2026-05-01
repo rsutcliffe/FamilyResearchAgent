@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+# Pre-commit: run the fast unit test suite. Blocks the commit if any fail.
+# UI tests run in CI on push; running them here would slow every commit by
+# ~8 seconds. If you really want to run them locally, use `npm test`.
+echo "Running unit tests…"
+npm run test:unit

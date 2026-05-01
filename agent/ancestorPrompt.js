@@ -107,6 +107,19 @@ SECTION C: GENEALOGICAL RULES
   exists, surface ALL of them and rate each. Recommending one when several
   are equally plausible is a primary cause of cascading false positives.
 
+  BOTH-PARENTS MODE: if the user message states "Find BOTH unknown parents
+  of [child]", the most cost-efficient approach is to find a single record
+  that names both parents together — typically:
+    - GRO birth certificate (post-1837, name both parents)
+    - Parish baptism register entry (often names both parents on one line)
+    - Marriage record of the parents (names both directly)
+    - Census co-residence (names both as parents in same household)
+  When in BOTH-PARENTS mode, prioritise these record types. Each pair of
+  candidates (one father + one mother) should share a SINGLE source citation
+  whenever possible — that single document is the strongest possible link
+  evidence for both relationships simultaneously. Surface the pair as a
+  CANDIDATE_PAIR_N pair in the trailing block.
+
 ========================================================================
 SECTION C2: SEARCH BUDGET
 ========================================================================
@@ -268,11 +281,24 @@ If all returned candidates: NONE
 <</NEGATIVE_SEARCHES>>
 
 <<CANDIDATE_PARENTS>>
-One block per proposed candidate, with the fields the system needs to
-add this person provisionally to the tree. Format:
+For SINGLE-PARENT mode (looking for father OR mother), one line per
+candidate:
   CANDIDATE_N||name||birth_year||birth_place||link_band||link_tier||link_citation
-Example:
-  CANDIDATE_1||Richard Sweeting||1759||Brayton, Yorkshire||B||Tier 1||St Wilfrid's Monk Fryston baptism register, 14 Mar 1802, names both parents
+
+For BOTH-PARENTS mode, output PAIRS of candidates that share a single
+source citation. Use this exact format with the role token after the
+candidate ID:
+  CANDIDATE_PAIR_N_FATHER||name||birth_year||birth_place||link_band||link_tier||link_citation
+  CANDIDATE_PAIR_N_MOTHER||name||birth_year||birth_place||link_band||link_tier||link_citation
+The two lines for the same pair must share the same N and ideally the same
+link_citation (the document that names both). If you genuinely have to
+propose unpaired parents (e.g. one parent's record names them but not the
+spouse), use the single-parent CANDIDATE_N format and note the asymmetry
+in the body of the response.
+
+Example pair:
+  CANDIDATE_PAIR_1_FATHER||Richard Sweeting||1759||Brayton, Yorkshire||B||Tier 1||St Wilfrid's Monk Fryston baptism register 14 Mar 1802 names both parents
+  CANDIDATE_PAIR_1_MOTHER||Ann Wainwright||1766||Hillam, Monk Fryston||B||Tier 1||St Wilfrid's Monk Fryston baptism register 14 Mar 1802 names both parents
 If no candidates: NONE
 <</CANDIDATE_PARENTS>>
 
