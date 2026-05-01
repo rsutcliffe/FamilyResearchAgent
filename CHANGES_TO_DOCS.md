@@ -1,19 +1,18 @@
-# Spec Doc Changes — Outstanding
+# Spec Doc Changes — Status
 
 The runtime system prompt is now extracted to [agent/systemPrompt.js](agent/systemPrompt.js) and imported by [docs/agent_1.jsx](docs/agent_1.jsx:2). This is the canonical source.
 
-[docs/20250419_Sutcliffe_ClaudeCode_PRD_Addendum_v1.1.docx](docs/20250419_Sutcliffe_ClaudeCode_PRD_Addendum_v1.1.docx) has been updated (§11.2 sentence softened — see below).
+All three doc updates are complete:
 
-The two remaining spec doc updates are listed here. They were not applied directly because:
+- [docs/20250419_Sutcliffe_ClaudeCode_PRD_Addendum_v1.1.docx](docs/20250419_Sutcliffe_ClaudeCode_PRD_Addendum_v1.1.docx) — §11.2 sentence softened (see Change 3 below).
+- ✅ **Change 1 applied** — [docs/20250419_Sutcliffe_ClaudeCode_PRD_v1.1.docx](docs/20250419_Sutcliffe_ClaudeCode_PRD_v1.1.docx). §6 prompt body replaced verbatim from [agent/systemPrompt.js](agent/systemPrompt.js); header note inserted directly under the §6 heading. v1.0 preserved alongside.
+- ✅ **Change 2 applied** — [docs/20250419_Sutcliffe_ClaudeCode_Requirements_v1.1.docx](docs/20250419_Sutcliffe_ClaudeCode_Requirements_v1.1.docx). §8 prompt body replaced verbatim from [agent/systemPrompt.js](agent/systemPrompt.js); header note inserted directly under the §8 heading. v1.0 preserved alongside.
 
-- The local Python is 3.9; the docx skill's `pack.py` requires 3.10+ for PEP 604 syntax.
-- Each remaining change is a 40+ paragraph block replacement, which is high-risk to do as raw XML edits without the validating pack pipeline.
-
-Both changes can be applied in a follow-up session with Python 3.10+ available, or manually in Word using the text below.
+Implementation note: the docx skill's `pack.py` needs Python 3.10+ (PEP 604) and the local Python is 3.9 with no Homebrew available, so the edit was done with stdlib `zipfile` + targeted XML splicing on `word/document.xml`. Verification confirmed both v1.1 files contain the source prompt line-for-line (365 paragraphs each, zero mismatches) and pass `qlmanage` thumbnail rendering.
 
 ---
 
-## Change 1 — PRD v1.0 §6 (Record Discovery Agent — System Prompt Specification)
+## Change 1 — PRD v1.0 §6 (Record Discovery Agent — System Prompt Specification) ✅ APPLIED
 
 **File:** `docs/20250419_Sutcliffe_ClaudeCode_PRD_v1.0.docx`
 **Target:** §6, the entire prompt body (between the §6 heading and the start of §7 "Data Structures").
@@ -38,7 +37,7 @@ Both changes can be applied in a follow-up session with Python 3.10+ available, 
 
 ---
 
-## Change 2 — Requirements §8 (Agent System Prompt)
+## Change 2 — Requirements §8 (Agent System Prompt) ✅ APPLIED
 
 **File:** `docs/20250419_Sutcliffe_ClaudeCode_Requirements_v1.0.docx`
 **Target:** §8, the entire prompt body (between the §8 heading and §9 "Non-Functional Requirements").

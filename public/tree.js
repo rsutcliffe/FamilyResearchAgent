@@ -248,11 +248,13 @@ const renderCards = () => {
     if (state.highlightWeakLinks && chain?.weakestLinkId) {
       card.classList.add("on-weak-chain");
     }
+    const pending = ind.pending_external_lookups ?? 0;
     card.innerHTML = `
       <div class="name">${escapeHtml(ind.name || "Unknown")}</div>
       <div class="dates">${dates}</div>
       <div class="place">${escapeHtml(ind.birth_place || "")}</div>
-      ${cascadeRisk ? `<div class="chain-warning" title="Chain weakness: ${chain.band} (own band ${ind.confidence})">⚠ chain ${chain.band}</div>` : ""}
+      ${pending > 0 ? `<div class="paid-lookup-hint" title="Agent suggested ${pending} paywalled lookup${pending === 1 ? "" : "s"} for this person. Click the card to see them and start there with your subscription.">£ ${pending}</div>` : ""}
+      ${cascadeRisk ? `<div class="chain-warning" title="${escapeHtml(ind.name || "This person")} is ${CONF_LABEL[ind.confidence]?.toLowerCase()} on their own evidence, but the family link connecting them back to root is only ${CONF_LABEL[chain.band]?.toLowerCase()}. Click the connection line below the card to verify or upgrade that link.">⚠ link: ${(CONF_LABEL[chain.band] ?? chain.band).toLowerCase()}</div>` : ""}
       ${pos.role !== "self" && pos.generation <= 2 ? `<div class="role-tag">${roleLabel(pos)}</div>` : ""}
     `;
     card.addEventListener("click", (e) => {
@@ -457,8 +459,8 @@ const selectPlaceholder = (pos) => {
   const child = state.byId.get(pos.childId);
   if (!child) return;
 
+  resetDetailPanelTransientState();
   $("#detail-panel").hidden = false;
-  $("#status").hidden = true;
   $("#decision-bar").hidden = false;
 
   const role = pos.role === "father" ? "Father" : "Mother";
@@ -496,6 +498,21 @@ const selectPlaceholder = (pos) => {
   $("#flag-btn").hidden = true;
 };
 
+// Reset every transient UI element of the detail panel so leftover state
+// from a previous individual (Stop button text, "Done. N searches", spinner
+// visibility, candidate picker, external lookups) doesn't bleed across
+// navigations. Called from selectPerson and selectPlaceholder.
+const resetDetailPanelTransientState = () => {
+  $("#status").hidden = true;
+  $("#status-text").textContent = "Searching public records…";
+  $("#status-query").textContent = "";
+  $("#status-meta").textContent = "";
+  $("#run-btn").disabled = false;
+  // Drop any candidate picker / external lookups section from a prior selection
+  document.querySelector("#candidate-picker")?.remove();
+  document.querySelector("#external-lookups-section")?.remove();
+};
+
 const selectPerson = async (id) => {
   state.selectedId = id;
   state.selectedPlaceholder = null;
@@ -503,6 +520,7 @@ const selectPerson = async (id) => {
   $(`[data-id="${id}"]`)?.classList.add("selected");
 
   if (state.streaming) cancelStream();
+  resetDetailPanelTransientState();
 
   $("#detail-panel").hidden = false;
   $("#status").hidden = true;
@@ -524,6 +542,7 @@ const selectPerson = async (id) => {
     ${p.warnings?.length ? `<div class="warnings">⚠ ${p.warnings.map(escapeHtml).join(" · ")}</div>` : ""}
     ${p.alerts?.length ? `<div class="alerts">⛔ ${escapeHtml(p.alerts[0])}</div>` : ""}
     ${state.reresearchById?.[id] ? `<div class="reresearch-banner">↻ ${escapeHtml(state.reresearchById[id].reason)} — re-running this individual now will use the fresh KB context.</div>` : ""}
+    ${(p.pending_external_lookups ?? 0) > 0 ? `<div class="reresearch-banner" style="background:#fff8e1; border-left-color:#f5c66a; color:#8b6c00;">£ ${p.pending_external_lookups} paywalled lookup${p.pending_external_lookups === 1 ? "" : "s"} suggested for this person — see the External lookups section below.</div>` : ""}
     ${spendLine}
   `;
 
@@ -765,6 +784,7 @@ const runAgent = () => {
   const id = state.selectedId;
   if (!id) return;
   if (!capCheck()) return;
+  if (!rerunCheck(id, "Record Discovery")) return;
   if (!cascadeCheck(id, "Record Discovery")) return;
   $("#run-btn").disabled = true;
   $("#status").hidden = false;
@@ -778,7 +798,16 @@ const runAgent = () => {
   state.streaming = { es, accumulated };
 
   es.onmessage = (e) => {
+    // Drop stale events from a stream that's no longer the active one
+    // (user navigated, ran on someone else, hit Stop). Old closures shouldn't
+    // be updating the shared DOM elements.
+    if (state.streaming?.es !== es) return;
     const event = JSON.parse(e.data);
+    // After "done" the run is logically complete. Any straggler search/text
+    // events are ignored so the counter doesn't drift past the server's count.
+    if (state.streaming?.completed && (event.type === "search" || event.type === "text")) {
+      return;
+    }
     if (event.type === "start") {
       $("#status-text").textContent = "Agent running…";
     } else if (event.type === "search") {
@@ -791,6 +820,9 @@ const runAgent = () => {
     } else if (event.type === "done") {
       const u = event.result.usage;
       $("#status-meta").textContent = `Done. ${event.result.search_count} searches · ${u.input_tokens + u.output_tokens} tokens`;
+      // Reconcile the displayed counter with the server's truth.
+      accumulated.searches = event.result.search_count;
+      $("#status-text").textContent = `Web search ${accumulated.searches} complete.`;
       if (state.streaming) state.streaming.completed = true;
     } else if (event.type === "saved") {
       cleanupStream();
@@ -938,6 +970,7 @@ const runAncestorDiscovery = () => {
   const ph = state.selectedPlaceholder;
   if (!ph) return;
   if (!capCheck()) return;
+  if (!rerunCheck(ph.childId, "Ancestor Discovery")) return;
   if (!cascadeCheck(ph.childId, "Ancestor Discovery")) return;
   $("#run-btn").disabled = true;
   $("#status").hidden = false;
@@ -952,7 +985,11 @@ const runAncestorDiscovery = () => {
   state.streaming = { es, accumulated };
 
   es.onmessage = (e) => {
+    if (state.streaming?.es !== es) return; // ignore stale closures
     const event = JSON.parse(e.data);
+    if (state.streaming?.completed && (event.type === "search" || event.type === "text")) {
+      return;
+    }
     if (event.type === "start") {
       $("#status-text").textContent = "Ancestor Discovery agent running…";
     } else if (event.type === "search") {
@@ -965,6 +1002,8 @@ const runAncestorDiscovery = () => {
     } else if (event.type === "done") {
       const u = event.result.usage;
       $("#status-meta").textContent = `Done. ${event.result.search_count} searches · ${u.input_tokens + u.output_tokens} tokens`;
+      accumulated.searches = event.result.search_count;
+      $("#status-text").textContent = `Web search ${accumulated.searches} complete.`;
       if (state.streaming) state.streaming.completed = true;
     } else if (event.type === "saved") {
       cleanupStream();
@@ -1178,14 +1217,35 @@ const parseRecommendationFreeForm = (text) => {
 const prefillAcceptDialog = async (id) => {
   const dlg = $("#accept-dialog");
   dlg.querySelector("form").reset();
-  try {
-    const ev = await fetch(`/api/evidence/${encodeURIComponent(id)}`).then((r) =>
-      r.json(),
-    );
-    if (!ev?.agent_result) return;
+  // Clear any previous status hint at the top of the dialog
+  let hintEl = dlg.querySelector(".prefill-hint");
+  if (hintEl) hintEl.remove();
+  const setHint = (text, kind = "muted") => {
+    const el = document.createElement("p");
+    el.className = `prefill-hint ${kind}`;
+    el.textContent = text;
+    el.style.cssText = "font-size:12px; margin:6px 0 12px; padding:6px 10px; border-radius:4px;";
+    if (kind === "warn") {
+      el.style.background = "#fff8e1";
+      el.style.borderLeft = "3px solid #f5c66a";
+    } else if (kind === "ok") {
+      el.style.background = "#e2efda";
+      el.style.borderLeft = "3px solid #1f6b3a";
+    } else {
+      el.style.background = "#f0f5fb";
+      el.style.borderLeft = "3px solid var(--accent)";
+    }
+    dlg.querySelector("h3").after(el);
+  };
 
-    // Prefer the structured RECOMMENDED_CITATION block — split into
-    // title / repository / reference / url cleanly.
+  try {
+    const ev = await fetch(`/api/evidence/${encodeURIComponent(id)}`).then((r) => r.json());
+    if (!ev?.agent_result) {
+      setHint("No agent run yet for this individual — fill in the citation manually.", "warn");
+      return;
+    }
+
+    // Prefer the structured RECOMMENDED_CITATION block
     const structured = parseRecommendedCitation(ev.agent_result);
     if (structured) {
       dlg.querySelector('[name="title"]').value = structured.title || "";
@@ -1193,24 +1253,44 @@ const prefillAcceptDialog = async (id) => {
       dlg.querySelector('[name="reference"]').value = structured.reference || "";
       dlg.querySelector('[name="url"]').value = structured.url || "";
       dlg.querySelector('[name="new_confidence"]').value = structured.new_confidence;
-      dlg.querySelector('[name="note"]').value =
-        "Pre-filled from agent's <<RECOMMENDED_CITATION>> block. Review before confirming.";
+      setHint(
+        `Auto-filled from the agent's structured citation (recommended band ${structured.new_confidence}). Review before confirming.`,
+        "ok",
+      );
+      console.log("[accept dialog] prefill from structured block:", structured);
       return;
     }
 
-    // Fallback: parse the free-form ## Recommendation section
+    // Fallback: free-form
     const free = parseRecommendationFreeForm(ev.agent_result);
-    if (!free) return;
+    console.log("[accept dialog] structured block not found; free-form parse:", free);
+    if (!free || (!free.band && !free.citation)) {
+      setHint(
+        "The agent's last run didn't recommend an upgrade (band: Unchanged or no match found). " +
+          "If you have evidence of your own, fill the citation manually.",
+        "warn",
+      );
+      return;
+    }
     if (free.band && ["A", "B", "C"].includes(free.band)) {
       dlg.querySelector('[name="new_confidence"]').value = free.band;
     }
     if (free.citation) {
       dlg.querySelector('[name="title"]').value = free.citation;
-      dlg.querySelector('[name="note"]').value =
-        "Pre-filled from agent's free-form recommendation. Re-run after the next deploy to get cleanly split repository/reference fields.";
+      setHint(
+        "Auto-filled from the agent's free-form recommendation. Repository and reference need manual splitting from the title. " +
+          "(Re-running the agent will produce a structured citation that auto-fills cleanly.)",
+        "warn",
+      );
+    } else {
+      setHint(
+        `The agent recommended band ${free.band} but didn't include a parseable citation. Fill manually.`,
+        "warn",
+      );
     }
   } catch (e) {
     console.warn("Failed to prefill from agent result", e);
+    setHint("Could not auto-fill (see console for error). Fill manually.", "warn");
   }
 };
 
@@ -1225,6 +1305,30 @@ const capCheck = () => {
       `Restart the server to reset the session counter, or raise SESSION_CAP_USD in .env (then restart).`,
   );
   return false;
+};
+
+// Per-individual re-run guard. After the threshold (default 3 prior runs),
+// every subsequent click on Run Agent prompts confirmation showing the
+// cumulative spend, so accidental re-runs in testing don't bleed cost.
+const RERUN_WARN_THRESHOLD = 3;
+
+const rerunCheck = (id, agentLabel) => {
+  const ind = state.spend?.by_individual?.[id];
+  const runs = ind?.runs ?? 0;
+  if (runs < RERUN_WARN_THRESHOLD) return true;
+  const cost = ind?.cost ?? 0;
+  const person = state.byId.get(id);
+  const name = person?.name ?? id;
+  const proceed = confirm(
+    `Re-run guard\n\n` +
+      `${agentLabel} on ${name} would be run #${runs + 1}.\n\n` +
+      `Cumulative spend on this person so far: ${fmtUSD(cost)} across ${runs} prior run${runs === 1 ? "" : "s"}.\n\n` +
+      `Re-running only adds value if the KB has new context since the last run. ` +
+      `If you're testing, override anyway. If not, cancel and consider whether ` +
+      `you'd be paying for similar searches.\n\n` +
+      `Proceed with run #${runs + 1}?`,
+  );
+  return proceed;
 };
 
 // Cascade pre-flight check. If the chain from root to this person passes

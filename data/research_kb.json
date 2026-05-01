@@ -70,10 +70,533 @@
       "count": 3
     }
   ],
-  "negative_searches": [],
+  "negative_searches": [
+    {
+      "individual_id": "@I1825902597@",
+      "source": "FreeBMD",
+      "query": "David Sutcliffe birth 1949 Leeds",
+      "recorded_at": "2026-05-01T09:01:59.640Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "FamilySearch",
+      "query": "David Sutcliffe birth 1949 Leeds Yorkshire",
+      "recorded_at": "2026-05-01T09:01:59.640Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "GRO public index",
+      "query": "GRO birth index \"David Sutcliffe\" 1949 Leeds \"Cockerham\"",
+      "recorded_at": "2026-05-01T09:01:59.640Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "1939 Register",
+      "query": "1939 Register \"Dennis Sutcliffe\" \"Lily\" Leeds",
+      "recorded_at": "2026-05-01T09:01:59.640Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "Ancestry",
+      "query": "\"David Sutcliffe\" \"Denise Matthews\" marriage Leeds 1970s",
+      "recorded_at": "2026-05-01T09:01:59.640Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "GRO direct",
+      "query": "site:gro.gov.uk \"David Sutcliffe\" birth 1949",
+      "recorded_at": "2026-05-01T09:01:59.640Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "YorkshireBMD",
+      "query": "yorkshirebmd \"Sutcliffe\" birth 1949 Leeds Morley Hunslet",
+      "recorded_at": "2026-05-01T09:01:59.640Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "FreeBMD",
+      "query": "FreeBMD \"David Sutcliffe\" \"Denise\" marriage Leeds 1970 1971 1972",
+      "recorded_at": "2026-05-01T09:01:59.640Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "1939 Register / census",
+      "query": "\"Dennis Sutcliffe\" \"Lily\" Leeds 1939 register OR 1951 census household",
+      "recorded_at": "2026-05-01T09:01:59.640Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "1951 census England Wales",
+      "query": "Dennis Sutcliffe Lily Leeds household",
+      "recorded_at": "2026-05-01T09:03:25.735Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "FreeBMD",
+      "query": "Sutcliffe birth 1949 Leeds Hunslet Morley registration district",
+      "recorded_at": "2026-05-01T09:03:25.735Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "1961 census",
+      "query": "Sutcliffe Leeds Hunslet Gildersome Dennis Lily David",
+      "recorded_at": "2026-05-01T09:03:25.735Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "YorkshireBMD",
+      "query": "David Sutcliffe Matthews marriage 1970 1971 1972 1973",
+      "recorded_at": "2026-05-01T09:03:25.735Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "GRO birth index",
+      "query": "1949 Sutcliffe David Leeds registration quarter",
+      "recorded_at": "2026-05-01T09:03:25.735Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "Findmypast 1951 census",
+      "query": "Dennis Sutcliffe Leeds",
+      "recorded_at": "2026-05-01T09:03:25.735Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "British Newspaper Archive",
+      "query": "Sutcliffe Dennis OR David Leeds birth 1949 announcement",
+      "recorded_at": "2026-05-01T09:03:25.735Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "GRO marriage index",
+      "query": "David Sutcliffe Denise 1972 Leeds",
+      "recorded_at": "2026-05-01T09:03:25.735Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "FreeBMD",
+      "query": "GRO birth index 1949 Sutcliffe mother maiden name Cockerham Leeds",
+      "recorded_at": "2026-05-01T09:05:04.796Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "1971 census England Wales",
+      "query": "1971 census England Wales Sutcliffe Dennis Lily Leeds household",
+      "recorded_at": "2026-05-01T09:05:04.796Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "YorkshireBMD",
+      "query": "yorkshirebmd Sutcliffe Matthews marriage Leeds 1968 1969 1974 1975",
+      "recorded_at": "2026-05-01T09:05:04.796Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "FreeBMD",
+      "query": "FreeBMD Richard David Sutcliffe birth 1972 Leeds father David",
+      "recorded_at": "2026-05-01T09:05:04.796Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "FreeBMD",
+      "query": "site:freebmd.org.uk \"Sutcliffe\" \"David\" birth 1949",
+      "recorded_at": "2026-05-01T09:05:04.796Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "Leeds local register office",
+      "query": "Leeds local register office BMD index 1949 Sutcliffe birth Hunslet",
+      "recorded_at": "2026-05-01T09:05:04.796Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "YorkshireBMD",
+      "query": "yorkshirebmd birth index coverage 1949 Leeds Hunslet Morley years available",
+      "recorded_at": "2026-05-01T09:05:04.796Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "YorkshireBMD",
+      "query": "YorkshireBMD Richard David Sutcliffe birth 1972 Leeds",
+      "recorded_at": "2026-05-01T09:10:05.870Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "FreeBMD",
+      "query": "FreeBMD Dennis Sutcliffe death Leeds Yorkshire 1960s 1970s 1980s",
+      "recorded_at": "2026-05-01T09:10:05.870Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "FreeBMD",
+      "query": "freebmd.org.uk \"Richard David\" \"Sutcliffe\" birth 1972 Leeds",
+      "recorded_at": "2026-05-01T09:10:05.870Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "GRO online index",
+      "query": "GRO online birth index \"David Sutcliffe\" 1949 Leeds registration",
+      "recorded_at": "2026-05-01T09:10:05.870Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "FreeBMD",
+      "query": "site:freebmd.org.uk Sutcliffe Matthews marriage 1971 1972 1973 Leeds",
+      "recorded_at": "2026-05-01T09:10:05.870Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "1939 Register household",
+      "query": "\"Lily Sutcliffe\" OR \"Lily Cockerham\" 1939 register Leeds Hunslet household",
+      "recorded_at": "2026-05-01T09:10:05.870Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "YorkshireBMD",
+      "query": "yorkshirebmd \"Dennis Sutcliffe\" \"Cockerham\" marriage Leeds",
+      "recorded_at": "2026-05-01T09:10:05.870Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "FreeBMD",
+      "query": "FreeBMD Dennis Sutcliffe Lily Cockerham marriage 1930s 1940s Leeds Yorkshire",
+      "recorded_at": "2026-05-01T09:10:05.870Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "Google",
+      "query": "GRO birth index 1949 \"Sutcliffe\" Leeds Morley Hunslet registration district volume",
+      "recorded_at": "2026-05-01T09:16:34.573Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "Google",
+      "query": "freebmd.org.uk Sutcliffe Matthews marriage 1970 1971 1972 1973 1974 Yorkshire",
+      "recorded_at": "2026-05-01T09:16:34.573Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "Google",
+      "query": "YorkshireBMD \"Sutcliffe\" birth 1948 1949 1950 Hunslet Morley Tadcaster",
+      "recorded_at": "2026-05-01T09:16:34.573Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "Google",
+      "query": "GRO online index \"David Sutcliffe\" birth 1949 mother \"Cockerham\"",
+      "recorded_at": "2026-05-01T09:16:34.573Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "Google",
+      "query": "site:yorkshirebmd.org.uk \"David Sutcliffe\" birth 1949",
+      "recorded_at": "2026-05-01T09:16:34.573Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "Google",
+      "query": "\"Richard David Sutcliffe\" birth 1972 Leeds father \"David Sutcliffe\"",
+      "recorded_at": "2026-05-01T09:16:34.573Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "YorkshireBMD",
+      "query": "yorkshirebmd.org.uk birth index Leeds 1949 Sutcliffe",
+      "recorded_at": "2026-05-01T09:16:34.573Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "Google",
+      "query": "GRO birth certificate \"David Sutcliffe\" 1949 Leeds register \"Dennis\"",
+      "recorded_at": "2026-05-01T09:16:34.573Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "Google",
+      "query": "\"Richard David Sutcliffe\" born 1972 Leeds father \"David\" GRO birth registration",
+      "recorded_at": "2026-05-01T09:16:34.573Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "YorkshireBMD",
+      "query": "YorkshireBMD births 1949 Leeds Hunslet Sutcliffe index",
+      "recorded_at": "2026-05-01T09:19:39.370Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "GRO online index",
+      "query": "GRO online birth index 1949 Leeds registration district search",
+      "recorded_at": "2026-05-01T09:19:39.370Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "YorkshireBMD",
+      "query": "YorkshireBMD coverage years available Leeds Hunslet birth registrations post-1945",
+      "recorded_at": "2026-05-01T09:19:39.370Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "FreeBMD",
+      "query": "FreeBMD \"Dennis Sutcliffe\" death Yorkshire 1970s 1980s 1990s",
+      "recorded_at": "2026-05-01T09:19:39.370Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "GRO online index coverage",
+      "query": "GRO online birth index coverage years available 1949 \"not available\" OR \"excluded\" births",
+      "recorded_at": "2026-05-01T09:19:39.370Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "British Newspaper Archive",
+      "query": "\"David Sutcliffe\" Leeds obituary death notice Yorkshire 2000s 2010s 2020s",
+      "recorded_at": "2026-05-01T09:19:39.370Z"
+    },
+    {
+      "individual_id": "@I1825902597@",
+      "source": "FreeBMD",
+      "query": "FreeBMD \"Dennis Sutcliffe\" death 1960 1970 1980 Yorkshire Leeds Morley Gildersome",
+      "recorded_at": "2026-05-01T09:19:39.370Z"
+    },
+    {
+      "individual_id": "@I1825902598@",
+      "source": "FreeBMD",
+      "query": "Denise Matthews birth 1951 Leeds",
+      "recorded_at": "2026-05-01T10:28:41.685Z"
+    },
+    {
+      "individual_id": "@I1825902598@",
+      "source": "FreeBMD",
+      "query": "Herbert Matthews Iris Binns marriage Leeds 1950 1955",
+      "recorded_at": "2026-05-01T10:28:41.685Z"
+    },
+    {
+      "individual_id": "@I1825902598@",
+      "source": "YorkshireBMD",
+      "query": "Matthews Binns marriage Leeds 1950 1952",
+      "recorded_at": "2026-05-01T10:28:41.685Z"
+    },
+    {
+      "individual_id": "@I1825902598@",
+      "source": "GRO online index",
+      "query": "Denise Matthews birth Leeds 1951",
+      "recorded_at": "2026-05-01T10:28:41.685Z"
+    },
+    {
+      "individual_id": "@I1825902598@",
+      "source": "GRO gov.uk",
+      "query": "Denise Matthews birth Leeds 1951 site:gro.gov.uk",
+      "recorded_at": "2026-05-01T10:28:41.685Z"
+    },
+    {
+      "individual_id": "@I1825902598@",
+      "source": "FreeBMD",
+      "query": "Denise Matthews David Sutcliffe marriage Leeds 1969 1975",
+      "recorded_at": "2026-05-01T10:28:41.685Z"
+    },
+    {
+      "individual_id": "@I1825902598@",
+      "source": "YorkshireBMD",
+      "query": "Matthews Sutcliffe marriage Leeds 1970 1974",
+      "recorded_at": "2026-05-01T10:28:41.685Z"
+    },
+    {
+      "individual_id": "@I1825902598@",
+      "source": "GRO birth",
+      "query": "Matthews Leeds 1951 mother Iris",
+      "recorded_at": "2026-05-01T10:28:41.685Z"
+    },
+    {
+      "individual_id": "@I1825902598@",
+      "source": "FreeBMD",
+      "query": "Richard Sutcliffe birth 1972 Leeds mother Matthews",
+      "recorded_at": "2026-05-01T10:30:07.626Z"
+    },
+    {
+      "individual_id": "@I1825902598@",
+      "source": "FreeBMD",
+      "query": "Denise Matthews marriage Sutcliffe 1968 1976",
+      "recorded_at": "2026-05-01T10:30:07.626Z"
+    },
+    {
+      "individual_id": "@I1825902598@",
+      "source": "GRO index",
+      "query": "Richard Sutcliffe birth 1972 Leeds mother maiden name Matthews",
+      "recorded_at": "2026-05-01T10:30:07.626Z"
+    },
+    {
+      "individual_id": "@I1825902598@",
+      "source": "YorkshireBMD",
+      "query": "Sutcliffe Matthews marriage 1965 1978 West Yorkshire",
+      "recorded_at": "2026-05-01T10:30:07.626Z"
+    },
+    {
+      "individual_id": "@I1825902598@",
+      "source": "GRO.gov.uk",
+      "query": "Denise Matthews OR Denise Sutcliffe birth 1951 Leeds site:gro.gov.uk",
+      "recorded_at": "2026-05-01T10:30:07.626Z"
+    },
+    {
+      "individual_id": "@I1825902598@",
+      "source": "General web",
+      "query": "\"Denise Matthews\" OR \"Denise Sutcliffe\" Leeds 1951 genealogy birth record",
+      "recorded_at": "2026-05-01T10:30:07.626Z"
+    },
+    {
+      "individual_id": "@I1825902598@",
+      "source": "GRO birth index",
+      "query": "Sutcliffe Leeds 1972 mother maiden name",
+      "recorded_at": "2026-05-01T10:30:07.626Z"
+    },
+    {
+      "individual_id": "@I1825902598@",
+      "source": "YorkshireBMD",
+      "query": "YorkshireBMD Denise Matthews birth 1951",
+      "recorded_at": "2026-05-01T10:31:45.613Z"
+    },
+    {
+      "individual_id": "@I1825902598@",
+      "source": "FreeBMD",
+      "query": "FreeBMD David Sutcliffe birth 1949 Leeds",
+      "recorded_at": "2026-05-01T10:31:45.613Z"
+    },
+    {
+      "individual_id": "@I1825902598@",
+      "source": "FreeBMD",
+      "query": "freebmd.org.uk David Sutcliffe marriage Leeds 1965 1975",
+      "recorded_at": "2026-05-01T10:31:45.613Z"
+    },
+    {
+      "individual_id": "@I1825902598@",
+      "source": "FreeBMD",
+      "query": "Herbert Matthews Iris Binns marriage 1950 Leeds West Yorkshire civil registration",
+      "recorded_at": "2026-05-01T10:31:45.613Z"
+    },
+    {
+      "individual_id": "@I1825902598@",
+      "source": "GRO.gov.uk",
+      "query": "GRO birth index 1972 Leeds Sutcliffe mother maiden Matthews",
+      "recorded_at": "2026-05-01T10:31:45.613Z"
+    },
+    {
+      "individual_id": "@I1825902598@",
+      "source": "GRO.gov.uk",
+      "query": "GRO online certificate order Denise Matthews born 1951 Leeds West Yorkshire",
+      "recorded_at": "2026-05-01T10:31:45.613Z"
+    },
+    {
+      "individual_id": "@I1825902598@",
+      "source": "FreeBMD",
+      "query": "freebmd marriage index Herbert Matthews Iris Binns 1948 1955 Yorkshire",
+      "recorded_at": "2026-05-01T10:31:45.613Z"
+    },
+    {
+      "individual_id": "@I1825902676@",
+      "source": "FamilySearch",
+      "query": "Hannah Pickersgill baptism Kippax Yorkshire 1825 parish register",
+      "recorded_at": "2026-05-01T10:54:48.867Z"
+    },
+    {
+      "individual_id": "@I1825902676@",
+      "source": "FamilySearch",
+      "query": "FamilySearch \"Hannah Pickersgill\" Yorkshire 1825 baptism christening",
+      "recorded_at": "2026-05-01T10:54:48.867Z"
+    },
+    {
+      "individual_id": "@I1825902676@",
+      "source": "FreeBMD/General web",
+      "query": "Nathaniel Crawshaw Hannah Pickersgill marriage Yorkshire FreeBMD",
+      "recorded_at": "2026-05-01T10:54:48.867Z"
+    },
+    {
+      "individual_id": "@I1825902676@",
+      "source": "YorkshireBMD/General web",
+      "query": "Yorkshire BMD Crawshaw Pickersgill marriage Pontefract Wetherby 1840 1850",
+      "recorded_at": "2026-05-01T10:54:48.867Z"
+    },
+    {
+      "individual_id": "@I1825902676@",
+      "source": "Census/General web",
+      "query": "\"Nathaniel Crawshaw\" Hannah Kippax census 1851 1861",
+      "recorded_at": "2026-05-01T10:54:48.867Z"
+    },
+    {
+      "individual_id": "@I1825902676@",
+      "source": "FreeREG/General web",
+      "query": "Pickersgill baptism \"Kippax\" OR \"Garforth\" 1820 1825 1830 Yorkshire",
+      "recorded_at": "2026-05-01T10:54:48.867Z"
+    },
+    {
+      "individual_id": "@I1825902676@",
+      "source": "General web/Baptism",
+      "query": "\"Philip Crawshaw\" baptism Kippax 1859 Hannah mother",
+      "recorded_at": "2026-05-01T10:54:48.867Z"
+    },
+    {
+      "individual_id": "@I1825902676@",
+      "source": "General web/1841 census",
+      "query": "1841 census Kippax \"Pickersgill\" family Yorkshire West Riding",
+      "recorded_at": "2026-05-01T10:54:48.867Z"
+    },
+    {
+      "individual_id": "@I1825902676@",
+      "source": "FamilySearch / General web",
+      "query": "FamilySearch \"Nathaniel Crawshaw\" 1851 census Yorkshire",
+      "recorded_at": "2026-05-01T11:00:03.372Z"
+    },
+    {
+      "individual_id": "@I1825902676@",
+      "source": "FamilySearch / General web",
+      "query": "FamilySearch Pickersgill baptism Kippax 1820 1830",
+      "recorded_at": "2026-05-01T11:00:03.373Z"
+    },
+    {
+      "individual_id": "@I1825902676@",
+      "source": "FamilySearch / General web",
+      "query": "FamilySearch \"Nathaniel Crawshaw\" Hannah 1861 census Kippax West Riding",
+      "recorded_at": "2026-05-01T11:00:03.373Z"
+    },
+    {
+      "individual_id": "@I1825902676@",
+      "source": "YorkshireBMD / General web",
+      "query": "YorkshireBMD Crawshaw Pickersgill marriage 1845 1850 Wetherby Pontefract registration district",
+      "recorded_at": "2026-05-01T11:00:03.373Z"
+    },
+    {
+      "individual_id": "@I1825902676@",
+      "source": "FreeBMD / General web",
+      "query": "FreeBMD \"Crawshaw\" \"Pickersgill\" marriage 1837 1870",
+      "recorded_at": "2026-05-01T11:00:03.373Z"
+    },
+    {
+      "individual_id": "@I1825902676@",
+      "source": "General web / Census",
+      "query": "\"Nathaniel Crawshaw\" Hannah Kippax 1861 1871 census miner",
+      "recorded_at": "2026-05-01T11:00:03.373Z"
+    },
+    {
+      "individual_id": "@I1825902676@",
+      "source": "WikiTree / General web",
+      "query": "wikitree \"Nathaniel Crawshaw\" Kippax 1871 census Hannah wife",
+      "recorded_at": "2026-05-01T11:00:03.373Z"
+    },
+    {
+      "individual_id": "@I1825902676@",
+      "source": "FamilySearch / General web",
+      "query": "familysearch.org \"Nathaniel Crawshaw\" 1871 England Wales census record",
+      "recorded_at": "2026-05-01T11:00:03.373Z"
+    },
+    {
+      "individual_id": "@I1825902676@",
+      "source": "West Yorkshire Archive Service / General web",
+      "query": "West Yorkshire Archive Service Kippax St Mary parish register baptisms 1820 1830 catalogue reference",
+      "recorded_at": "2026-05-01T11:00:03.373Z"
+    }
+  ],
   "confirmed_relatives": {},
   "migration_routes": [],
   "alias_registry": {},
   "reresearch_recommended": {},
-  "last_changed_at": "2026-05-01T08:15:16.593Z"
+  "last_changed_at": "2026-05-01T11:00:03.373Z"
 }

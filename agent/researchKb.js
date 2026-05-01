@@ -68,7 +68,21 @@ export const buildKbContextBody = (
   const naming = (kb.naming_pattern_warnings ?? [])
     .filter((w) => individual.name?.toLowerCase().split(/\s+/).includes(w.name.toLowerCase()));
 
-  const neg = (kb.negative_searches ?? []).filter((n) => n.individual_id === individual.id);
+  // Deduplicate negative searches by source||query (KB may contain
+  // duplicates from older builds), then cap to the most recent N to
+  // keep prompt input tokens bounded. Persisted KB stays untouched.
+  const NEG_SEARCH_PROMPT_CAP = 20;
+  const negRaw = (kb.negative_searches ?? []).filter((n) => n.individual_id === individual.id);
+  const negSeen = new Set();
+  const negDedup = [];
+  for (const n of negRaw.slice().reverse()) { // reverse → newest first
+    const key = `${n.source}||${n.query}`;
+    if (negSeen.has(key)) continue;
+    negSeen.add(key);
+    negDedup.push(n);
+    if (negDedup.length >= NEG_SEARCH_PROMPT_CAP) break;
+  }
+  const neg = negDedup.reverse(); // back to chronological for display
 
   // Confirmed relatives: derive from BOTH the FAMC family (parents + siblings)
   // AND any FAMS family (spouse + children). Filtering by confidence A or B
@@ -116,12 +130,25 @@ export const buildKbContextBody = (
     }
   }
 
+  // Cap confirmed_relatives at 8 most relevant. Sort: A-band first, then
+  // B-band, then unranked; preserve the order within each band as found.
+  const RELATIVES_PROMPT_CAP = 8;
   const seen = new Set();
-  const relatives = [...fromKb, ...derived].filter((r) => {
+  const allRelatives = [...fromKb, ...derived].filter((r) => {
     if (seen.has(r.relative_id)) return false;
     seen.add(r.relative_id);
     return true;
   });
+  const bandRank = (r) =>
+    r.confidence === "A" ? 0 : r.confidence === "B" ? 1 : 2;
+  const relatives = allRelatives
+    .map((r, i) => ({ r, idx: i }))
+    .sort((a, b) => {
+      const d = bandRank(a.r) - bandRank(b.r);
+      return d !== 0 ? d : a.idx - b.idx;
+    })
+    .map(({ r }) => r)
+    .slice(0, RELATIVES_PROMPT_CAP);
 
   const aliases = kb.alias_registry ?? {};
   const migrations = kb.migration_routes ?? [];
@@ -240,11 +267,13 @@ export const buildKbContextBody = (
 
   body += `\nalias_registry:\n`;
   const aliasKeys = Object.keys(aliases);
+  const ALIASES_PER_KEY_CAP = 6;
   if (aliasKeys.length) {
     for (const k of aliasKeys) {
       const variants = aliases[k];
       if (variants?.length) {
-        body += `  ${yamlEsc(k)}: [${variants.map((v) => `"${yamlEsc(v)}"`).join(", ")}]\n`;
+        const trimmed = variants.slice(0, ALIASES_PER_KEY_CAP);
+        body += `  ${yamlEsc(k)}: [${trimmed.map((v) => `"${yamlEsc(v)}"`).join(", ")}]\n`;
       }
     }
   } else {
@@ -324,6 +353,15 @@ export const parseAliasObservationsBlock = (text) => {
 
 // Apply the negative searches and alias observations from one agent run to
 // the KB. Returns an updated kb object (does not mutate input).
+//
+// Persistent caps (different from prompt-display caps in buildKbContextBody):
+//   - negative_searches per individual: keep last 50, dedup by source||query
+//   - alias variants per standard name: keep last 12
+// These are large enough that no signal is lost, small enough that the file
+// can't grow unboundedly across thousands of runs.
+const NEG_SEARCH_PERSIST_CAP = 50;
+const ALIAS_PERSIST_CAP = 12;
+
 export const applyAgentRunToKb = (kb, individualId, agentResultText) => {
   const next = JSON.parse(JSON.stringify(kb));
   const negs = parseNegativeSearchesBlock(agentResultText);
@@ -339,12 +377,28 @@ export const applyAgentRunToKb = (kb, individualId, agentResultText) => {
       next.negative_searches.push({ individual_id: individualId, ...n, recorded_at: new Date().toISOString() });
     }
   }
+  // Trim to the most recent NEG_SEARCH_PERSIST_CAP per individual.
+  const byIndividual = new Map();
+  for (const ns of next.negative_searches) {
+    const arr = byIndividual.get(ns.individual_id) ?? [];
+    arr.push(ns);
+    byIndividual.set(ns.individual_id, arr);
+  }
+  const trimmed = [];
+  for (const [, arr] of byIndividual) {
+    trimmed.push(...arr.slice(-NEG_SEARCH_PERSIST_CAP));
+  }
+  next.negative_searches = trimmed;
+
   const aliases = parseAliasObservationsBlock(agentResultText);
   next.alias_registry = next.alias_registry ?? {};
   for (const a of aliases) {
     next.alias_registry[a.standard] = next.alias_registry[a.standard] ?? [];
     if (!next.alias_registry[a.standard].includes(a.variant)) {
       next.alias_registry[a.standard].push(a.variant);
+    }
+    if (next.alias_registry[a.standard].length > ALIAS_PERSIST_CAP) {
+      next.alias_registry[a.standard] = next.alias_registry[a.standard].slice(-ALIAS_PERSIST_CAP);
     }
   }
   next.last_changed_at = new Date().toISOString();

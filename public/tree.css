@@ -141,6 +141,10 @@ body.tree-mode {
   outline-offset: 2px;
 }
 
+/* Tick = "verified" — applied to A-band individuals (already verified
+   when imported) and anyone the agent has been run against. Same visual
+   treatment so the user reads them as a single "done" signal. */
+.card.A::after,
 .card.researched::after {
   content: "✓";
   position: absolute;
@@ -308,6 +312,22 @@ body.tree-mode {
   background: rgba(255, 255, 255, 0.7);
   padding: 1px 4px;
   border-radius: 2px;
+}
+
+/* Paid-lookup hint: agent suggested paywalled lookups not yet consulted.
+   Bottom-left so it doesn't collide with the chain-warning at bottom-right. */
+.card .paid-lookup-hint {
+  position: absolute;
+  bottom: 4px;
+  left: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #8b6c00;
+  background: #fff8e1;
+  border: 1px solid #f5c66a;
+  padding: 1px 6px;
+  border-radius: 8px;
+  letter-spacing: 0.3px;
 }
 
 .card.cascade-risk {

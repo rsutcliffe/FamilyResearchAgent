@@ -12,6 +12,7 @@ import {
   computeNamingPatterns,
   clearReresearchFlag,
   parseNextTimeBlock,
+  parseExternalLookups,
 } from "./agent/researchKb.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -116,11 +117,26 @@ app.get("/api/individuals", async (_req, res) => {
     ]);
     const enriched = individuals.map((p) => {
       const ev = ensureMultiRunShape(evidence[p.id]);
+      // Pending external lookups = paywalled sources the agent has suggested
+      // in its latest run that the user hasn't yet consulted (recorded in
+      // paid_lookups). Service-name match is case-insensitive.
+      let pendingExternalLookups = 0;
+      if (ev?.runs?.length) {
+        const latest = ev.runs[ev.runs.length - 1];
+        const suggested = parseExternalLookups(latest?.agent_result ?? "");
+        const doneServices = new Set(
+          (ev.paid_lookups ?? []).map((pl) => (pl.service ?? "").toLowerCase()),
+        );
+        pendingExternalLookups = suggested.filter(
+          (s) => !doneServices.has((s.service ?? "").toLowerCase()),
+        ).length;
+      }
       return {
         ...p,
         researched: Boolean(ev?.runs?.length),
         run_count: ev?.runs?.length ?? 0,
         decision: decisions[p.id]?.decision ?? null,
+        pending_external_lookups: pendingExternalLookups,
       };
     });
     res.json(enriched);
