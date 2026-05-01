@@ -49,6 +49,8 @@ test("…", async ({ page, mockAgentRun }) => {
 
 | Module | What's tested |
 |---|---|
+| `agent/apiClients/*` | WikiTree / FamilySearch / TNA Discovery — pure parsers + fetch wrappers (with injected `fetch`), idempotent re-fetch, OAuth token cache, error handling |
+| `agent/externalApiOrchestrator.js` | `gatherApiLeads` (3 sources via DI, source_kind tagging, cache freshness, idempotent re-runs, partial-failure tolerance) |
 | `agent/researchKb.js` parsers | `parseNegativeSearchesBlock`, `parseAliasObservationsBlock`, `parseExternalLookups`, `parseNextTimeBlock`, `computeNamingPatterns` (inc. surname-as-middle-name filtering, lowercase rejection) |
 | `agent/researchKb.js` KB writes | `applyAgentRunToKb` (negative-search dedup + FIFO cap), `applyAcceptedMatchToKb` (parishes, confirmed_relatives, migration routes, source efficacy, re-research flags), `applyAcceptedCandidateToKb`, `clearReresearchFlag` |
 | Tree UI | Page load, topbar controls, card render |

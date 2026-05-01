@@ -265,26 +265,44 @@ export const buildKbContextBody = (
     body += `  (no efficacy data yet — first runs)\n`;
   }
 
-  // External GEDCOM suggestions for THIS individual — Tier 3 only,
-  // explicitly flagged as leads to verify, never authoritative.
+  // External suggestions for THIS individual — Tier 3 only, explicitly
+  // flagged as leads to verify, never authoritative. Sources include
+  // imported GEDCOM(s) and live API queries (FamilySearch, WikiTree, TNA
+  // Discovery). Each entry is tagged with `source_kind`.
   const extSugg = kb.external_suggestions?.by_individual?.[individual.id] ?? [];
   if (extSugg.length > 0) {
     body += `\nexternal_suggestions:\n`;
-    body += `  (Tier 3 — imported from external GEDCOM(s). These are LEADS to verify, not primary evidence. Never raises a band on its own. Use them as hypotheses to investigate via free or paywalled sources.)\n`;
+    body += `  (Tier 3 — imported from external GEDCOM(s) and queried from external APIs (FamilySearch, WikiTree, TNA Discovery). These are LEADS to verify, not primary evidence. Never raises a band on its own. Use them as hypotheses to investigate via free or paywalled sources. Surface any TNA catalogue refs in <<EXTERNAL_LOOKUPS>>.)\n`;
     for (const m of extSugg) {
-      const d = m.external_data ?? {};
-      body += `  - external_id: "${yamlEsc(m.external_id)}"\n`;
-      body += `    source_file: "${yamlEsc(m.external_source_file ?? "(unknown)")}"\n`;
-      body += `    match_confidence: ${m.confidence}\n`;
+      const kind = m.source_kind ?? "gedcom";
+      body += `  - source_kind: ${kind}\n`;
+      body += `    external_id: "${yamlEsc(m.external_id)}"\n`;
+
+      if (kind === "tna") {
+        if (m.catalogue_ref) body += `    catalogue_ref: "${yamlEsc(m.catalogue_ref)}"\n`;
+        if (m.title) body += `    title: "${yamlEsc(m.title)}"\n`;
+        if (m.held_by) body += `    held_by: "${yamlEsc(m.held_by)}"\n`;
+        if (m.covering_dates) body += `    covering_dates: "${yamlEsc(m.covering_dates)}"\n`;
+        if (m.catalogue_url) body += `    catalogue_url: "${yamlEsc(m.catalogue_url)}"\n`;
+        continue;
+      }
+
+      if (kind === "gedcom" && m.external_source_file) {
+        body += `    source_file: "${yamlEsc(m.external_source_file)}"\n`;
+      }
+      if (m.confidence) body += `    match_confidence: ${m.confidence}\n`;
       if (m.reasons?.length) {
         body += `    match_reasons: [${m.reasons.map((r) => `"${yamlEsc(r)}"`).join(", ")}]\n`;
       }
+      const d = m.external_data ?? {};
       body += `    external_data:\n`;
       if (d.name) body += `      name: "${yamlEsc(d.name)}"\n`;
       if (d.birth_year) body += `      birth_year: ${d.birth_year}\n`;
       if (d.birth_place) body += `      birth_place: "${yamlEsc(d.birth_place)}"\n`;
       if (d.death_date) body += `      death_date: "${yamlEsc(d.death_date)}"\n`;
+      if (d.death_place) body += `      death_place: "${yamlEsc(d.death_place)}"\n`;
       if (d.famc) body += `      famc: "${yamlEsc(d.famc)}"\n`;
+      if (d.profile_url) body += `      profile_url: "${yamlEsc(d.profile_url)}"\n`;
       if (d.citations?.length) {
         body += `      citations:\n`;
         for (const c of d.citations.slice(0, 5)) {

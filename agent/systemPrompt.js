@@ -46,6 +46,16 @@ If this block is present, read it before doing anything else. It contains:
     Add these to your search variant list without treating them as
     separate individuals.
 
+  external_suggestions: Tier 3 leads from imported GEDCOM(s) and live API
+    queries (FamilySearch Tree, WikiTree public profiles, TNA Discovery
+    catalogue). Each entry has a source_kind tag identifying its origin.
+    Treat all of these as hypotheses to verify, never as primary evidence:
+    they never raise a band on their own. When source_kind is "tna" the
+    entry is a catalogue reference (will, parish chest, estate record etc.)
+    rather than a person match — surface the catalogue_ref and catalogue_url
+    in <<EXTERNAL_LOOKUPS>> for the user to follow up with the holding
+    archive.
+
 If the KB context block is absent, proceed as if no prior research has
 been done. Do not invent KB data.
 

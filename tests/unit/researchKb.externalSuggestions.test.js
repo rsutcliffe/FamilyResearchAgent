@@ -91,6 +91,78 @@ describe("buildKbContextBody — external_suggestions section", () => {
     assert.ok(body.includes("@EXT_B@"));
   });
 
+  test("tags each entry with its source_kind so the agent knows where the lead came from", () => {
+    const kb = baseKb();
+    kb.external_suggestions.by_individual["@OUR_ANN@"] = [
+      {
+        source_kind: "wikitree",
+        external_id: "Sweeting-12",
+        confidence: "strong",
+        reasons: ["wt"],
+        external_data: {
+          name: "Ann Sweeting",
+          birth_year: 1802,
+          birth_place: "Monks Frystone",
+          profile_url: "https://www.wikitree.com/wiki/Sweeting-12",
+        },
+      },
+      {
+        source_kind: "familysearch",
+        external_id: "L1AB-CDE",
+        confidence: "strong",
+        reasons: ["fs"],
+        external_data: {
+          name: "Ann Sweeting",
+          birth_year: 1802,
+          birth_place: "Monks Frystone",
+          profile_url: "https://www.familysearch.org/tree/person/details/L1AB-CDE",
+        },
+      },
+    ];
+    const body = buildKbContextBody(kb, ourIndividual, [], [], {});
+    assert.match(body, /source_kind:\s*wikitree/);
+    assert.match(body, /source_kind:\s*familysearch/);
+    assert.ok(body.includes("https://www.wikitree.com/wiki/Sweeting-12"));
+    assert.ok(body.includes("https://www.familysearch.org/tree/person/details/L1AB-CDE"));
+  });
+
+  test("renders TNA catalogue refs with held_by and catalogue_url for <<EXTERNAL_LOOKUPS>>", () => {
+    const kb = baseKb();
+    kb.external_suggestions.by_individual["@OUR_ANN@"] = [
+      {
+        source_kind: "tna",
+        external_id: "C12345",
+        catalogue_ref: "PROB 11/1234/56",
+        title: "Will of Ann Sweeting of Monks Frystone",
+        held_by: "The National Archives, Kew",
+        covering_dates: "1875",
+        catalogue_url: "https://discovery.nationalarchives.gov.uk/details/r/C12345",
+      },
+    ];
+    const body = buildKbContextBody(kb, ourIndividual, [], [], {});
+    assert.match(body, /source_kind:\s*tna/);
+    assert.ok(body.includes("PROB 11/1234/56"));
+    assert.ok(body.includes("The National Archives, Kew"));
+    assert.ok(body.includes("https://discovery.nationalarchives.gov.uk/details/r/C12345"));
+    // Hint that these should be surfaced in <<EXTERNAL_LOOKUPS>>
+    assert.match(body, /external_lookups|surface.*catalogue/i);
+  });
+
+  test("legacy GEDCOM entries without source_kind default to 'gedcom' (backward compatible)", () => {
+    const kb = baseKb();
+    kb.external_suggestions.by_individual["@OUR_ANN@"] = [
+      {
+        external_id: "@EXT@",
+        external_source_file: "old.ged",
+        confidence: "medium",
+        reasons: ["ok"],
+        external_data: { name: "Ann Sweeting", birth_year: 1802 },
+      },
+    ];
+    const body = buildKbContextBody(kb, ourIndividual, [], [], {});
+    assert.match(body, /source_kind:\s*gedcom/);
+  });
+
   test("indicates that section is leads-only and never raises a band on its own", () => {
     const kb = baseKb();
     kb.external_suggestions.by_individual["@OUR_ANN@"] = [

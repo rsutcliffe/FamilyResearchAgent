@@ -15,6 +15,10 @@ import {
   parseNextTimeBlock,
   parseExternalLookups,
 } from "./agent/researchKb.js";
+import { gatherApiLeads, isCacheFresh } from "./agent/externalApiOrchestrator.js";
+import { searchWikiTreePersons, isWikiTreeDisabled } from "./agent/apiClients/wikiTreeClient.js";
+import { searchFamilySearchTree, isFamilySearchDisabled } from "./agent/apiClients/familySearchClient.js";
+import { searchTnaDiscovery, isTnaDisabled } from "./agent/apiClients/tnaDiscoveryClient.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(__dirname, "data");
@@ -74,6 +78,57 @@ if (!process.env.ANTHROPIC_API_KEY) {
   );
   process.exit(2);
 }
+
+const EXTERNAL_API_CACHE_DAYS = Number(process.env.EXTERNAL_API_CACHE_DAYS ?? 30);
+const FAMILYSEARCH_CLIENT_ID = process.env.FAMILYSEARCH_CLIENT_ID;
+if (!isFamilySearchDisabled() && !FAMILYSEARCH_CLIENT_ID) {
+  console.warn(
+    "[externalApi] FAMILYSEARCH_CLIENT_ID not set — FamilySearch lookups will be skipped. " +
+      "Register an app at https://developers.familysearch.org/ to enable, or set FAMILYSEARCH_DISABLE=1 to silence.",
+  );
+}
+
+const externalApiClients = {
+  searchWikiTree: searchWikiTreePersons,
+  searchFamilySearch: searchFamilySearchTree,
+  searchTna: searchTnaDiscovery,
+  isWikiTreeDisabled,
+  // Treat "no client_id" as disabled — saves a guaranteed-failing token call.
+  isFamilySearchDisabled: () => isFamilySearchDisabled() || !FAMILYSEARCH_CLIENT_ID,
+  isTnaDisabled,
+  familySearchClientId: FAMILYSEARCH_CLIENT_ID,
+};
+
+// Wraps gatherApiLeads with cache check + atomic write. Errors are logged
+// and swallowed — never block the SSE stream.
+const refreshApiLeads = async (individual, ourTree) => {
+  try {
+    const current = await readJson(EXTERNAL_SUGGESTIONS_FILE);
+    if (isCacheFresh(current.api_cache, individual.id, EXTERNAL_API_CACHE_DAYS)) {
+      return current;
+    }
+    const { suggestions, summary } = await gatherApiLeads({
+      individual,
+      ourTree,
+      currentSuggestions: current,
+      clients: externalApiClients,
+    });
+    await writeJsonAtomic(EXTERNAL_SUGGESTIONS_FILE, suggestions);
+    console.log(
+      `[externalApi] ${individual.id} ${individual.name}: WT=${summary.wikitree_count} FS=${summary.familysearch_count} TNA=${summary.tna_count}` +
+        (summary.errors.length ? ` errors=${summary.errors.map((e) => e.source).join(",")}` : ""),
+    );
+    return suggestions;
+  } catch (err) {
+    console.warn(`[externalApi] orchestrator failed: ${err.message}`);
+    return await readJson(EXTERNAL_SUGGESTIONS_FILE).catch(() => ({
+      by_individual: {},
+      unmatched: [],
+      imports: [],
+      api_cache: {},
+    }));
+  }
+};
 
 const readJson = async (file) => JSON.parse(await fs.readFile(file, "utf8"));
 
@@ -405,13 +460,16 @@ app.get("/api/agent/run/:id", async (req, res) => {
   // Build KB context body for this individual using current KB state, prior
   // runs, and any external GEDCOM suggestions so the agent can use them as
   // Tier 3 leads to verify.
-  const [kb, families, allIndividuals, evidenceLog, externalSugg] = await Promise.all([
+  const [kb, families, allIndividuals, evidenceLog] = await Promise.all([
     readJson(RESEARCH_KB_FILE),
     readJson(FAMILIES_FILE),
     readJson(INDIVIDUALS_FILE),
     readJson(EVIDENCE_LOG_FILE),
-    readJson(EXTERNAL_SUGGESTIONS_FILE),
   ]);
+  // Pre-fetch external API leads (WikiTree / FamilySearch / TNA) before
+  // building the prompt context. Cached per individual; orchestrator
+  // failures never block the run.
+  const externalSugg = await refreshApiLeads(profile, allIndividuals);
   const kbWithExternal = { ...kb, external_suggestions: externalSugg };
   const kbBody = buildKbContextBody(
     kbWithExternal,
@@ -513,11 +571,12 @@ app.get("/api/ancestor/run/:childId/:role", async (req, res) => {
   req.on("close", () => ac.abort());
 
   // Build KB context for the ancestor search anchored on the child.
-  const [kb, evidenceLog, externalSugg] = await Promise.all([
+  // Pre-fetch external API leads for the child first (cache-respecting).
+  const [kb, evidenceLog] = await Promise.all([
     readJson(RESEARCH_KB_FILE),
     readJson(EVIDENCE_LOG_FILE),
-    readJson(EXTERNAL_SUGGESTIONS_FILE),
   ]);
+  const externalSugg = await refreshApiLeads(child, individuals);
   const kbWithExternal = { ...kb, external_suggestions: externalSugg };
   const kbBody = buildKbContextBody(
     kbWithExternal,

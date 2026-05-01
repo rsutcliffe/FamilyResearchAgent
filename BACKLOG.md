@@ -12,36 +12,31 @@ Deferred features. Pull from the top of each section when you're ready.
 
 - **Adaptive search budget (Strategy 8).** Dynamic `WEB_SEARCH_MAX_USES` based on era / surname rarity / KB richness. A pre-1837 Sutcliffe in West Yorkshire might warrant 12 searches; a post-1837 Cooper in Cardiff might need 4. Currently every run gets the same flat budget.
 
-## Paywalled access — FamilySearch API (Phase B, deferred)
+## External API integrations — follow-ups
 
-**Why deferred.** Anthropic's `web_search` tool already finds FamilySearch
-public pages reasonably well. The marginal value of full API integration is
-structured response shape + image-collection access, not new data. Worth
-revisiting only if web_search turns out to be insufficient in practice.
+External API leads (FamilySearch, WikiTree, TNA Discovery) are now wired
+in via [agent/externalApiOrchestrator.js](agent/externalApiOrchestrator.js)
+as Tier 3 lead generators feeding `external_suggestions` in the KB context.
+Outstanding items:
 
-**What's required when we do this:**
-
-- User registers an app at developer.familysearch.org → gets `client_id`,
-  `client_secret`. Manual one-time step.
-- OAuth 2.0 implementation. Recommended flow for a local single-user tool:
-  Authorization Code with PKCE via the user's browser (cleanest for tokens
-  that map to the user's own subscription level). Alternative: Client
-  Credentials (app-level access, no user login, but limited scope).
-- Token refresh logic — tokens expire after ~1 hour. Need a refresh loop or
-  re-prompt on expiry.
-- New `agent/familysearchApi.js` module wrapping the Search API endpoints
-  (`/platform/search/persons`, `/platform/records/search`).
-- Anthropic SDK does NOT support custom server tools — would need to expose
-  the FS calls as a *client* tool the agent invokes via the standard tool
-  use loop. That's a different streaming pattern from `web_search_20250305`.
-- Track API call count + remaining rate-limit headroom; surface in spend
-  display alongside Anthropic costs.
-- Budget category extension: paid-service ledger (currently spend tracking
-  is single-bucket Anthropic only).
-
-Estimated effort: 4–6 hours including OAuth, agent tool-loop changes,
-testing, and rate-limit handling. Probably worth doing as one focused
-session rather than slotting in piecemeal.
+- **Promote to Anthropic function tools.** Pre-fetch is good for the target
+  individual but the agent can't drill into related people mid-run. v2 would
+  expose `familysearch_get_relatives`, `wikitree_get_ancestors`, etc. as
+  custom tools alongside `web_search` so the agent can pivot when it finds
+  a promising lead.
+- **Authenticated WikiTree session.** Public-profile reads work without
+  auth; private/Trusted-List profiles need a session. Worth wiring only if
+  WikiTree turns out to have data the user wants behind auth.
+- **FamilySearch image collections + records search.** Currently only Tree
+  Person Search is hit. The Records collections (parish, census, etc.)
+  would need a separate endpoint and likely the user's own authenticated
+  session to access higher-tier records. Defer until the tree-search hit
+  rate is observed in practice.
+- **Paid-source ledger extension.** Spend tracking is currently single-bucket
+  Anthropic. If a paid source (Findmypast, Ancestry, etc.) ever gets API
+  access, the per-source cost should be surfaced in `/api/spend`.
+- **MyHeritage / Findmypast.** No public APIs. Out of scope unless one
+  appears.
 
 ## Production code investigation
 
