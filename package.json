@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node --env-file=.env server.js",
     "smoke": "node --env-file=.env scripts/smoke-test.mjs",
+    "backtest": "node scripts/backtest.mjs",
     "import:gedcom": "node scripts/import-gedcom.mjs",
     "test": "npm run test:unit && npm run test:ui",
     "test:unit": "node --test tests/unit/*.test.js",

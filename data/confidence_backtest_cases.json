@@ -1,0 +1,110 @@
+{
+  "_notes": "Curated synthetic scenarios for backtesting the LR table. Each case has a name, prior_kind (looked up in name_rarity_prior_probabilities), evidence (an array of { kind, lr, evidence_group? }), and an expected_band + expected_posterior_min/max range. Run via `node scripts/backtest.mjs`. Adjust the LR table when a case fails repeatedly — never adjust the case to make a misbehaving table look good.",
+
+  "cases": [
+    {
+      "name": "Strong Tier 1 convergence — Sutcliffe Heptonstall 1774 baptism + will",
+      "prior_kind": "uncommon",
+      "evidence": [
+        { "kind": "parish_baptism", "lr": 50, "evidence_group": "heptonstall_PR_1774" },
+        { "kind": "will_or_probate", "lr": 80 }
+      ],
+      "expected_band": "A",
+      "expected_posterior_min": 0.99
+    },
+    {
+      "name": "Tier 3 only — Ann Sweeting Ancestry-tree match",
+      "prior_kind": "moderate",
+      "evidence": [
+        { "kind": "member_family_tree", "lr": 1.5 },
+        { "kind": "wikitree_profile", "lr": 1.8 }
+      ],
+      "expected_band": "D",
+      "expected_posterior_min": 0.20,
+      "expected_posterior_max": 0.45
+    },
+    {
+      "name": "Common-name disaster — John Smith Leeds 1820 single census",
+      "prior_kind": "very_common",
+      "evidence": [
+        { "kind": "census_record", "lr": 8 }
+      ],
+      "expected_band": "D",
+      "expected_posterior_min": 0.10,
+      "expected_posterior_max": 0.40
+    },
+    {
+      "name": "Multi-source convergence — three independent Tier 2",
+      "prior_kind": "moderate",
+      "evidence": [
+        { "kind": "census_record", "lr": 8, "evidence_group": "census_1841" },
+        { "kind": "census_record", "lr": 8, "evidence_group": "census_1851" },
+        { "kind": "memorial_inscription", "lr": 15 }
+      ],
+      "expected_band": "A",
+      "expected_posterior_min": 0.97
+    },
+    {
+      "name": "Self-correlated — two indexes of same baptism",
+      "prior_kind": "moderate",
+      "evidence": [
+        { "kind": "parish_baptism", "lr": 50, "evidence_group": "heptonstall_PR_1774" },
+        { "kind": "parish_register_index", "lr": 12, "evidence_group": "heptonstall_PR_1774" }
+      ],
+      "expected_band": "B",
+      "expected_posterior_min": 0.85,
+      "expected_posterior_max": 0.94,
+      "_notes": "Same evidence_group ⇒ collapses to LR=50. Ensures duplicates don't manufacture confidence."
+    },
+    {
+      "name": "Negative evidence kills a weak claim",
+      "prior_kind": "moderate",
+      "evidence": [
+        { "kind": "member_family_tree", "lr": 1.5 },
+        { "kind": "civil_bmd_certificate", "lr": 0.05, "note": "GRO searched comprehensively, not found" }
+      ],
+      "expected_band": "D",
+      "expected_posterior_max": 0.05
+    },
+    {
+      "name": "Strong positive partially offset by moderate negative",
+      "prior_kind": "moderate",
+      "evidence": [
+        { "kind": "will_or_probate", "lr": 80 },
+        { "kind": "parish_burial", "lr": 0.5, "note": "expected burial not found at parish" }
+      ],
+      "expected_band": "B",
+      "expected_posterior_min": 0.80,
+      "expected_posterior_max": 0.95
+    },
+    {
+      "name": "Reviewer contradiction — mother born after child",
+      "prior_kind": "moderate",
+      "evidence": [
+        { "kind": "parish_baptism", "lr": 50 },
+        { "kind": "review_contradiction", "lr": 0.001, "note": "mother born after child" }
+      ],
+      "expected_band": "D",
+      "expected_posterior_max": 0.05
+    },
+    {
+      "name": "Sibling reconciliation — three independent baptisms naming same parents",
+      "prior_kind": "uncommon",
+      "evidence": [
+        { "kind": "sibling_baptism_naming_same", "lr": 10, "evidence_group": "sib_baptism_kid1" },
+        { "kind": "sibling_baptism_naming_same", "lr": 10, "evidence_group": "sib_baptism_kid2" },
+        { "kind": "sibling_baptism_naming_same", "lr": 10, "evidence_group": "sib_baptism_kid3" }
+      ],
+      "expected_band": "A",
+      "expected_posterior_min": 0.99
+    },
+    {
+      "name": "Empty evidence — posterior equals prior",
+      "prior_kind": "moderate",
+      "evidence": [],
+      "expected_band": "D",
+      "expected_posterior_min": 0.10,
+      "expected_posterior_max": 0.20
+    }
+  ]
+}

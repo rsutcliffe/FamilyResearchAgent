@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "notes": "Expert-prior likelihood-ratio table for Bayesian confidence accumulation. Borrowed shape from NHS PDS-MPI matching: each evidence kind has lr_match (multiplier when evidence is found and supports the hypothesis) and lr_no_match (multiplier when the evidence was searched but absent). Calibration loop in Phase 5 will refine these from real accept/reject outcomes.",
+
+  "sources_identity": {
+    "civil_bmd_certificate":     { "tier": 1, "lr_match": 80,  "lr_no_match": 0.05 },
+    "civil_bmd_index":           { "tier": 2, "lr_match": 25,  "lr_no_match": 0.10 },
+    "parish_baptism":            { "tier": 1, "lr_match": 50,  "lr_no_match": 0.20 },
+    "parish_marriage":           { "tier": 1, "lr_match": 40,  "lr_no_match": 0.30 },
+    "parish_burial":             { "tier": 1, "lr_match": 30,  "lr_no_match": 0.50 },
+    "parish_register_index":     { "tier": 2, "lr_match": 12,  "lr_no_match": 0.40 },
+    "will_or_probate":           { "tier": 1, "lr_match": 80,  "lr_no_match": 0.90 },
+    "census_record":             { "tier": 2, "lr_match": 8,   "lr_no_match": 0.40 },
+    "memorial_inscription":      { "tier": 2, "lr_match": 15,  "lr_no_match": 0.90 },
+    "newspaper_obituary":        { "tier": 2, "lr_match": 12,  "lr_no_match": 0.90 },
+    "newspaper_announcement":    { "tier": 2, "lr_match": 10,  "lr_no_match": 0.95 },
+    "tna_catalogue_ref":         { "tier": 2, "lr_match": 6,   "lr_no_match": 0.95 },
+    "wikitree_profile":          { "tier": 3, "lr_match": 1.8, "lr_no_match": 1.00 },
+    "familysearch_tree_match":   { "tier": 3, "lr_match": 1.8, "lr_no_match": 1.00 },
+    "member_family_tree":        { "tier": 3, "lr_match": 1.5, "lr_no_match": 1.00 }
+  },
+
+  "sources_relationship": {
+    "will_naming_child":                 { "tier": 1, "lr_match": 80,  "lr_no_match": 0.95 },
+    "baptism_naming_parents":            { "tier": 1, "lr_match": 50,  "lr_no_match": 0.30 },
+    "marriage_naming_father":            { "tier": 1, "lr_match": 30,  "lr_no_match": 0.60 },
+    "burial_naming_relative":            { "tier": 1, "lr_match": 25,  "lr_no_match": 0.85 },
+    "civil_bmd_certificate_naming":      { "tier": 1, "lr_match": 60,  "lr_no_match": 0.20 },
+    "census_household_relationship":     { "tier": 2, "lr_match": 12,  "lr_no_match": 0.50 },
+    "sibling_baptism_naming_same":       { "tier": 2, "lr_match": 10,  "lr_no_match": 1.00 },
+    "memorial_inscription_naming":       { "tier": 2, "lr_match": 18,  "lr_no_match": 0.95 },
+    "newspaper_obituary_naming":         { "tier": 2, "lr_match": 15,  "lr_no_match": 0.95 },
+    "wikitree_profile_naming":           { "tier": 3, "lr_match": 1.6, "lr_no_match": 1.00 },
+    "member_family_tree_naming":         { "tier": 3, "lr_match": 1.4, "lr_no_match": 1.00 }
+  },
+
+  "reviewer_findings": {
+    "mother_too_young_at_birth":   { "lr_against": 0.10, "applies_to": "relationship" },
+    "mother_too_old_at_birth":     { "lr_against": 0.05, "applies_to": "relationship" },
+    "mother_born_after_child":     { "lr_against": 0.001, "applies_to": "relationship" },
+    "father_born_after_child":     { "lr_against": 0.001, "applies_to": "relationship" },
+    "father_too_old_at_birth":     { "lr_against": 0.4,  "applies_to": "relationship" },
+    "siblings_too_close":          { "lr_against": 0.5,  "applies_to": "relationship" },
+    "death_before_birth":          { "lr_against": 0.001, "applies_to": "identity" },
+    "lifespan_implausible":        { "lr_against": 0.4,  "applies_to": "identity" },
+    "high_band_no_evidence":       { "lr_against": 0.6,  "applies_to": "identity" }
+  },
+
+  "name_rarity_prior_probabilities": {
+    "very_rare":   0.50,
+    "uncommon":    0.30,
+    "moderate":    0.15,
+    "common":      0.07,
+    "very_common": 0.03,
+    "_notes": "Prior P(this candidate is the right person) before any evidence is examined. 'Sutcliffe Heptonstall 1774' is uncommon; 'John Smith Leeds 1820' is very common."
+  },
+
+  "default_prior_probability": 0.15,
+
+  "band_thresholds": {
+    "A": 0.95,
+    "B": 0.80,
+    "C": 0.50,
+    "_notes": "Posterior probability above the threshold ⇒ band. Bands match the existing categorical scheme so all read sites stay backward-compatible."
+  },
+
+  "_caveats": [
+    "lr_match values assume a moderate-rarity name. Multiply by 1.5x for very_rare names; 0.7x for very_common.",
+    "lr_no_match < 1 means absence of expected evidence is mildly negative. Only apply lr_no_match when a search was DONE — not when no search has happened.",
+    "Independence: evidence with the same evidence_group is collapsed (most extreme LR kept). Use evidence_group for: same source indexed twice, multiple records derived from one parish register volume, etc.",
+    "These LRs are starting points. The Phase 5 calibration loop will surface where they're badly wrong from real accept/reject outcomes."
+  ]
+}
