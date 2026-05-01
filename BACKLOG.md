@@ -2,9 +2,48 @@
 
 Deferred features. Pull from the top of each section when you're ready.
 
-## Self-improvement (longer-term loop)
+## Confidence-uplift roadmap
 
-- **Reviewer agent (Strategy 5).** A separate, cheaper model call that reads each *accepted* match and evaluates it independently. Distinct prompt focused on critique. Catches over-eager Band A acceptances on Tier 2 sources. Adds ~10% to per-accept cost. Worth doing once you have 10+ accepts to review against.
+The two highest-leverage uplift mechanics — sibling reconciliation and a
+deterministic reviewer / contradiction-detector — landed in
+[reviewer + sibling reconciliation slice]. Remaining items, ordered by
+likely value:
+
+- **Will / probate / burial-record pipeline.** TNA Discovery already
+  surfaces will references for the user to check manually; what's
+  missing is (a) a structured form to paste in the will text after
+  ordering it from TNA, (b) an agent that parses the text and extracts
+  named relatives, (c) automatic confirmed_relatives entries. Wills are
+  the gold standard for relationships pre-1837. FindAGrave + BillionGraves
+  headstone transcriptions plug into the same pipe.
+
+- **Census triangulation prompt tightening.** Make the agent explicitly
+  chain 1841→1851→1861→1871→1881→1891→1901→1911 for any post-1800
+  individual; currently it does this opportunistically, not
+  systematically. Probably a prompt change + a deterministic check that
+  flags missing decades.
+
+- **LLM-based reviewer (v2).** Layer on top of the deterministic
+  reviewer: a separate, cheaper model call that reads each accepted
+  match and evaluates it independently. Distinct prompt focused on
+  critique. Catches over-eager Band A acceptances on Tier 2 sources.
+  Adds ~10% to per-accept cost. Worth doing once you have 10+ accepts
+  to review against.
+
+- **Bayesian confidence accumulator.** Replace the categorical A/B/C/D
+  bands with probabilistic reasoning that accumulates over evidence
+  (each Tier 1 source bumps log-odds by N, each Tier 2 by M, etc.).
+  Mathematically nicer; a big rewrite of how `confidence` propagates.
+  Defer unless the categorical model starts failing.
+
+- **Ancestry DNA match integration.** If the user has taken a test, the
+  match list is concrete biological corroboration of relationships.
+  No public API; export-and-import via a CSV would work. Plugs into the
+  existing Tier-3-leads pipe, but the matches with shared cM > N% are
+  effectively Tier 1 evidence for a relationship existing (just not
+  *which* relationship).
+
+## Self-improvement (longer-term loop)
 
 - **Query-template library (Strategy 6).** Extract successful query patterns from accepted runs (e.g. `site:familysearch.org [name] [parish] [year]` → 3 Tier 1 matches). Surface the proven templates in the next run's KB context. Currently the model has to re-discover what works. Medium effort; needs careful curation to avoid surfacing flukes.
 

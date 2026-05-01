@@ -17,6 +17,7 @@ import {
 } from "./agent/researchKb.js";
 import { gatherApiLeads, isCacheFresh } from "./agent/externalApiOrchestrator.js";
 import { tryAcquireRunLock, releaseRunLock } from "./agent/runLock.js";
+import { reviewTree } from "./agent/reviewer.js";
 import { searchWikiTreePersons, isWikiTreeDisabled } from "./agent/apiClients/wikiTreeClient.js";
 import { searchFamilySearchTree, isFamilySearchDisabled } from "./agent/apiClients/familySearchClient.js";
 import { searchTnaDiscovery, isTnaDisabled } from "./agent/apiClients/tnaDiscoveryClient.js";
@@ -414,6 +415,23 @@ app.get("/api/external/summary", async (_req, res) => {
 app.get("/api/kb", async (_req, res) => {
   try {
     res.json(await readJson(RESEARCH_KB_FILE));
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Tree review: deterministic checks for chronology/age-gap/dangling-ref
+// problems and confidence-band-vs-evidence mismatches. Free at runtime
+// (no LLM) so safe to call on every page load.
+app.get("/api/review", async (_req, res) => {
+  try {
+    const [individuals, families, evidenceLog] = await Promise.all([
+      readJson(INDIVIDUALS_FILE),
+      readJson(FAMILIES_FILE),
+      readJson(EVIDENCE_LOG_FILE),
+    ]);
+    const findings = reviewTree({ individuals, families, evidenceLog });
+    res.json({ findings });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

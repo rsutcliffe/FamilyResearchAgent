@@ -440,6 +440,40 @@ test.describe("Claim from import", () => {
   });
 });
 
+test.describe("Tree review", () => {
+  test("topbar exposes a Review button", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("#review-tree")).toBeVisible();
+  });
+
+  test("dialog renders findings filtered by severity", async ({ page, isolatedReads }) => {
+    await page.route("**/api/review", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          findings: [
+            { severity: "error", kind: "death_before_birth", individual_id: "@A@", message: "Time-traveller A" },
+            { severity: "warning", kind: "siblings_too_close", family_id: "@F1@", message: "Two same-year siblings" },
+            { severity: "info", kind: "high_band_no_evidence", individual_id: "@B@", message: "Band B with no run" },
+          ],
+        }),
+      }),
+    );
+    await page.goto("/");
+    await page.waitForSelector(".card");
+    await page.locator("#review-tree").click();
+    await expect(page.locator("#review-dialog")).toBeVisible();
+    // Default filter: errors + warnings on, info off
+    await expect(page.locator("#review-list")).toContainText("Time-traveller A");
+    await expect(page.locator("#review-list")).toContainText("Two same-year siblings");
+    await expect(page.locator("#review-list")).not.toContainText("Band B with no run");
+    // Toggle info on — band-B finding should now show
+    await page.locator("#review-filter-info").check();
+    await expect(page.locator("#review-list")).toContainText("Band B with no run");
+  });
+});
+
 test.describe("Visual snapshots", () => {
   // Visual snapshots are platform-specific (font rendering, anti-aliasing
   // differ across macOS / Linux / Windows). The baselines are committed

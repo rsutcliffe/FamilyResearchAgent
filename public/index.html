@@ -32,6 +32,7 @@
         <button id="reset-view" title="Reset view">Reset</button>
         <button id="import-gedcom" title="Import an external GEDCOM (Ancestry export, etc.) as Tier 3 leads — never raises a band on its own; surfaced to agents as hypotheses to verify">Import .ged</button>
         <button id="claim-descendants" title="Promote unmatched people from your imported GEDCOM(s) into the local tree — useful for adding your own descendants (children, grandchildren) who weren't in the curated ancestor tree">Claim from import</button>
+        <button id="review-tree" title="Run deterministic checks against the whole tree — chronology, age gaps, confidence-band vs evidence, dangling references. Free at runtime, no LLM.">Review</button>
         <button id="export-gedcom" title="Export an updated GEDCOM with confidence bands, accepted citations as SOUR records, and any agent-proposed individuals">Export .ged</button>
         <a href="/list" class="link">List view</a>
       </div>
@@ -138,6 +139,41 @@
           <button type="button" id="import-submit" class="primary">
             Import
           </button>
+        </menu>
+      </form>
+    </dialog>
+
+    <dialog id="review-dialog">
+      <form method="dialog">
+        <h3>Tree review</h3>
+        <p class="muted">
+          Deterministic checks for chronology, age gaps, dangling references,
+          and confidence-band-vs-evidence mismatches. Findings here don't
+          modify the tree — they surface things to investigate.
+        </p>
+        <div style="margin:8px 0;">
+          <label style="font-size:13px;">
+            <input type="checkbox" id="review-filter-errors" checked /> errors
+          </label>
+          <label style="font-size:13px;margin-left:12px;">
+            <input type="checkbox" id="review-filter-warnings" checked /> warnings
+          </label>
+          <label style="font-size:13px;margin-left:12px;">
+            <input type="checkbox" id="review-filter-info" /> info
+          </label>
+        </div>
+        <div
+          id="review-list"
+          style="max-height:55vh;overflow-y:auto;border:1px solid #ddd;border-radius:4px;"
+        ></div>
+        <p
+          id="review-empty"
+          class="muted"
+          hidden
+          style="text-align:center;padding:20px;"
+        ></p>
+        <menu>
+          <button value="cancel" formnovalidate>Close</button>
         </menu>
       </form>
     </dialog>

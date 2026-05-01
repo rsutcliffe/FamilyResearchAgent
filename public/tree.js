@@ -2037,6 +2037,74 @@ const wireDepth = () => {
     }
   };
 
+  // Tree review modal — deterministic checks (chronology, age gaps,
+  // band/evidence mismatches, dangling refs).
+  const SEVERITY_RANK = { error: 3, warning: 2, info: 1 };
+  let reviewFindings = [];
+  const renderReviewList = () => {
+    const list = $("#review-list");
+    const empty = $("#review-empty");
+    list.innerHTML = "";
+    const showErrors = $("#review-filter-errors").checked;
+    const showWarnings = $("#review-filter-warnings").checked;
+    const showInfo = $("#review-filter-info").checked;
+    const filtered = reviewFindings
+      .filter((f) =>
+        (f.severity === "error" && showErrors) ||
+        (f.severity === "warning" && showWarnings) ||
+        (f.severity === "info" && showInfo),
+      )
+      .sort((a, b) => SEVERITY_RANK[b.severity] - SEVERITY_RANK[a.severity]);
+    if (filtered.length === 0) {
+      empty.hidden = false;
+      empty.textContent = reviewFindings.length === 0
+        ? "Nothing to flag — the tree is internally consistent."
+        : "No findings at the selected severity levels.";
+      return;
+    }
+    empty.hidden = true;
+    for (const f of filtered) {
+      const row = document.createElement("div");
+      row.style.cssText = "padding:8px 12px;border-bottom:1px solid #eee;display:flex;gap:10px;align-items:flex-start;";
+      const sevColours = { error: "#c00000", warning: "#bf6f00", info: "#5a6170" };
+      row.innerHTML = `
+        <span style="display:inline-block;min-width:60px;font-size:11px;font-weight:700;color:${sevColours[f.severity]};text-transform:uppercase;">${f.severity}</span>
+        <div style="flex:1;font-size:13px;">
+          <div>${escapeHtml(f.message)}</div>
+          <div class="muted" style="font-size:11px;margin-top:2px;">${escapeHtml(f.kind)}${f.individual_id ? " · " + escapeHtml(f.individual_id) : ""}${f.family_id ? " · " + escapeHtml(f.family_id) : ""}</div>
+        </div>
+        ${f.individual_id ? `<button type="button" class="ghost review-jump" data-id="${escapeHtml(f.individual_id)}">Open</button>` : ""}
+      `;
+      const jump = row.querySelector(".review-jump");
+      if (jump) {
+        jump.addEventListener("click", () => {
+          $("#review-dialog").close();
+          selectPerson(jump.dataset.id);
+        });
+      }
+      list.appendChild(row);
+    }
+  };
+
+  $("#review-tree")?.addEventListener("click", async () => {
+    try {
+      const res = await fetch("/api/review");
+      if (!res.ok) {
+        alert(`Review failed: ${(await res.json()).error}`);
+        return;
+      }
+      const { findings } = await res.json();
+      reviewFindings = findings;
+      renderReviewList();
+      $("#review-dialog").showModal();
+    } catch (e) {
+      alert(`Review failed: ${e.message}`);
+    }
+  });
+  $("#review-filter-errors")?.addEventListener("change", renderReviewList);
+  $("#review-filter-warnings")?.addEventListener("change", renderReviewList);
+  $("#review-filter-info")?.addEventListener("change", renderReviewList);
+
   $("#claim-descendants")?.addEventListener("click", async () => {
     try {
       const res = await fetch("/api/external/unmatched");
