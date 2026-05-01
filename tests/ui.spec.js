@@ -52,6 +52,23 @@ test.describe("Tree view", () => {
     const marriageLine = page.locator("#connections line.marriage");
     await expect(marriageLine).toHaveCount(1);
   });
+
+  test("renders descendants below root", async ({ page, isolatedReads }) => {
+    await page.goto("/");
+    await page.waitForSelector(".card");
+    // Fixture: @TF_KID@ is a child of root via @TF_MARR@, so should render below root.
+    const childCard = page.locator(`.card[data-id="@TF_KID@"]`);
+    await expect(childCard).toBeAttached();
+    // y-coordinate of the descendant card should be greater than root's
+    // (down on screen). Read the inline style.top from the rendered DOM.
+    const yByCard = async (id) => {
+      const top = await page.locator(`.card[data-id="${id}"]`).evaluate((el) => el.style.top);
+      return parseFloat(top);
+    };
+    const rootY = await yByCard("@I1825902591@");
+    const kidY = await yByCard("@TF_KID@");
+    expect(kidY).toBeGreaterThan(rootY);
+  });
 });
 
 test.describe("Detail panel — clean state on selection", () => {

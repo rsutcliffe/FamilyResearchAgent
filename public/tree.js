@@ -136,6 +136,45 @@ const placePlaceholder = (childId, role, gen, xLeft, xRight) => {
   });
 };
 
+// How many descendant generations to render. Capped to keep the canvas
+// manageable; descendants are rarely the research focus, just a way to
+// see the tree as a whole.
+const MAX_DESCENDANT_DEPTH = 3;
+
+// Recursively place descendants below root. Each generation gets one row
+// (y = descGen * ROW_H, positive = below). Each child's slot is an equal
+// share of its parent's allocated width — naive but fine for the small
+// numbers of descendants in a personal tree.
+const placeDescendants = (personId, descGen, xLeft, xRight) => {
+  if (descGen > MAX_DESCENDANT_DEPTH) return;
+  const ind = state.byId.get(personId);
+  if (!ind) return;
+  const childIds = [];
+  for (const famId of ind.fams ?? []) {
+    const fam = state.famById.get(famId);
+    if (!fam) continue;
+    for (const cId of fam.children ?? []) {
+      if (!childIds.includes(cId)) childIds.push(cId);
+    }
+  }
+  if (childIds.length === 0) return;
+  const span = (xRight - xLeft) / childIds.length;
+  for (let i = 0; i < childIds.length; i += 1) {
+    const cId = childIds[i];
+    if (state.positions.has(cId)) continue;
+    const cLeft = xLeft + i * span;
+    const cRight = xLeft + (i + 1) * span;
+    const cMid = (cLeft + cRight) / 2;
+    state.positions.set(cId, {
+      x: cMid,
+      y: descGen * ROW_H,
+      generation: -descGen,
+      role: "descendant",
+    });
+    placeDescendants(cId, descGen + 1, cLeft, cRight);
+  }
+};
+
 // Place the root's spouse(s) at the same row as root, offset to the right
 // by one slot. The pedigree algorithm proper only walks ancestor links —
 // spouses are sideways, not upward — so this is a one-shot placement
@@ -169,6 +208,18 @@ const computeLayout = () => {
   const totalW = totalSlots * SLOT_W;
   placeAncestors(ROOT_ID, 0, 0, totalW);
   placeRootSpouses(totalW);
+  // Descendants span a width proportional to the number of children at the
+  // first descendant generation, so the bottom row doesn't crowd. Min span
+  // keeps the layout sensible when there are 0–1 children.
+  const root = state.byId.get(ROOT_ID);
+  const firstGenChildren = new Set();
+  for (const famId of root?.fams ?? []) {
+    const fam = state.famById.get(famId);
+    for (const cId of fam?.children ?? []) firstGenChildren.add(cId);
+  }
+  const descSpan = Math.max(SLOT_W * 4, firstGenChildren.size * SLOT_W * 2);
+  const rootMid = totalW / 2;
+  placeDescendants(ROOT_ID, 1, rootMid - descSpan / 2, rootMid + descSpan / 2);
   computeChainWeakness();
 };
 
