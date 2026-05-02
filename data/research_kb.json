@@ -934,6 +934,42 @@
       "source": "GRO index (web search)",
       "query": "GRO index White Annie birth Leeds 1875 Joseph father",
       "recorded_at": "2026-05-01T11:21:41.420Z"
+    },
+    {
+      "individual_id": "@I1825902591@",
+      "source": "FreeBMD",
+      "query": "FreeBMD Richard David Sutcliffe birth 1972 Leeds",
+      "recorded_at": "2026-05-02T15:31:33.555Z"
+    },
+    {
+      "individual_id": "@I1825902591@",
+      "source": "FreeBMD",
+      "query": "site:freebmd.org.uk Sutcliffe Richard 1972",
+      "recorded_at": "2026-05-02T15:31:33.555Z"
+    },
+    {
+      "individual_id": "@I1825902591@",
+      "source": "GRO/TNA guidance",
+      "query": "GRO birth certificate access restriction 50 years England Wales policy",
+      "recorded_at": "2026-05-02T15:31:33.555Z"
+    },
+    {
+      "individual_id": "@I1825902591@",
+      "source": "YorkshireBMD",
+      "query": "YorkshireBMD births index Leeds 1972 Sutcliffe",
+      "recorded_at": "2026-05-02T15:31:33.555Z"
+    },
+    {
+      "individual_id": "@I1825902591@",
+      "source": "GRO index direct",
+      "query": "GRO index search births 1972 \"Richard David Sutcliffe\" Leeds",
+      "recorded_at": "2026-05-02T15:31:33.555Z"
+    },
+    {
+      "individual_id": "@I1825902591@",
+      "source": "FreeBMD",
+      "query": "FreeBMD marriage Sutcliffe Major Leeds Yorkshire",
+      "recorded_at": "2026-05-02T15:31:33.555Z"
     }
   ],
   "confirmed_relatives": {},
@@ -946,5 +982,5 @@
     ]
   },
   "reresearch_recommended": {},
-  "last_changed_at": "2026-05-01T11:21:41.420Z"
+  "last_changed_at": "2026-05-02T15:31:33.555Z"
 }

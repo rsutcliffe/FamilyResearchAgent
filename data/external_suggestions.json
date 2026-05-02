@@ -361,6 +361,56 @@
         },
         "external_source_file": "Sutcliffe 20250701.ged",
         "imported_at": "2026-05-01T13:23:53.771Z"
+      },
+      {
+        "source_kind": "tna",
+        "external_id": "552f74c3-076f-4897-87f5-4b23bca1e62d",
+        "catalogue_ref": "QSP/3517/10",
+        "title": "Certificate of expenses of Richard Law, cabinet-maker, David Atkinson, book-seller, and John Sutcliffe, station-master, all of Ulverston, for attendance as witnesess in case against Sarah Winder",
+        "held_by": "Lancashire Archives",
+        "covering_dates": "1856 8 Aug",
+        "catalogue_url": "https://discovery.nationalarchives.gov.uk/details/r/552f74c3-076f-4897-87f5-4b23bca1e62d",
+        "score": 165.758987
+      },
+      {
+        "source_kind": "tna",
+        "external_id": "C7879209",
+        "catalogue_ref": "C 16/150/L94",
+        "title": "Cause number: 1863 L94. Short title: Lockwood v Sutcliffe. Documents: Bill, interrogatories, two answers. Plaintiffs:...",
+        "held_by": "The National Archives, Kew",
+        "covering_dates": "1863",
+        "catalogue_url": "https://discovery.nationalarchives.gov.uk/details/r/C7879209",
+        "score": 126.805435
+      },
+      {
+        "source_kind": "tna",
+        "external_id": "C5644033",
+        "catalogue_ref": "C 10/37/86",
+        "title": "Short title: Hawmond v Pighels. Plaintiffs: David Hawmond. Defendants: Thomas Pighels, Michael Pighels, Richard Pighels...",
+        "held_by": "The National Archives, Kew",
+        "covering_dates": "1654",
+        "catalogue_url": "https://discovery.nationalarchives.gov.uk/details/r/C5644033",
+        "score": 108.024529
+      },
+      {
+        "source_kind": "tna",
+        "external_id": "C14382770",
+        "catalogue_ref": "LCO 22/190",
+        "title": "Robert Henry Render; Basil L V Richards; George R J Robertson; David C Robinson; James...",
+        "held_by": "The National Archives, Kew",
+        "covering_dates": "1992 Jan 01 - 1996 Dec 31",
+        "catalogue_url": "https://discovery.nationalarchives.gov.uk/details/r/C14382770",
+        "score": 98.6955643
+      },
+      {
+        "source_kind": "tna",
+        "external_id": "C13509090",
+        "catalogue_ref": "LCO 22/95",
+        "title": "Lawrence Benjamin Alt; Brian Atchley; David John Bate; Clive Broadley; David Leslie Bulmer; James Percival...",
+        "held_by": "The National Archives, Kew",
+        "covering_dates": "1995 Jan 01 - 1998 Dec 31",
+        "catalogue_url": "https://discovery.nationalarchives.gov.uk/details/r/C13509090",
+        "score": 82.99734
       }
     ],
     "@I1825902649@": [
@@ -49877,5 +49927,10 @@
       "external_source_file": "Sutcliffe 20250701.ged",
       "imported_at": "2026-05-01T13:23:53.771Z"
     }
-  ]
+  ],
+  "api_cache": {
+    "@I1825902591@": {
+      "fetched_at": "2026-05-02T15:30:10.279Z"
+    }
+  }
 }

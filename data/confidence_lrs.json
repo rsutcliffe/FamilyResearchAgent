@@ -44,8 +44,7 @@
     "father_too_old_at_birth":     { "lr_against": 0.4,  "applies_to": "relationship" },
     "siblings_too_close":          { "lr_against": 0.5,  "applies_to": "relationship" },
     "death_before_birth":          { "lr_against": 0.001, "applies_to": "identity" },
-    "lifespan_implausible":        { "lr_against": 0.4,  "applies_to": "identity" },
-    "high_band_no_evidence":       { "lr_against": 0.6,  "applies_to": "identity" }
+    "lifespan_implausible":        { "lr_against": 0.4,  "applies_to": "identity" }
   },
 
   "name_rarity_prior_probabilities": {
