@@ -3,6 +3,8 @@
 // written back via writeJsonAtomic. This module is pure (no IO) so it's easy
 // to test and reason about.
 
+import { lookupLr, loadLrTable } from "./confidence.js";
+
 // Extract a per-person surname from a "Forename Forename Surname" string. The
 // GEDCOM parser stripped the // markers so we use the last whitespace-delimited
 // token. Handles "Smith-Jones" and similar.
@@ -642,6 +644,38 @@ export const applyAcceptedMatchToKb = (kb, {
       };
     }
   }
+
+  // Phase 2: record this accept as a Bayesian identity-evidence entry so the
+  // confidence breakdown panel reflects it. Source-kind inference is rough —
+  // we look at the citation title for hints; otherwise default to a generic
+  // "parish_baptism" Tier 1. The user can refine in a later phase.
+  next.confidence_evidence = next.confidence_evidence ?? {};
+  next.confidence_evidence[individual.id] = next.confidence_evidence[individual.id] ?? { identity: [], relationship: [] };
+  const inferKind = (cit) => {
+    const t = `${cit?.title ?? ""} ${cit?.reference ?? ""}`.toLowerCase();
+    if (/baptism|baptis|baptized/.test(t)) return "parish_baptism";
+    if (/marriage|wed/.test(t)) return "parish_marriage";
+    if (/burial|buried/.test(t)) return "parish_burial";
+    if (/will|probate/.test(t)) return "will_or_probate";
+    if (/census/.test(t)) return "census_record";
+    if (/birth.*certificate|gro|general register/.test(t)) return "civil_bmd_certificate";
+    if (/freebmd|bmd index/.test(t)) return "civil_bmd_index";
+    return "parish_baptism"; // safe default for the era this tree mostly covers
+  };
+  const kind = inferKind(citation);
+  const lr = lookupLr({ kind, direction: "match", domain: "identity" }) ?? 50;
+  const tier = (() => {
+    try { return loadLrTable().sources_identity?.[kind]?.tier ?? 1; } catch { return 1; }
+  })();
+  next.confidence_evidence[individual.id].identity.push({
+    kind,
+    lr,
+    source_tier: tier,
+    source_kind: "decision_accept",
+    source: citation ? `${citation.title}. ${citation.repository}. ${citation.reference}` : null,
+    evidence_group: citation?.reference ? `accept_${citation.reference}` : undefined,
+    added_at: new Date().toISOString(),
+  });
 
   next.last_changed_at = new Date().toISOString();
   return next;

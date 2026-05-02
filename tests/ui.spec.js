@@ -440,6 +440,53 @@ test.describe("Claim from import", () => {
   });
 });
 
+test.describe("Confidence breakdown panel (Phase 2)", () => {
+  test("renders legacy + Bayesian bands and contributions list", async ({ page, isolatedReads }) => {
+    await page.route("**/api/confidence/**", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          legacy_band: "B",
+          evidence: {
+            identity: [
+              { kind: "parish_baptism", lr: 50, source_tier: 1, source_kind: "decision_accept", note: "Heptonstall PR 1774" },
+              { kind: "member_family_tree", lr: 1.5, source_tier: 3, source_kind: "external_suggestion", note: "from gedcom: @G1@" },
+            ],
+            relationship: [],
+          },
+          result: {
+            prior: 0.15,
+            posterior: 0.93,
+            posterior_odds: 13.3,
+            posterior_log_odds: 2.59,
+            band: "B",
+            contributions: [
+              { kind: "parish_baptism", source_tier: 1, lr: 50, log_lr: 3.91, note: "Heptonstall PR 1774" },
+              { kind: "member_family_tree", source_tier: 3, lr: 1.5, log_lr: 0.41, note: "from gedcom: @G1@" },
+            ],
+            thresholds: { A: 0.95, B: 0.80, C: 0.50 },
+          },
+        }),
+      }),
+    );
+    await page.goto("/");
+    await page.waitForSelector(".card");
+    await page.locator(".card").first().dispatchEvent("click");
+    await expect(page.locator("#confidence-breakdown")).toBeVisible();
+    await expect(page.locator("#confidence-breakdown-summary")).toContainText("Legacy");
+    await expect(page.locator("#confidence-breakdown-summary")).toContainText("Bayesian");
+    await expect(page.locator("#confidence-breakdown-summary")).toContainText("93.0%");
+    // Expand to see contributions
+    await page.locator("#confidence-breakdown summary").click();
+    await expect(page.locator("#confidence-breakdown-body")).toContainText("parish_baptism");
+    await expect(page.locator("#confidence-breakdown-body")).toContainText("member_family_tree");
+    // Strongest contribution should be listed first
+    const firstRow = page.locator("#confidence-breakdown-body strong").first();
+    await expect(firstRow).toHaveText("parish_baptism");
+  });
+});
+
 test.describe("Sibling reconciliation panel", () => {
   test("renders corroboration when the selected individual has researched siblings", async ({ page, isolatedReads }) => {
     await page.route("**/api/siblings/reconcile/**", (route) =>

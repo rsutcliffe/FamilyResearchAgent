@@ -690,6 +690,10 @@ const resetDetailPanelTransientState = () => {
   $("#sibling-reconciliation").hidden = true;
   $("#sibling-reconciliation-list").innerHTML = "";
   $("#sibling-reconciliation-summary").textContent = "";
+  // Clear the confidence-breakdown section.
+  $("#confidence-breakdown").hidden = true;
+  $("#confidence-breakdown-summary").textContent = "";
+  $("#confidence-breakdown-body").innerHTML = "";
 };
 
 // Render the external API leads list for the currently selected individual.
@@ -798,6 +802,72 @@ const fetchAndRenderSiblingReconciliation = async (id) => {
   }
 };
 
+// Phase 2 Bayesian breakdown — informational, doesn't override the legacy
+// band. Collapsed by default to keep the panel quiet; the summary line
+// shows the gist (legacy vs Bayesian + posterior) so most clicks are
+// answered without expanding.
+const renderConfidenceBreakdown = (payload) => {
+  const section = $("#confidence-breakdown");
+  if (!payload?.result) {
+    section.hidden = true;
+    return;
+  }
+  section.hidden = false;
+  const { result, evidence, legacy_band } = payload;
+  const posteriorPct = (result.posterior * 100).toFixed(1) + "%";
+  const bayesianBand = result.band;
+  const summary = $("#confidence-breakdown-summary");
+  summary.innerHTML =
+    `Legacy <span class="badge ${legacy_band ?? "D"}">${legacy_band ?? "?"}</span>` +
+    ` · Bayesian <span class="badge ${bayesianBand}">${bayesianBand}</span> ${posteriorPct}` +
+    ` <span class="muted">(${result.contributions.length} contribution${result.contributions.length === 1 ? "" : "s"})</span>`;
+
+  const body = $("#confidence-breakdown-body");
+  const contribsByImpact = [...result.contributions].sort((a, b) => Math.abs(b.log_lr) - Math.abs(a.log_lr));
+  if (contribsByImpact.length === 0) {
+    body.innerHTML = `<div class="muted">No evidence accumulated yet — posterior equals the prior (${(result.prior * 100).toFixed(0)}%).</div>`;
+    return;
+  }
+  let rows = "";
+  for (const c of contribsByImpact) {
+    const direction = c.lr > 1 ? "↑" : c.lr < 1 ? "↓" : "·";
+    const impact = c.log_lr > 0 ? "supports" : c.log_lr < 0 ? "against" : "neutral";
+    rows += `
+      <div style="padding:6px 0;border-top:1px dashed var(--border);display:flex;gap:8px;align-items:flex-start;">
+        <span style="min-width:22px;font-weight:700;color:${c.lr > 1 ? "#1f6b3a" : c.lr < 1 ? "#c00000" : "#5a6170"};">${direction}</span>
+        <div style="flex:1;">
+          <div><strong>${escapeHtml(c.kind)}</strong> <span class="muted">LR ${c.lr} · ${escapeHtml(impact)}${c.source_tier ? ` · Tier ${c.source_tier}` : ""}</span></div>
+          ${c.note ? `<div class="muted" style="font-size:11px;">${escapeHtml(c.note)}</div>` : ""}
+        </div>
+      </div>
+    `;
+  }
+  body.innerHTML = `
+    <div class="muted" style="margin-bottom:6px;">
+      Prior ${(result.prior * 100).toFixed(0)}% → posterior ${posteriorPct}.
+      Stored evidence: ${(evidence.identity ?? []).filter((e) => e.source_kind === "decision_accept").length}.
+      Reviewer findings: ${(evidence.identity ?? []).filter((e) => e.source_kind === "reviewer").length + (evidence.relationship ?? []).filter((e) => e.source_kind === "reviewer").length}.
+      External: ${(evidence.identity ?? []).filter((e) => e.source_kind === "external_suggestion").length}.
+    </div>
+    ${rows}
+  `;
+};
+
+const fetchAndRenderConfidenceBreakdown = async (id) => {
+  try {
+    const res = await fetch(`/api/confidence/${encodeURIComponent(id)}`);
+    if (!res.ok) {
+      $("#confidence-breakdown").hidden = true;
+      return;
+    }
+    const payload = await res.json();
+    if (state.selectedId !== id) return; // stale
+    renderConfidenceBreakdown(payload);
+  } catch {
+    /* swallow */
+  }
+};
+
 const fetchAndRenderExternalLeads = async (id) => {
   try {
     const res = await fetch(`/api/external/leads/${encodeURIComponent(id)}`);
@@ -848,6 +918,7 @@ const selectPerson = async (id) => {
   // the main evidence load and can settle whenever it returns.
   fetchAndRenderExternalLeads(id);
   fetchAndRenderSiblingReconciliation(id);
+  fetchAndRenderConfidenceBreakdown(id);
 
   const evRes = await fetch(`/api/evidence/${encodeURIComponent(id)}`);
   const ev = await evRes.json();

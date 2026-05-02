@@ -19,6 +19,8 @@ import { gatherApiLeads, isCacheFresh } from "./agent/externalApiOrchestrator.js
 import { tryAcquireRunLock, releaseRunLock } from "./agent/runLock.js";
 import { reviewTree } from "./agent/reviewer.js";
 import { reconcileSiblings } from "./agent/siblingReconciliation.js";
+import { deriveConfidenceEvidence } from "./agent/confidenceEvidence.js";
+import { accumulateConfidence } from "./agent/confidence.js";
 import { searchWikiTreePersons, isWikiTreeDisabled } from "./agent/apiClients/wikiTreeClient.js";
 import { searchFamilySearchTree, isFamilySearchDisabled } from "./agent/apiClients/familySearchClient.js";
 import { searchTnaDiscovery, isTnaDisabled } from "./agent/apiClients/tnaDiscoveryClient.js";
@@ -433,6 +435,44 @@ app.get("/api/review", async (_req, res) => {
     ]);
     const findings = reviewTree({ individuals, families, evidenceLog });
     res.json({ findings });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Bayesian confidence breakdown for one individual. Phase 2: read-only,
+// information-only — does NOT modify the canonical individual.confidence
+// field. Blends stored evidence (decision accepts) with ephemeral derived
+// evidence (reviewer findings, external suggestions).
+app.get("/api/confidence/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const [individuals, families, kb, evidenceLog, externalSuggestions] = await Promise.all([
+      readJson(INDIVIDUALS_FILE),
+      readJson(FAMILIES_FILE),
+      readJson(RESEARCH_KB_FILE),
+      readJson(EVIDENCE_LOG_FILE),
+      readJson(EXTERNAL_SUGGESTIONS_FILE),
+    ]);
+    const individual = individuals.find((p) => p.id === id);
+    if (!individual) {
+      res.status(404).json({ error: "Individual not found" });
+      return;
+    }
+    // Reviewer findings re-derived per-request — they're cheap (deterministic
+    // checks across the whole tree) and re-deriving keeps stale findings out.
+    const { reviewTree } = await import("./agent/reviewer.js");
+    const reviewerFindings = reviewTree({ individuals, families, evidenceLog });
+
+    const evidence = deriveConfidenceEvidence({
+      id, kb, reviewerFindings, externalSuggestions,
+    });
+    const result = accumulateConfidence({ evidence: evidence.identity });
+    res.json({
+      evidence,
+      result,
+      legacy_band: individual.confidence,
+    });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
