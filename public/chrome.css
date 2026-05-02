@@ -322,8 +322,8 @@ body.wb-chrome {
   margin-bottom: 8px;
 }
 .wb-donut {
-  width: 100px;
-  height: 100px;
+  width: 130px;
+  height: 130px;
   display: block;
   margin: 0 auto;
 }
@@ -405,14 +405,9 @@ body.wb-chrome {
 
 #full-narrative {
   border-top: 1px solid var(--border, #e1e3e8);
-  padding: 10px 16px;
+  padding: 16px 0;
   background: var(--surface-raised);
 }
-#full-narrative summary {
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 12px;
-  color: var(--muted, #6b7280);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+#full-narrative .wb-section-title {
+  margin: 0 0 8px;
 }

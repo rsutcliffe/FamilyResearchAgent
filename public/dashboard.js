@@ -79,25 +79,64 @@ const renderRecentRuns = (items) => {
     .join("");
 };
 
+const CATEGORY_LABEL = {
+  accepted: "Accepted citation",
+  agent_run: "Agent run",
+  gedcom_import: "GEDCOM import",
+};
+const CATEGORY_PILL = {
+  accepted: "confirmed",
+  agent_run: "verified",
+  gedcom_import: "conflicting",
+};
+
 const renderRecentEvidence = (items) => {
   const root = $("#recent-evidence");
   if (!items.length) {
-    root.innerHTML = `<p class="muted wb-empty">No ingested evidence yet — accept a citation, or run the Ingest flow on a document.</p>`;
+    root.innerHTML = `<p class="muted wb-empty">No ingested evidence yet — accept a citation, run the agent, or import a GEDCOM.</p>`;
     return;
   }
   root.innerHTML = items
-    .map(
-      (it) => `
+    .map((it) => {
+      const cat = it.category ?? "accepted";
+      const label = CATEGORY_LABEL[cat] ?? "Evidence";
+      const pillCls = CATEGORY_PILL[cat] ?? "confirmed";
+      const detail =
+        cat === "agent_run" && it.search_count
+          ? `${it.search_count} searches · ${escapeHtml(it.source ?? "")}`
+          : escapeHtml(it.source ?? "");
+      // Per-row context line: surfaces the citation note + claim backed +
+      // LR contribution so feed rows aren't reduced to source+tier alone.
+      const ctxBits = [];
+      if (it.note) ctxBits.push(`<span class="wb-ctx-note">"${escapeHtml(it.note)}"</span>`);
+      if (it.claim_kind && it.claim_kind !== "agent_run" && it.claim_kind !== "gedcom_import") {
+        ctxBits.push(`backs ${escapeHtml(it.claim_kind)}`);
+      }
+      if (it.lr_match != null) ctxBits.push(`<span class="wb-ctx-lr">LR ×${it.lr_match}</span>`);
+      const contextLine = ctxBits.length ? `<div class="wb-feed-context">${ctxBits.join(" · ")}</div>` : "";
+      return `
       <a class="wb-feed-row" href="/?id=${encodeURIComponent(it.individual_id)}">
         <div class="wb-feed-main">
-          <div class="wb-feed-title">${escapeHtml(it.individual_name)} <span class="muted">— ${escapeHtml(it.kind)}</span></div>
-          <div class="wb-feed-source muted">${escapeHtml(it.source ?? "")}</div>
+          <div class="wb-feed-title">
+            ${escapeHtml(it.individual_name)}
+            <span class="wb-pill ${pillCls}" style="margin-left:6px; font-size:9px;">${escapeHtml(label)}</span>
+          </div>
+          <div class="wb-feed-source muted">${detail}</div>
+          ${contextLine}
         </div>
         <div class="wb-feed-meta muted">${escapeHtml(fmtRelative(it.added_at))}${it.source_tier ? ` · T${it.source_tier}` : ""}</div>
-      </a>`,
-    )
+      </a>`;
+    })
     .join("");
 };
+
+// Map normalised severity to status-pill class. The pill components
+// themselves already exist in chrome.css — we just pick the right one.
+//   high   → conflicting (red-ish)
+//   medium → verified    (amber-ish)
+//   low    → confirmed   (neutral/quiet)
+const severityPillClass = (sev) =>
+  sev === "high" ? "conflicting" : sev === "medium" ? "verified" : "confirmed";
 
 const renderQueue = (items) => {
   $("#queue-count").textContent = items.length ? `${items.length} item${items.length === 1 ? "" : "s"}` : "All clear";
@@ -107,16 +146,33 @@ const renderQueue = (items) => {
     return;
   }
   tbody.innerHTML = items
-    .map(
-      (it) => `
-      <tr>
-        <td><span class="wb-pill ${it.severity === "high" ? "conflicting" : it.severity === "medium" ? "verified" : "confirmed"}">${escapeHtml(it.severity)}</span></td>
-        <td><strong>${escapeHtml(it.individual_name)}</strong></td>
-        <td>${escapeHtml((it.kind ?? "").replace(/_/g, " "))}</td>
-        <td>${escapeHtml(it.summary ?? "")}</td>
-        <td><a class="wb-card-link" href="/?id=${encodeURIComponent(it.individual_id)}">Open →</a></td>
-      </tr>`,
-    )
+    .map((it) => {
+      // Grouped rows (e.g. high_band_no_evidence × 80) show the sample
+      // names inline + an "Open list" link to the band-filtered list.
+      const isGroup = !!it.group;
+      const indCell = isGroup
+        ? `<strong>${escapeHtml(it.individual_name)}</strong>` +
+          `<div class="muted" style="font-size:11px;">e.g. ${it.group.sample_names.map(escapeHtml).join(", ")}${it.group.count > it.group.sample_names.length ? "…" : ""}</div>`
+        : `<strong>${escapeHtml(it.individual_name)}</strong>`;
+      const linkHref = isGroup
+        ? `/list.html?band=A,B`
+        : `/?id=${encodeURIComponent(it.individual_id)}`;
+      const linkLabel = isGroup ? "Open list →" : "Open →";
+      // Triggered-by line (e.g. evidence_contradiction rows) — names which
+      // source raised the alarm so the queue isn't a mystery.
+      const tb = it.triggered_by;
+      const triggeredByLine = tb && (tb.source || tb.kind)
+        ? `<div class="wb-feed-triggered-by">Triggered by: ${escapeHtml(tb.source ?? tb.kind)}${tb.source_tier ? ` (T${tb.source_tier})` : ""}${tb.note ? ` — "${escapeHtml(tb.note)}"` : ""}</div>`
+        : "";
+      return `
+        <tr>
+          <td><span class="wb-pill ${severityPillClass(it.severity)}">${escapeHtml(it.severity)}</span></td>
+          <td>${indCell}</td>
+          <td>${escapeHtml((it.kind ?? "").replace(/_/g, " "))}</td>
+          <td>${escapeHtml(it.summary ?? "")}${triggeredByLine}</td>
+          <td><a class="wb-card-link" href="${linkHref}">${linkLabel}</a></td>
+        </tr>`;
+    })
     .join("");
 };
 

@@ -1,6 +1,6 @@
 // Evidence Matrix — flat cross-tree table of every claim, filterable.
 
-import { buildClaimsMatrix } from "/claimsMatrix.js";
+import { buildClaimsMatrix, renderDonut, renderBandScale } from "/claimsMatrix.js";
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -90,8 +90,8 @@ const renderTable = (rows) => {
   tbody.innerHTML = rows
     .map(
       (r) => `
-      <tr data-id="${escapeHtml(r.individual_id)}">
-        <td><a href="/?id=${encodeURIComponent(r.individual_id)}"><strong>${escapeHtml(r.individual_name)}</strong></a></td>
+      <tr data-id="${escapeHtml(r.individual_id)}" class="wb-clickable-row">
+        <td><strong>${escapeHtml(r.individual_name)}</strong></td>
         <td><span class="badge ${r.band ?? "D"}">${r.band ?? "?"}</span></td>
         <td>${escapeHtml(r.claim)}</td>
         <td class="muted">${escapeHtml(r.details ?? "")}</td>
@@ -100,6 +100,108 @@ const renderTable = (rows) => {
       </tr>`,
     )
     .join("");
+  // Wire row clicks to open the drawer
+  tbody.querySelectorAll("tr.wb-clickable-row").forEach((tr) =>
+    tr.addEventListener("click", () => openDrawer(tr.dataset.id)),
+  );
+};
+
+// ---- Drill-down drawer ----
+const drawerCache = new Map(); // individual_id → { confidencePayload, evidence }
+
+const fetchDrawerData = async (id) => {
+  if (drawerCache.has(id)) return drawerCache.get(id);
+  const [confResp, evResp] = await Promise.all([
+    fetch(`/api/confidence/${encodeURIComponent(id)}`),
+    fetch(`/api/evidence/${encodeURIComponent(id)}`),
+  ]);
+  const confidencePayload = confResp.ok ? await confResp.json() : null;
+  const evidence = evResp.ok ? await evResp.json() : null;
+  const data = { confidencePayload, evidence };
+  drawerCache.set(id, data);
+  return data;
+};
+
+const openDrawer = async (id) => {
+  const ind = state.rows.find((r) => r.individual_id === id);
+  if (!ind) return;
+  const drawer = document.getElementById("claim-drawer");
+  document.getElementById("drawer-title").textContent = ind.individual_name;
+  document.getElementById("drawer-meta").textContent = "Loading…";
+  document.getElementById("drawer-matrix").innerHTML = "";
+  document.getElementById("drawer-narrative-wrap").hidden = true;
+  document.getElementById("drawer-open-tree").href = `/?id=${encodeURIComponent(id)}`;
+  drawer.hidden = false;
+  drawer.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+
+  const { confidencePayload, evidence } = await fetchDrawerData(id);
+  if (!confidencePayload) {
+    document.getElementById("drawer-meta").textContent = "Could not load confidence data.";
+    return;
+  }
+
+  const legacyBand = confidencePayload.legacy_band ?? "D";
+  const bayesianBand = confidencePayload.result?.band;
+  const posterior = confidencePayload.result?.posterior;
+  const contributions = confidencePayload.result?.contributions ?? [];
+  const hasIndependent = contributions.some(
+    (c) => c.source_kind === "decision_accept" || (c.source_tier && c.source_tier <= 2),
+  );
+
+  document.getElementById("drawer-meta").innerHTML = `
+    <div style="display:flex; gap:16px; align-items:center;">
+      <div style="width:80px;">${renderDonut({ band: legacyBand, posterior: hasIndependent ? posterior : null })}</div>
+      <div style="flex:1;">
+        ${renderBandScale({ band: legacyBand })}
+        <div style="margin-top:6px;">
+          ${hasIndependent
+            ? `Band ${legacyBand} · posterior ${(posterior * 100).toFixed(1)}%${bayesianBand && bayesianBand !== legacyBand ? ` · Bayesian would be ${bayesianBand}` : ""}`
+            : `Band ${legacyBand} from imported records — no independent agent evidence yet.`}
+        </div>
+      </div>
+    </div>`;
+
+  // Full claims matrix for this individual
+  const fullRows = buildClaimsMatrix({ contributions, decision: ind.decision });
+  renderTableInto(document.getElementById("drawer-matrix"), fullRows);
+
+  // Narrative excerpt
+  if (evidence?.agent_result) {
+    const wrap = document.getElementById("drawer-narrative-wrap");
+    const slot = document.getElementById("drawer-narrative");
+    const excerpt = evidence.agent_result.slice(0, 2500);
+    slot.innerHTML = excerpt
+      .split(/\n\n+/)
+      .map((para) => `<p>${escapeHtml(para)}</p>`)
+      .join("");
+    wrap.hidden = false;
+  }
+};
+
+const renderTableInto = (root, rows) => {
+  if (!rows.length) {
+    root.innerHTML = '<tbody><tr><td class="muted">No accumulated evidence.</td></tr></tbody>';
+    return;
+  }
+  root.innerHTML = `
+    <thead><tr><th>Claim</th><th>Detail</th><th>Sources</th><th>Status</th></tr></thead>
+    <tbody>${rows
+      .map((r) => `
+        <tr>
+          <td><strong>${escapeHtml(r.claim)}</strong></td>
+          <td class="muted">${escapeHtml(r.details ?? "")}</td>
+          <td>${r.weights.length ? `<div class="wb-weight">${tierBarSegments(r.weights)}</div>` : '<span class="muted">—</span>'}</td>
+          <td>${r.status ? `<span class="wb-pill ${r.status}">${r.status}</span>` : '<span class="muted">—</span>'}</td>
+        </tr>`)
+      .join("")}</tbody>`;
+};
+
+const closeDrawer = () => {
+  const drawer = document.getElementById("claim-drawer");
+  drawer.hidden = true;
+  drawer.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
 };
 
 const refresh = () => {
@@ -115,6 +217,13 @@ const refresh = () => {
 };
 
 export const initEvidenceMatrix = async () => {
+  // Drawer close handlers
+  document.getElementById("drawer-close")?.addEventListener("click", closeDrawer);
+  document.querySelector("#claim-drawer .wb-drawer-backdrop")?.addEventListener("click", closeDrawer);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !document.getElementById("claim-drawer")?.hidden) closeDrawer();
+  });
+
   for (const f of ["search", "claim", "band", "status"]) {
     const el = document.getElementById(`filter-${f}`);
     el?.addEventListener("input", () => {

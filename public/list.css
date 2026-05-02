@@ -1,0 +1,171 @@
+/* List page (Ancestors → Linear) — single shared chrome, no internal sidebar.
+   Replaces the old #app/#sidebar split. */
+
+#list-root {
+  padding: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.list-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 1100px) {
+  .list-layout { grid-template-columns: 280px 1fr; }
+}
+
+#people-pane {
+  background: var(--surface-raised);
+  border: 1px solid var(--border, #e1e3e8);
+  border-radius: 10px;
+  max-height: calc(100vh - var(--chrome-topbar-h, 52px) - 220px);
+  overflow-y: auto;
+  position: sticky;
+  top: calc(var(--chrome-topbar-h, 52px) + 16px);
+}
+
+#people {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#people li {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border, #e1e3e8);
+  cursor: pointer;
+  font-size: 13px;
+}
+#people li:last-child { border-bottom: none; }
+#people li:hover { background: var(--surface-sunken); }
+#people li.selected { background: var(--indigo-tint, #eef0fb); }
+
+#people li .person-name {
+  font-weight: 600;
+  margin-right: 6px;
+}
+#people li .person-meta {
+  font-size: 11px;
+  color: var(--muted, #6b7280);
+  margin-top: 2px;
+}
+#people li .tick { color: #2e7d32; margin-left: 6px; font-size: 10px; }
+#people li .decision-tag {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-left: 6px;
+}
+#people li .decision-tag.accepted { background: var(--pill-confirmed-bg); color: var(--pill-confirmed-fg); }
+#people li .decision-tag.flagged  { background: var(--pill-corroborated-bg); color: var(--pill-corroborated-fg); }
+#people li .decision-tag.rejected { background: #f5e0e0; color: #c00000; }
+
+#detail-pane {
+  background: var(--surface-raised);
+  border: 1px solid var(--border, #e1e3e8);
+  border-radius: 10px;
+  padding: 24px;
+  min-height: 320px;
+}
+
+#empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted, #6b7280);
+}
+#empty-state h2 { font-size: 18px; margin: 0 0 8px; color: var(--text, #1a1f2c); }
+#empty-state p { margin: 0; }
+
+#detail #detail-header h2 {
+  margin: 0 0 4px;
+  font-size: 22px;
+  font-weight: 700;
+}
+#detail #detail-header .meta {
+  font-size: 13px;
+  color: var(--muted, #6b7280);
+  margin-bottom: 16px;
+}
+
+/* Inline override: claims-matrix-section in list.html doesn't sit on the
+   dark tree canvas, so it doesn't need its own surface. */
+#detail #claims-matrix-section {
+  background: transparent;
+  border-bottom: 1px solid var(--border, #e1e3e8);
+  padding: 8px 0 16px;
+  margin-bottom: 16px;
+}
+
+#detail #full-narrative {
+  border-top: 1px solid var(--border, #e1e3e8);
+  padding-top: 16px;
+  margin-top: 0;
+  background: transparent;
+}
+
+#detail #result {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text, #1a1f2c);
+  max-width: 740px;
+}
+#detail #result h2 {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 18px 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted, #6b7280);
+}
+
+#decision-bar {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border, #e1e3e8);
+}
+#decision-bar button {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid var(--border, #e1e3e8);
+  background: var(--surface-raised);
+  color: var(--text, #1a1f2c);
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: inherit;
+}
+#decision-bar button:hover { background: var(--surface-sunken); }
+#decision-bar button.primary {
+  background: var(--text, #1a1f2c);
+  color: white;
+  border-color: var(--text, #1a1f2c);
+}
+#decision-bar button.primary:hover { background: #2c313b; }
+
+#status:not([hidden]) {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 16px 0;
+  padding: 14px 16px;
+  background: var(--surface-sunken);
+  border-radius: 8px;
+}
+#status .spinner {
+  width: 18px;
+  height: 18px;
+  border: 3px solid var(--border, #e1e3e8);
+  border-top-color: var(--indigo, #4c5fd5);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }

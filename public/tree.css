@@ -12,15 +12,15 @@ body.tree-mode {
   top: var(--chrome-topbar-h, 52px);
   left: var(--chrome-sidebar-w, 220px);
   right: 0;
-  height: 52px;
-  background: var(--surface-raised, #ffffff);
+  height: 44px;
+  background: var(--surface-sunken, #f5f6fa);
   border-bottom: 1px solid var(--border, #e1e3e8);
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 12px;
   padding: 0 18px;
   z-index: 10;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 #topbar .brand {
@@ -84,7 +84,7 @@ body.tree-mode {
 
 #canvas {
   position: fixed;
-  top: calc(var(--chrome-topbar-h, 52px) + 52px);
+  top: calc(var(--chrome-topbar-h, 52px) + 44px);
   left: var(--chrome-sidebar-w, 220px);
   right: 0;
   bottom: 0;
@@ -492,10 +492,10 @@ button.add-manual {
 /* Detail panel — slides in from right. */
 #detail-panel {
   position: fixed;
-  top: calc(var(--chrome-topbar-h, 52px) + 52px);
+  top: calc(var(--chrome-topbar-h, 52px) + 44px);
   right: 0;
   bottom: 0;
-  width: 540px;
+  width: 600px;
   max-width: 60vw;
   background: var(--panel);
   color: var(--text);

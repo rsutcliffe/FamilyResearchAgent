@@ -12,13 +12,15 @@
     <main id="dashboard-root">
       <header class="wb-page-head">
         <h1>Sources</h1>
-        <p class="muted">Every cited source across the tree. Default view groups by individual — click a row to expand and see that person's sources. Switch to Tier view to see sources grouped Tier 1 (primary records) → Tier 3 (leads).</p>
+        <p class="muted">
+          What backs each individual in the tree, broken into three categories: <strong>archive citations</strong> imported from your GEDCOM(s) (TNA, GRO, parish offices, etc. — these are the real provenance for legacy bands), <strong>accepted citations</strong> you've confirmed via the agent flow (Phase 2 evidence), and the <strong>agent search trail</strong> (queries the research agent has run — included for transparency, not as cited evidence).
+        </p>
       </header>
 
       <div class="wb-sources-controls">
-        <div class="wb-toggle" role="tablist" aria-label="Group sources by">
-          <button id="group-individual" type="button" aria-pressed="true">By individual</button>
-          <button id="group-tier" type="button" aria-pressed="false">By tier</button>
+        <div class="wb-toggle" role="tablist" aria-label="View">
+          <button id="view-individual" type="button" aria-pressed="true">By individual</button>
+          <button id="view-flat" type="button" aria-pressed="false">Flat (all sources)</button>
         </div>
         <label>
           Sort
@@ -32,8 +34,38 @@
         <span class="muted" id="sources-count" style="margin-left:auto;"></span>
       </div>
 
-      <div id="sources-by-individual"></div>
-      <div id="sources-by-tier" hidden></div>
+      <section class="wb-card">
+        <header>
+          <h2>Archive citations</h2>
+          <span class="muted" id="archive-count"></span>
+        </header>
+        <p class="muted wb-section-blurb">
+          Sourced from imported GEDCOM(s). These are real archive references — TNA classes, GRO indexes, parish-register fonds — backing each individual when they were imported.
+        </p>
+        <div id="archive-body"></div>
+      </section>
+
+      <section class="wb-card">
+        <header>
+          <h2>Accepted citations</h2>
+          <span class="muted" id="accepted-count"></span>
+        </header>
+        <p class="muted wb-section-blurb">
+          Citations you've confirmed through the agent's Accept Match flow. These contribute to the Bayesian posterior as Tier 1 evidence.
+        </p>
+        <div id="accepted-body"></div>
+      </section>
+
+      <section class="wb-card">
+        <header>
+          <h2>Agent search trail</h2>
+          <span class="muted" id="trail-count"></span>
+        </header>
+        <p class="muted wb-section-blurb">
+          Queries the research agent has run while looking for evidence. <strong>These are not citations</strong> — they're the search history, surfaced so you can see what's already been tried.
+        </p>
+        <div id="trail-body"></div>
+      </section>
     </main>
 
     <script type="module">

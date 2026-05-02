@@ -548,33 +548,6 @@ const wirePanZoom = () => {
       applyTransform();
     }
   });
-  // "Run Bayesian Update" — purely a re-fetch; no agent run, no spend.
-  // Explicit loading + success feedback so the user sees the recompute.
-  const rerunBtn = $("#rerun-bayesian-btn");
-  if (rerunBtn) {
-    rerunBtn.addEventListener("click", async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (!state.selectedId || rerunBtn.disabled) return;
-      const originalLabel = rerunBtn.textContent;
-      rerunBtn.disabled = true;
-      rerunBtn.textContent = "Updating…";
-      _reviewCache = null;
-      try {
-        await fetchAndRenderConfidenceBreakdown(state.selectedId);
-        rerunBtn.textContent = "✓ Updated";
-        rerunBtn.classList.add("flash-ok");
-        setTimeout(() => {
-          rerunBtn.textContent = originalLabel;
-          rerunBtn.classList.remove("flash-ok");
-          rerunBtn.disabled = false;
-        }, 900);
-      } catch {
-        rerunBtn.textContent = originalLabel;
-        rerunBtn.disabled = false;
-      }
-    });
-  }
 };
 
 // ----- Detail panel + agent run ---------------------------------------------
@@ -834,9 +807,9 @@ const fetchAndRenderSiblingReconciliation = async (id) => {
 };
 
 // Phase 2 Bayesian breakdown — informational, doesn't override the legacy
-// band. Collapsed by default to keep the panel quiet; the summary line
-// shows the gist (legacy vs Bayesian + posterior) so most clicks are
-// answered without expanding.
+// band. Always visible (no collapse) — confidence is the project's
+// centrepiece, hiding it under a click defeats the point. Summary line
+// gives the gist; rows below give the audit trail.
 const renderConfidenceBreakdown = (payload) => {
   const section = $("#confidence-breakdown");
   if (!payload?.result) {
@@ -1307,15 +1280,48 @@ const renderClaimsAndConfidence = async (id, payload) => {
   }
   section.hidden = false;
   const decision = state.decisionsById?.[id] ?? null;
-  const rows = buildClaimsMatrix({ contributions: payload.result.contributions ?? [], decision });
+  const contributions = payload.result.contributions ?? [];
+  const rows = buildClaimsMatrix({ contributions, decision });
   renderClaimsMatrixInto($("#claims-matrix"), rows);
 
+  // Legacy band is the canonical headline (Phase 2 design — Bayesian is
+  // informational, not authoritative). The donut shows the imported/
+  // accepted band; we annotate with the Bayesian posterior when there's
+  // genuinely independent evidence to report.
+  const legacyBand = payload.legacy_band ?? "D";
+  const bayesianBand = payload.result.band;
+  const posterior = payload.result.posterior;
+  const hasIndependentEvidence = contributions.some(
+    (c) => c.source_kind === "decision_accept" || (c.source_tier && c.source_tier <= 2),
+  );
+  const showBayesian = hasIndependentEvidence;
+
   const donutSlot = $("#confidence-donut-slot");
-  if (donutSlot) donutSlot.innerHTML = renderDonut({ band: payload.result.band, posterior: payload.result.posterior });
+  if (donutSlot)
+    donutSlot.innerHTML = renderDonut({
+      band: legacyBand,
+      posterior: showBayesian ? posterior : null,
+    });
   const scaleSlot = $("#confidence-band-scale-slot");
-  if (scaleSlot) scaleSlot.innerHTML = renderBandScale({ band: payload.result.band });
+  if (scaleSlot) scaleSlot.innerHTML = renderBandScale({ band: legacyBand });
   const interp = $("#confidence-interpretation");
-  if (interp) interp.textContent = interpretBand({ band: payload.result.band, posterior: payload.result.posterior, contributions: payload.result.contributions });
+  if (interp) {
+    const supports = contributions.filter((c) => c.lr > 1).length;
+    const conflicts = contributions.filter(
+      (c) => c.lr < 1 || c.source_kind === "reviewer",
+    ).length;
+    let text;
+    if (!hasIndependentEvidence) {
+      text = `Band ${legacyBand} from imported records. Run the agent to gather Bayesian-grade evidence (parish, civil BMD, census).`;
+    } else {
+      const tail = conflicts > 0 ? ` ${conflicts} conflict${conflicts === 1 ? "" : "s"} flagged.` : "";
+      text = `Band ${legacyBand} · Bayesian posterior ${(posterior * 100).toFixed(1)}% · ${supports} supporting source${supports === 1 ? "" : "s"}.${tail}`;
+      if (showBayesian && bayesianBand && bayesianBand !== legacyBand) {
+        text += ` (Bayesian band would be ${bayesianBand} — surface for review.)`;
+      }
+    }
+    interp.textContent = text;
+  }
 
   const [allFindings, kbResp] = await Promise.all([
     fetchReviewOnce(),
@@ -1324,7 +1330,7 @@ const renderClaimsAndConfidence = async (id, payload) => {
   if (state.selectedId !== id) return;
   const myFindings = allFindings.filter((f) => f.individual_id === id);
   const reresearch = kbResp?.reresearch_recommended?.[id] ?? null;
-  const contradictions = (payload.result.contributions ?? []).filter((c) => c.lr < 1).length;
+  const contradictions = contributions.filter((c) => c.lr < 1).length;
   renderNextStepsInto($("#next-steps-list"), { reviewerFindings: myFindings, reresearch, contradictions });
 };
 

@@ -3,69 +3,113 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Sutcliffe Family Research Agent</title>
+    <title>Ancestors (List) — Family Research Agent</title>
     <link rel="stylesheet" href="/style.css" />
     <link rel="stylesheet" href="/chrome.css" />
+    <link rel="stylesheet" href="/dashboard.css" />
+    <link rel="stylesheet" href="/list.css" />
   </head>
   <body class="wb-chrome">
-    <div id="app">
-      <aside id="sidebar">
-        <header>
-          <h1>Record Discovery</h1>
-          <p class="subtitle">Sutcliffe Family Tree</p>
-          <div id="filters">
-            <button data-filter="all" class="active">All</button>
-            <button data-filter="C">C Uncertain</button>
-            <button data-filter="D">D Unverified</button>
-          </div>
-        </header>
-        <ul id="people"></ul>
-      </aside>
-      <main id="main">
-        <div id="empty-state">
-          <h2>Select an individual</h2>
-          <p>
-            Pick a person from the list to view what we know, run the research
-            agent, and record a decision.
-          </p>
+    <main id="list-root">
+      <header class="wb-page-head">
+        <h1>Ancestors (List)</h1>
+        <p class="muted">Every individual in the tree, filterable. Click a name to see what we know — Claims &amp; Evidence Matrix, confidence, the agent's full research narrative, and decision controls.</p>
+        <div class="wb-filters" style="margin-top: 12px;">
+          <label>Band
+            <select id="band-filter">
+              <option value="all">All</option>
+              <option value="A">A — Verified</option>
+              <option value="B">B — Probable</option>
+              <option value="C">C — Uncertain</option>
+              <option value="D">D — Unverified</option>
+            </select>
+          </label>
+          <label>Decision
+            <select id="decision-filter">
+              <option value="all">All</option>
+              <option value="undecided">Undecided</option>
+              <option value="accepted">Accepted</option>
+              <option value="flagged">Flagged</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </label>
+          <label>Search
+            <input id="search-filter" type="search" placeholder="name…" autocomplete="off" />
+          </label>
+          <span class="muted" id="list-count" style="margin-left:auto;"></span>
         </div>
-        <article id="detail" hidden>
-          <header id="detail-header"></header>
-          <section id="status" hidden>
-            <div class="spinner"></div>
-            <div>
-              <strong id="status-text">Searching public records…</strong>
-              <p id="status-query" class="muted"></p>
-              <p id="status-meta" class="muted"></p>
-            </div>
-            <button id="stop-btn" class="ghost">Stop</button>
-          </section>
-          <section id="result"></section>
-          <section id="decision-bar" hidden>
-            <button id="run-btn">Run Agent</button>
-            <button id="accept-btn" class="primary" hidden>Accept Match</button>
-            <button id="reject-btn" hidden>Reject — No Match</button>
-            <button id="flag-btn" hidden>Flag for Investigation</button>
-          </section>
+      </header>
+
+      <div class="list-layout">
+        <aside id="people-pane">
+          <ul id="people"></ul>
+        </aside>
+
+        <article id="detail-pane">
+          <div id="empty-state">
+            <h2>Select an individual</h2>
+            <p>Pick a person on the left to view what we know, run the research agent, and record a decision.</p>
+          </div>
+
+          <article id="detail" hidden>
+            <header id="detail-header"></header>
+
+            <section id="status" hidden>
+              <div class="spinner"></div>
+              <div>
+                <strong id="status-text">Searching public records…</strong>
+                <p id="status-query" class="muted"></p>
+                <p id="status-meta" class="muted"></p>
+              </div>
+              <button id="stop-btn" class="ghost">Stop</button>
+            </section>
+
+            <section id="claims-matrix-section" hidden>
+              <div class="wb-section-row">
+                <div class="wb-section-main">
+                  <h3 class="wb-section-title">Claims &amp; Evidence Matrix</h3>
+                  <table id="claims-matrix" class="wb-claims"></table>
+                </div>
+                <aside class="wb-section-side">
+                  <div class="wb-confidence-card">
+                    <div class="wb-confidence-label">Confidence</div>
+                    <div id="confidence-donut-slot"></div>
+                    <div id="confidence-band-scale-slot"></div>
+                    <p id="confidence-interpretation" class="muted"></p>
+                  </div>
+                  <div class="wb-next-steps">
+                    <div class="wb-confidence-label">Next Steps</div>
+                    <ul id="next-steps-list"></ul>
+                  </div>
+                </aside>
+              </div>
+            </section>
+
+            <section id="full-narrative" hidden>
+              <h3 class="wb-section-title">Agent research narrative</h3>
+              <div id="result"></div>
+            </section>
+
+            <section id="decision-bar" hidden>
+              <button id="run-btn">Run Agent</button>
+              <button id="accept-btn" class="primary" hidden>Accept Match</button>
+              <button id="reject-btn" hidden>Reject — No Match</button>
+              <button id="flag-btn" hidden>Flag for Investigation</button>
+            </section>
+          </article>
         </article>
-      </main>
-    </div>
+      </div>
+    </main>
 
     <dialog id="accept-dialog">
       <form method="dialog">
         <h3>Confirm match citation</h3>
-        <p class="muted">
-          All fields except URL are required. Choose the confidence band you are
-          accepting; A requires a Tier 1 source.
-        </p>
+        <p class="muted">All fields except URL are required. Choose the confidence band you are accepting; A requires a Tier 1 source.</p>
         <label>Source title<input name="title" required /></label>
         <label>Repository<input name="repository" required /></label>
-        <label
-          >Reference / folio<input name="reference" required /></label
-        >
+        <label>Reference / folio<input name="reference" required /></label>
         <label>URL <input name="url" type="url" /></label>
-        <label
-          >New confidence band
+        <label>New confidence band
           <select name="new_confidence" required>
             <option value="">—</option>
             <option value="A">A — Verified</option>
@@ -73,15 +117,10 @@
             <option value="C">C — Uncertain</option>
           </select>
         </label>
-        <label
-          >Notes (optional)
-          <textarea name="note" rows="3"></textarea>
-        </label>
+        <label>Notes (optional)<textarea name="note" rows="3"></textarea></label>
         <menu>
           <button value="cancel">Cancel</button>
-          <button id="accept-confirm" class="primary" value="confirm">
-            Confirm Accept
-          </button>
+          <button id="accept-confirm" class="primary" value="confirm">Confirm Accept</button>
         </menu>
       </form>
     </dialog>
@@ -89,11 +128,7 @@
     <dialog id="flag-dialog">
       <form method="dialog">
         <h3>Flag for further investigation</h3>
-        <p class="muted">Describe what needs more work.</p>
-        <label
-          >Note (required)
-          <textarea name="note" rows="4" required></textarea>
-        </label>
+        <label>Note (required)<textarea name="note" rows="4" required></textarea></label>
         <menu>
           <button value="cancel">Cancel</button>
           <button class="primary" value="confirm">Save Flag</button>

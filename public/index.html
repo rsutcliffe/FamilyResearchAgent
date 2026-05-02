@@ -10,10 +10,6 @@
   </head>
   <body class="tree-mode wb-chrome">
     <header id="topbar">
-      <div class="brand">
-        <strong>Sutcliffe Family Tree</strong>
-        <span class="muted">Record Discovery</span>
-      </div>
       <div id="stats" class="muted"></div>
       <div id="spend" class="muted" title="Session and lifetime API spend"></div>
       <div class="controls">
@@ -40,7 +36,6 @@
           <span id="active-runs-count">0 running</span>
         </button>
         <button id="export-gedcom" title="Export an updated GEDCOM with confidence bands, accepted citations as SOUR records, and any agent-proposed individuals">Export .ged</button>
-        <a href="/list" class="link">List view</a>
       </div>
     </header>
 
@@ -70,11 +65,10 @@
           </div>
           <aside class="wb-section-side">
             <div class="wb-confidence-card">
-              <div class="wb-confidence-label">Bayesian Confidence</div>
+              <div class="wb-confidence-label">Confidence</div>
               <div id="confidence-donut-slot"></div>
               <div id="confidence-band-scale-slot"></div>
               <p id="confidence-interpretation" class="muted"></p>
-              <button id="rerun-bayesian-btn" class="wb-rerun" type="button">Run Bayesian Update</button>
             </div>
             <div class="wb-next-steps">
               <div class="wb-confidence-label">Next Steps</div>
@@ -83,10 +77,10 @@
           </aside>
         </div>
       </section>
-      <details id="full-narrative" hidden>
-        <summary>Full agent narrative</summary>
+      <section id="full-narrative" hidden>
+        <h3 class="wb-section-title" style="padding: 0 16px;">Agent research narrative</h3>
         <section id="result"></section>
-      </details>
+      </section>
       <section id="sibling-reconciliation" hidden>
         <div class="external-leads-header">
           <strong>Sibling corroboration</strong>
@@ -95,13 +89,13 @@
         <div id="sibling-reconciliation-summary" class="muted" style="font-size:13px;margin-bottom:6px;"></div>
         <div id="sibling-reconciliation-list"></div>
       </section>
-      <details id="confidence-breakdown" hidden style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);">
-        <summary style="cursor:pointer;font-weight:600;font-size:14px;">
-          <span>Confidence breakdown</span>
+      <section id="confidence-breakdown" hidden>
+        <div class="external-leads-header">
+          <strong>Confidence breakdown</strong>
           <span id="confidence-breakdown-summary" class="muted" style="font-weight:400;margin-left:8px;font-size:13px;"></span>
-        </summary>
+        </div>
         <div id="confidence-breakdown-body" style="margin-top:8px;font-size:13px;"></div>
-      </details>
+      </section>
       <section id="external-leads" hidden>
         <div class="external-leads-header">
           <strong>External API leads</strong>

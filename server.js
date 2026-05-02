@@ -33,9 +33,9 @@ import {
   buildRecentEvidence,
   buildRecentRuns,
   buildEvidenceQueue,
-  buildSources,
+  buildSourcesCatalog,
 } from "./agent/dashboardAggregations.js";
-import { accumulateConfidence } from "./agent/confidence.js";
+import { accumulateConfidence, loadLrTable } from "./agent/confidence.js";
 import {
   scanIngestFolder,
   attachIngestionStatus,
@@ -637,11 +637,13 @@ app.get("/api/dashboard/distribution", async (_req, res) => {
 app.get("/api/dashboard/recent-evidence", async (req, res) => {
   try {
     const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 20));
-    const [individuals, kb] = await Promise.all([
+    const [individuals, kb, evidenceLog, externalSuggestions] = await Promise.all([
       readJson(INDIVIDUALS_FILE),
       readJson(RESEARCH_KB_FILE),
+      readJson(EVIDENCE_LOG_FILE).catch(() => ({})),
+      readJson(EXTERNAL_SUGGESTIONS_FILE).catch(() => ({})),
     ]);
-    res.json({ items: buildRecentEvidence({ kb, individuals, limit }) });
+    res.json({ items: buildRecentEvidence({ kb, evidenceLog, externalSuggestions, individuals, lrTable: loadLrTable(), limit }) });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -695,12 +697,14 @@ app.get("/api/dashboard/all-claims", async (_req, res) => {
 
 app.get("/api/sources", async (_req, res) => {
   try {
-    const [individuals, kb, evidenceLog] = await Promise.all([
+    const [individuals, kb, evidenceLog, externalSuggestions] = await Promise.all([
       readJson(INDIVIDUALS_FILE),
       readJson(RESEARCH_KB_FILE),
       readJson(EVIDENCE_LOG_FILE).catch(() => ({})),
+      readJson(EXTERNAL_SUGGESTIONS_FILE).catch(() => ({})),
     ]);
-    res.json({ items: buildSources({ kb, evidenceLog, individuals }) });
+    const cat = buildSourcesCatalog({ kb, evidenceLog, externalSuggestions, individuals, lrTable: loadLrTable() });
+    res.json(cat);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

@@ -1,4 +1,6 @@
-// Sources page — accordion-style grouped by individual (default) or tier.
+// Sources page — three categories (archive citations, accepted citations,
+// agent search trail) each rendered with By-individual accordion or Flat
+// table view. Driven by /api/sources catalogue.
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -20,29 +22,23 @@ const fmtRelative = (iso) => {
   return `${Math.round(h / 24)}d ago`;
 };
 
-const titleFromSource = (s) => {
+// Archive citations are repository + reference strings — full text shown
+// as the title; no URL extraction. Accepted/trail entries may be free
+// text. Truncate the title for table display.
+const titleOf = (s, limit = 90) => {
   if (!s) return "(unknown)";
-  if (s.startsWith("http")) {
-    try {
-      const u = new URL(s);
-      return u.hostname.replace(/^www\./, "") + u.pathname.replace(/\/$/, "");
-    } catch {
-      return s;
-    }
-  }
-  return s;
+  if (s.length <= limit) return s;
+  return s.slice(0, limit) + "…";
 };
 
 const state = {
-  raw: [], // /api/sources items
-  group: "individual", // "individual" | "tier"
+  catalogue: { archive_citations: [], accepted_citations: [], search_trail: [] },
+  view: "individual", // "individual" | "flat"
   sort: "name",
 };
 
-// Pure: regroup the flat sources list by individual. Each individual gets
-// every source they're attached to (a source attached to N individuals
-// shows up under each).
-const groupByIndividual = (sources) => {
+// Pure: regroup a flat sources list by individual.
+export const groupByIndividual = (sources) => {
   const byInd = new Map();
   for (const s of sources) {
     for (const ind of s.individuals ?? []) {
@@ -57,15 +53,10 @@ const groupByIndividual = (sources) => {
 
 const sortGroups = (groups, mode) => {
   const arr = [...groups];
-  if (mode === "name") {
-    arr.sort((a, b) => a.name.localeCompare(b.name));
-  } else if (mode === "count-desc") {
-    arr.sort((a, b) => b.sources.length - a.sources.length);
-  } else if (mode === "count-asc") {
-    arr.sort((a, b) => a.sources.length - b.sources.length);
-  } else if (mode === "recent") {
-    arr.sort((a, b) => (b.lastCited ?? "").localeCompare(a.lastCited ?? ""));
-  }
+  if (mode === "name") arr.sort((a, b) => a.name.localeCompare(b.name));
+  else if (mode === "count-desc") arr.sort((a, b) => b.sources.length - a.sources.length);
+  else if (mode === "count-asc") arr.sort((a, b) => a.sources.length - b.sources.length);
+  else if (mode === "recent") arr.sort((a, b) => (b.lastCited ?? "").localeCompare(a.lastCited ?? ""));
   return arr;
 };
 
@@ -74,107 +65,151 @@ const sortSources = (sources, mode) => {
   if (mode === "count-desc") arr.sort((a, b) => b.citation_count - a.citation_count);
   else if (mode === "count-asc") arr.sort((a, b) => a.citation_count - b.citation_count);
   else if (mode === "recent") arr.sort((a, b) => (b.last_cited ?? "").localeCompare(a.last_cited ?? ""));
-  else arr.sort((a, b) => titleFromSource(a.source).localeCompare(titleFromSource(b.source)));
+  else arr.sort((a, b) => (a.source ?? "").localeCompare(b.source ?? ""));
   return arr;
 };
 
-const renderSourcesTable = (sources) => {
-  if (!sources.length) return `<p class="muted">No sources.</p>`;
+// Per-source context list. Surfaces the per-citation note, claim backed,
+// and LR contribution that buildSourcesCatalog now attaches via contexts[].
+// "Context over aggregation" rule: never reduce a list view to source+count.
+const renderContexts = (contexts = []) => {
+  if (!contexts.length) return "";
+  const items = contexts
+    .map((c) => {
+      const indLink = c.individual_id
+        ? `<a href="/?id=${encodeURIComponent(c.individual_id)}">${escapeHtml(c.individual_name ?? c.individual_id)}</a>`
+        : "";
+      const noteFragment = c.note ? `<span class="wb-ctx-note">"${escapeHtml(c.note)}"</span>` : "";
+      const claimFragment = c.claim_kind && c.claim_kind !== "search_query" && c.claim_kind !== "archive_citation"
+        ? `<span class="wb-ctx-claim">backs ${escapeHtml(c.claim_kind)}</span>`
+        : "";
+      const lrFragment = c.lr_match != null
+        ? `<span class="wb-ctx-lr">LR ×${c.lr_match}</span>`
+        : "";
+      return `<li>${indLink}${noteFragment ? " · " + noteFragment : ""}${claimFragment ? " · " + claimFragment : ""}${lrFragment ? " · " + lrFragment : ""}</li>`;
+    })
+    .join("");
   return `
-    <table class="wb-claims wb-sources-table">
+    <details class="wb-source-contexts">
+      <summary class="muted">Show ${contexts.length} per-cite context${contexts.length === 1 ? "" : "s"}</summary>
+      <ul class="wb-ctx-list">${items}</ul>
+    </details>`;
+};
+
+const renderSourcesTable = (sources, opts = {}) => {
+  if (!sources.length) return `<p class="muted">None.</p>`;
+  const showTier = opts.showTier ?? true;
+  return `
+    <table class="wb-claims wb-sources-table wb-sortable">
       <thead>
         <tr>
           <th>Source</th>
-          <th>Tier</th>
+          ${showTier ? "<th>Tier</th>" : ""}
           <th>Backs</th>
+          <th>Individuals</th>
           <th>Last cited</th>
         </tr>
       </thead>
       <tbody>
         ${sources
-          .map((s) => `
-            <tr>
-              <td>
-                <div class="wb-source-title"><strong>${escapeHtml(titleFromSource(s.source))}</strong></div>
-                ${s.source && s.source.startsWith("http")
-                  ? `<div class="muted wb-source-url"><a href="${escapeHtml(s.source)}" target="_blank" rel="noreferrer">${escapeHtml(s.source)}</a></div>`
-                  : ""}
-              </td>
-              <td>${s.tier ? `T${s.tier}` : "—"}</td>
-              <td>${s.citation_count} claim${s.citation_count === 1 ? "" : "s"}</td>
-              <td class="muted">${escapeHtml(fmtRelative(s.last_cited))}</td>
-            </tr>`)
+          .map((s) => {
+            const lrSummary = (() => {
+              const lrs = (s.contexts ?? []).map((c) => c.lr_match).filter((x) => x != null);
+              if (!lrs.length) return "";
+              const max = Math.max(...lrs);
+              return ` <span class="muted">· max LR ×${max}</span>`;
+            })();
+            return `
+          <tr>
+            <td>
+              <div class="wb-source-title"><strong>${escapeHtml(titleOf(s.source))}</strong></div>
+              ${s.source_id ? `<div class="muted wb-source-url">GEDCOM ref: ${escapeHtml(s.source_id)}</div>` : ""}
+              ${s.sample ? `<div class="muted wb-source-url">${escapeHtml(s.sample)}</div>` : ""}
+              ${renderContexts(s.contexts)}
+            </td>
+            ${showTier ? `<td>${s.tier ? `T${s.tier}` : "—"}</td>` : ""}
+            <td>${s.citation_count} cite${s.citation_count === 1 ? "" : "s"}${lrSummary}</td>
+            <td>${s.individuals
+              .slice(0, 3)
+              .map((i) => `<a href="/?id=${encodeURIComponent(i.id)}">${escapeHtml(i.name)}</a>`)
+              .join(", ")}${s.individuals.length > 3 ? ` <span class="muted">+${s.individuals.length - 3}</span>` : ""}</td>
+            <td class="muted">${escapeHtml(fmtRelative(s.last_cited))}</td>
+          </tr>`;
+          })
           .join("")}
       </tbody>
     </table>`;
 };
 
-const renderByIndividual = () => {
-  const root = $("#sources-by-individual");
-  const groups = sortGroups(groupByIndividual(state.raw), state.sort);
-  $("#sources-count").textContent = `${groups.length} individual${groups.length === 1 ? "" : "s"} cited`;
+const renderByIndividualSection = (root, sources, { showTier = true, emptyMsg = "No entries." } = {}) => {
+  const groups = sortGroups(groupByIndividual(sources), state.sort);
   if (!groups.length) {
-    root.innerHTML = `<p class="muted">No sources have been cited yet.</p>`;
-    return;
+    root.innerHTML = `<p class="muted">${emptyMsg}</p>`;
+    return groups.length;
   }
   root.innerHTML = groups
-    .map((g) => `
+    .map(
+      (g) => `
       <details class="wb-individual-acc" data-id="${escapeHtml(g.id)}">
         <summary>
           <span class="wb-individual-acc-name">${escapeHtml(g.name)}</span>
-          <span class="wb-individual-acc-meta">${g.sources.length} source${g.sources.length === 1 ? "" : "s"}${g.lastCited ? ` · last cited ${escapeHtml(fmtRelative(g.lastCited))}` : ""}</span>
+          <span class="wb-individual-acc-meta">${g.sources.length} entr${g.sources.length === 1 ? "y" : "ies"}${g.lastCited ? ` · last cited ${escapeHtml(fmtRelative(g.lastCited))}` : ""}</span>
         </summary>
         <div class="wb-individual-acc-body">
-          ${renderSourcesTable(sortSources(g.sources, state.sort))}
+          ${renderSourcesTable(sortSources(g.sources, state.sort), { showTier })}
         </div>
-      </details>`)
+      </details>`,
+    )
     .join("");
+  return groups.length;
 };
 
-const renderByTier = () => {
-  const root = $("#sources-by-tier");
-  const sorted = sortSources(state.raw, state.sort);
-  const t1 = sorted.filter((s) => s.tier === 1);
-  const t2 = sorted.filter((s) => s.tier === 2);
-  const t3 = sorted.filter((s) => s.tier === 3 || s.tier == null);
-  $("#sources-count").textContent = `${state.raw.length} source${state.raw.length === 1 ? "" : "s"} total`;
-  root.innerHTML = `
-    <section class="wb-card">
-      <header><h2>Tier 1 — Primary records</h2><span class="muted">${t1.length} source${t1.length === 1 ? "" : "s"}</span></header>
-      ${renderSourcesTable(t1)}
-    </section>
-    <section class="wb-card">
-      <header><h2>Tier 2 — Indexed / derivative</h2><span class="muted">${t2.length} source${t2.length === 1 ? "" : "s"}</span></header>
-      ${renderSourcesTable(t2)}
-    </section>
-    <section class="wb-card">
-      <header><h2>Tier 3 — Leads</h2><span class="muted">${t3.length} source${t3.length === 1 ? "" : "s"}</span></header>
-      ${renderSourcesTable(t3)}
-    </section>`;
+const renderFlatSection = (root, sources, { showTier = true, emptyMsg = "No entries." } = {}) => {
+  const sorted = sortSources(sources, state.sort);
+  if (!sorted.length) {
+    root.innerHTML = `<p class="muted">${emptyMsg}</p>`;
+    return 0;
+  }
+  root.innerHTML = renderSourcesTable(sorted, { showTier });
+  return sorted.length;
 };
 
 const refresh = () => {
-  if (state.group === "individual") {
-    $("#sources-by-individual").hidden = false;
-    $("#sources-by-tier").hidden = true;
-    renderByIndividual();
-  } else {
-    $("#sources-by-individual").hidden = true;
-    $("#sources-by-tier").hidden = false;
-    renderByTier();
-  }
+  const cat = state.catalogue;
+  const renderer =
+    state.view === "individual" ? renderByIndividualSection : renderFlatSection;
+
+  const archCount = renderer($("#archive-body"), cat.archive_citations, {
+    showTier: true,
+    emptyMsg: "No archive citations imported. Drop a GEDCOM with citations into the import flow.",
+  });
+  const accCount = renderer($("#accepted-body"), cat.accepted_citations, {
+    showTier: true,
+    emptyMsg: "No accepted citations yet. Use the Accept Match flow on the agent's recommendations to record a citation here.",
+  });
+  const trailCount = renderer($("#trail-body"), cat.search_trail, {
+    showTier: false,
+    emptyMsg: "No agent search history yet — run the agent on an individual to see queries here.",
+  });
+
+  $("#archive-count").textContent = `${cat.archive_citations.length} unique source${cat.archive_citations.length === 1 ? "" : "s"}, ${archCount} ${state.view === "individual" ? "individual" : "row"}${archCount === 1 ? "" : "s"}`;
+  $("#accepted-count").textContent = `${cat.accepted_citations.length} unique source${cat.accepted_citations.length === 1 ? "" : "s"}`;
+  $("#trail-count").textContent = `${cat.search_trail.length} unique quer${cat.search_trail.length === 1 ? "y" : "ies"}`;
+
+  const total = cat.archive_citations.length + cat.accepted_citations.length + cat.search_trail.length;
+  $("#sources-count").textContent = `${total} entries across all categories`;
 };
 
-const setGroup = (mode) => {
-  state.group = mode;
-  document.getElementById("group-individual").setAttribute("aria-pressed", mode === "individual" ? "true" : "false");
-  document.getElementById("group-tier").setAttribute("aria-pressed", mode === "tier" ? "true" : "false");
+const setView = (mode) => {
+  state.view = mode;
+  document.getElementById("view-individual").setAttribute("aria-pressed", mode === "individual" ? "true" : "false");
+  document.getElementById("view-flat").setAttribute("aria-pressed", mode === "flat" ? "true" : "false");
   refresh();
 };
 
 export const initSourcesPage = async () => {
-  document.getElementById("group-individual")?.addEventListener("click", () => setGroup("individual"));
-  document.getElementById("group-tier")?.addEventListener("click", () => setGroup("tier"));
+  document.getElementById("view-individual")?.addEventListener("click", () => setView("individual"));
+  document.getElementById("view-flat")?.addEventListener("click", () => setView("flat"));
   document.getElementById("sort-by")?.addEventListener("change", (e) => {
     state.sort = e.target.value;
     refresh();
@@ -182,13 +217,19 @@ export const initSourcesPage = async () => {
   try {
     const r = await fetch("/api/sources");
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    const { items } = await r.json();
-    state.raw = items ?? [];
+    const data = await r.json();
+    state.catalogue = {
+      archive_citations: data.archive_citations ?? [],
+      accepted_citations: data.accepted_citations ?? [],
+      search_trail: data.search_trail ?? [],
+    };
     refresh();
   } catch (e) {
-    $("#sources-by-individual").innerHTML = `<p class="muted">Could not load: ${escapeHtml(e.message)}</p>`;
+    for (const id of ["archive-body", "accepted-body", "trail-body"]) {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = `<p class="muted">Could not load: ${escapeHtml(e.message)}</p>`;
+    }
   }
 };
 
-// Exported for unit testing
-export { groupByIndividual, sortGroups, sortSources };
+export { sortGroups, sortSources };

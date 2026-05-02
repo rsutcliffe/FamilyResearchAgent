@@ -53,6 +53,7 @@
           <span class="muted" id="filter-count" style="margin-left:auto;"></span>
         </div>
 
+        <p class="muted" style="font-size: 12px; margin: 0 0 12px;">Click any row to open the individual's full Claims &amp; Evidence Matrix in a side drawer.</p>
         <table id="matrix-table" class="wb-claims wb-matrix wb-sortable">
           <thead>
             <tr>
@@ -68,6 +69,28 @@
         </table>
       </section>
     </main>
+
+    <aside id="claim-drawer" hidden aria-hidden="true">
+      <div class="wb-drawer-backdrop"></div>
+      <div class="wb-drawer-panel" role="dialog" aria-labelledby="drawer-title">
+        <header class="wb-drawer-head">
+          <h2 id="drawer-title"></h2>
+          <button id="drawer-close" type="button" aria-label="Close">&times;</button>
+        </header>
+        <div class="wb-drawer-body">
+          <div id="drawer-meta" class="muted" style="font-size: 12px; margin-bottom: 14px;"></div>
+          <h3 class="wb-section-title">Claims &amp; Evidence Matrix</h3>
+          <table id="drawer-matrix" class="wb-claims"></table>
+          <div id="drawer-narrative-wrap" hidden style="margin-top: 18px;">
+            <h3 class="wb-section-title">Agent narrative (first 2,500 chars)</h3>
+            <div id="drawer-narrative"></div>
+          </div>
+          <div style="margin-top: 18px;">
+            <a id="drawer-open-tree" class="wb-card-link" href="#">Open in tree view →</a>
+          </div>
+        </div>
+      </div>
+    </aside>
 
     <script type="module">
       import { renderChrome } from "/chrome.js";
