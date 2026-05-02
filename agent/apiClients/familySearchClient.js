@@ -1,14 +1,20 @@
 // FamilySearch API client — Tree Person Search via unauthenticated session.
 //
-// Docs:
+// STATUS (2026-05-01): API access declined by FamilySearch Partner Support
+// (ticket 2663032). Their stated policy is that API access is restricted to
+// businesses/software vendors actively shipping marketed apps; personal /
+// individual research projects are not eligible. The orchestrator is gated
+// off via FAMILYSEARCH_DISABLE=1 in .env. This file is retained so the
+// parser tests (tests/unit/apiClients.familySearch.parser.test.js) keep
+// running and so the wiring is ready if a future re-application under a
+// different (business/organisational) framing succeeds.
+//
+// Docs (still accurate, kept for reference):
 //   https://developers.familysearch.org/main/docs/authentication
 //   https://www.familysearch.org/developers/docs/api/tree/Tree_Person_Search_resource
 //
-// Auth model: FamilySearch's `client_credentials` grant requires special
-// permission ("not available for general use"). For our needs (read-only
-// tree search) the public `unauthenticated_session` grant is sufficient and
-// is documented as supporting Person Search. Only a registered app's
-// client_id is required (no client_secret).
+// Auth model (for reference): the public `unauthenticated_session` grant
+// supports Person Search and only needs a registered app's client_id.
 
 const TOKEN_URL = "https://api.familysearch.org/cis-web/oauth2/v3/token";
 const SEARCH_URL = "https://api.familysearch.org/platform/tree/search";

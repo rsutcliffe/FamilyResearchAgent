@@ -36,6 +36,10 @@ body {
   height: 100vh;
 }
 
+body.wb-chrome #app {
+  height: calc(100vh - var(--chrome-topbar-h, 52px));
+}
+
 #sidebar {
   width: 340px;
   flex-shrink: 0;

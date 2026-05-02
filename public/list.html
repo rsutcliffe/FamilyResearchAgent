@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Sutcliffe Family Research Agent</title>
     <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/chrome.css" />
   </head>
-  <body>
+  <body class="wb-chrome">
     <div id="app">
       <aside id="sidebar">
         <header>
@@ -100,6 +101,10 @@
       </form>
     </dialog>
 
+    <script type="module">
+      import { renderChrome } from "/chrome.js";
+      renderChrome({ active: "list", sectionLabel: "Research Workbench" });
+    </script>
     <script src="/list.js" type="module"></script>
   </body>
 </html>

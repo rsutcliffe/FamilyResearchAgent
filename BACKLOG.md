@@ -56,6 +56,12 @@ likely value:
 External API leads (FamilySearch, WikiTree, TNA Discovery) are now wired
 in via [agent/externalApiOrchestrator.js](agent/externalApiOrchestrator.js)
 as Tier 3 lead generators feeding `external_suggestions` in the KB context.
+
+**Status (2026-05-01):** FamilySearch declined API access for personal-use
+applications (ticket 2663032). The FS branch is permanently gated off via
+`FAMILYSEARCH_DISABLE=1` unless a fresh business-framed application is made.
+WikiTree and TNA Discovery remain live.
+
 Outstanding items:
 
 - **Promote to Anthropic function tools.** Pre-fetch is good for the target
@@ -66,11 +72,9 @@ Outstanding items:
 - **Authenticated WikiTree session.** Public-profile reads work without
   auth; private/Trusted-List profiles need a session. Worth wiring only if
   WikiTree turns out to have data the user wants behind auth.
-- **FamilySearch image collections + records search.** Currently only Tree
-  Person Search is hit. The Records collections (parish, census, etc.)
-  would need a separate endpoint and likely the user's own authenticated
-  session to access higher-tier records. Defer until the tree-search hit
-  rate is observed in practice.
+- ~~**FamilySearch image collections + records search.**~~ Closed —
+  no API path available following the 2026-05-01 decline. Records
+  collections would need API access we don't have.
 - **Paid-source ledger extension.** Spend tracking is currently single-bucket
   Anthropic. If a paid source (Findmypast, Ancestry, etc.) ever gets API
   access, the per-source cost should be surfaced in `/api/spend`.
@@ -83,7 +87,7 @@ Outstanding items:
 
 ## Other paywalled options
 
-- **Findmypast / TheGenealogist via browser automation.** Use Claude in Chrome / Playwright against the user's already-authenticated browser. Avoids credential handling. Brittle to UI changes; ToS implications for some services. Worth considering only if FamilySearch API + manual evidence flow leave a meaningful gap.
+- **Findmypast / TheGenealogist via browser automation.** Use Claude in Chrome / Playwright against the user's already-authenticated browser. Avoids credential handling. Brittle to UI changes; ToS implications for some services. With FamilySearch API permanently off the table (declined 2026-05-01), the manual evidence flow + WikiTree + TNA is the full free-source baseline — so paid sources via browser automation are the main remaining lever if that baseline proves insufficient.
 
 - **GRO online indexes.** GRO's own search is free but unauth'd; could screen-scrape the index for verification of post-1837 matches. Low priority while FreeBMD covers the same ground.
 

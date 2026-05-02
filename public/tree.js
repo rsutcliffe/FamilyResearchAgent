@@ -2,6 +2,13 @@
 // right), with confidence-coloured cards and connector lines. Click a card to
 // open the detail panel and run the Record Discovery agent.
 
+import {
+  buildClaimsMatrix,
+  interpretBand,
+  renderDonut,
+  renderBandScale,
+} from "./claimsMatrix.js";
+
 const ROOT_ID = "@I1825902591@"; // Richard David Sutcliffe
 const CONF_LABEL = { A: "VERIFIED", B: "PROBABLE", C: "UNCERTAIN", D: "UNVERIFIED" };
 const CARD_W = 140;
@@ -61,25 +68,32 @@ const fetchData = async () => {
   renderSpend();
 };
 
-const fmtUSD = (n) =>
-  n >= 1 ? `$${n.toFixed(2)}` : `${(n * 100).toFixed(1)}¢`;
+// Anthropic API is priced in USD; UI displays GBP per user preference.
+// Rate is a static constant — fine for cost-discipline reporting; not
+// worth wiring a live FX feed for sub-pound delta accuracy.
+const USD_TO_GBP = 0.79;
+const fmtGBP = (usd) => {
+  const gbp = (usd ?? 0) * USD_TO_GBP;
+  return gbp >= 1 ? `£${gbp.toFixed(2)}` : `${(gbp * 100).toFixed(1)}p`;
+};
 
 const renderSpend = () => {
   const s = state.spend;
   if (!s) return;
-  const session = fmtUSD(s.session.cost);
-  const lifetime = fmtUSD(s.lifetime.cost);
-  const cap = s.session.cap > 0 ? ` / ${fmtUSD(s.session.cap)} cap` : "";
+  const session = fmtGBP(s.session.cost);
+  const lifetime = fmtGBP(s.lifetime.cost);
+  const cap = s.session.cap > 0 ? ` / ${fmtGBP(s.session.cap)} cap` : "";
   const capWarn = s.session.cap_hit ? " ⛔" : "";
   $("#spend").innerHTML = `
     <span style="font-variant-numeric: tabular-nums;">
       Session <strong>${session}</strong>${cap}${capWarn} · Lifetime <strong>${lifetime}</strong>
     </span>
   `;
+  const fmtRate = (perM) => fmtGBP(perM).replace(/^£/, "£");
   $("#spend").title =
     `Session tokens: in ${s.session.tokens.input.toLocaleString()}, out ${s.session.tokens.output.toLocaleString()}\n` +
     `Lifetime tokens: in ${s.lifetime.tokens.input.toLocaleString()}, out ${s.lifetime.tokens.output.toLocaleString()}\n` +
-    `Pricing: $${s.pricing.input_per_million}/M input, $${s.pricing.output_per_million}/M output, $${s.pricing.cache_read_per_million}/M cache-read`;
+    `Pricing (per million tokens, GBP @ ${USD_TO_GBP} USD→GBP): in ${fmtRate(s.pricing.input_per_million)} · out ${fmtRate(s.pricing.output_per_million)} · cache-read ${fmtRate(s.pricing.cache_read_per_million)}`;
 };
 
 // Recursively place ancestors using slot allocation.
@@ -441,18 +455,8 @@ const drawConnections = (offsetX, offsetY) => {
 };
 
 const renderStats = () => {
-  const counts = state.individuals.reduce(
-    (acc, i) => ((acc[i.confidence] = (acc[i.confidence] ?? 0) + 1), acc),
-    {},
-  );
   const placed = state.positions.size;
-  $("#stats").innerHTML = `
-    Placed: <strong>${placed}</strong> of ${state.individuals.length} ·
-    <span style="color:#1f6b3a">A: ${counts.A ?? 0}</span> ·
-    <span style="color:#1f497d">B: ${counts.B ?? 0}</span> ·
-    <span style="color:#bf6f00">C: ${counts.C ?? 0}</span> ·
-    <span style="color:#c00000">D: ${counts.D ?? 0}</span>
-  `;
+  $("#stats").innerHTML = `Placed: <strong>${placed}</strong> of ${state.individuals.length}`;
 };
 
 const centerOnRoot = (totalW, totalH) => {
@@ -544,6 +548,33 @@ const wirePanZoom = () => {
       applyTransform();
     }
   });
+  // "Run Bayesian Update" — purely a re-fetch; no agent run, no spend.
+  // Explicit loading + success feedback so the user sees the recompute.
+  const rerunBtn = $("#rerun-bayesian-btn");
+  if (rerunBtn) {
+    rerunBtn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!state.selectedId || rerunBtn.disabled) return;
+      const originalLabel = rerunBtn.textContent;
+      rerunBtn.disabled = true;
+      rerunBtn.textContent = "Updating…";
+      _reviewCache = null;
+      try {
+        await fetchAndRenderConfidenceBreakdown(state.selectedId);
+        rerunBtn.textContent = "✓ Updated";
+        rerunBtn.classList.add("flash-ok");
+        setTimeout(() => {
+          rerunBtn.textContent = originalLabel;
+          rerunBtn.classList.remove("flash-ok");
+          rerunBtn.disabled = false;
+        }, 900);
+      } catch {
+        rerunBtn.textContent = originalLabel;
+        rerunBtn.disabled = false;
+      }
+    });
+  }
 };
 
 // ----- Detail panel + agent run ---------------------------------------------
@@ -863,6 +894,7 @@ const fetchAndRenderConfidenceBreakdown = async (id) => {
     const payload = await res.json();
     if (state.selectedId !== id) return; // stale
     renderConfidenceBreakdown(payload);
+    renderClaimsAndConfidence(id, payload);
   } catch {
     /* swallow */
   }
@@ -897,7 +929,7 @@ const selectPerson = async (id) => {
   const p = state.byId.get(id);
   const indSpend = state.spend?.by_individual?.[id];
   const spendLine = indSpend
-    ? `<div class="muted" style="font-size:11px; margin-top:4px;">Spent on this person: <strong>${fmtUSD(indSpend.cost)}</strong> · ${indSpend.runs} run(s) · ${indSpend.input_tokens.toLocaleString()} in / ${indSpend.output_tokens.toLocaleString()} out</div>`
+    ? `<div class="muted" style="font-size:11px; margin-top:4px;">Spent on this person: <strong>${fmtGBP(indSpend.cost)}</strong> · ${indSpend.runs} run(s) · ${indSpend.input_tokens.toLocaleString()} in / ${indSpend.output_tokens.toLocaleString()} out</div>`
     : "";
   $("#detail-header").innerHTML = `
     <h2>${escapeHtml(p.name)}</h2>
@@ -1151,6 +1183,149 @@ const renderMarkdown = (text) => {
 
 const renderResult = (text) => {
   $("#result").innerHTML = renderMarkdown(text);
+  // Result lives inside the collapsible "Full agent narrative" section in
+  // the redesigned panel. Reveal it whenever there's text to show.
+  const wrapper = $("#full-narrative");
+  if (wrapper) wrapper.hidden = !text;
+};
+
+// --- Slice 1: Claims & Evidence Matrix + Confidence Donut + Next Steps ---
+//
+// Driven by the same /api/confidence/:id payload as the legacy breakdown.
+// Renders into the new sections in the detail panel; gracefully no-ops if
+// those sections aren't in the DOM (e.g. on list.html until Slice 1 wires
+// it there too).
+
+const tierBarSegments = (weights) =>
+  weights
+    .map(
+      (s) =>
+        `<span class="seg t${s.tier}" style="width:${(s.fraction * 100).toFixed(1)}%"></span>`,
+    )
+    .join("");
+
+const renderClaimsMatrixInto = (root, rows) => {
+  if (!root) return;
+  if (!rows.length) {
+    root.innerHTML = `<tbody><tr><td class="muted" colspan="4">No accumulated evidence yet — run the agent or accept a citation to populate.</td></tr></tbody>`;
+    return;
+  }
+  const head = `
+    <colgroup>
+      <col class="col-claim" />
+      <col class="col-details" />
+      <col class="col-weights" />
+      <col class="col-status" />
+    </colgroup>
+    <thead>
+      <tr>
+        <th>Fact / claim</th>
+        <th>Details</th>
+        <th>Sources</th>
+        <th>Status</th>
+      </tr>
+    </thead>`;
+  const body = rows
+    .map((r) => {
+      const pill = r.status
+        ? `<span class="wb-pill ${r.status}">${r.status}</span>`
+        : `<span class="muted" style="font-size:11px;">—</span>`;
+      const weights = r.weights.length
+        ? `<div class="wb-weight">${tierBarSegments(r.weights)}</div>`
+        : `<span class="muted" style="font-size:11px;">no tier</span>`;
+      const count = r.contribution_count > 1 ? ` <span class="muted">×${r.contribution_count}</span>` : "";
+      return `
+        <tr>
+          <td><strong>${escapeHtml(r.claim)}</strong>${count}</td>
+          <td>${escapeHtml(r.details)}</td>
+          <td>${weights}</td>
+          <td>${pill}</td>
+        </tr>`;
+    })
+    .join("");
+  root.innerHTML = head + `<tbody>${body}</tbody>`;
+};
+
+const renderNextStepsInto = (root, { reviewerFindings = [], reresearch, contradictions = 0 }) => {
+  if (!root) return;
+  const items = [];
+  if (reresearch?.reason) {
+    items.push({
+      title: "Re-research recommended",
+      hint: reresearch.reason,
+    });
+  }
+  for (const f of reviewerFindings) {
+    items.push({
+      title: f.kind?.replace(/_/g, " ") ?? "Reviewer finding",
+      hint: f.message ?? "Open Review for context.",
+    });
+  }
+  if (contradictions > 0) {
+    items.push({
+      title: `${contradictions} contradiction${contradictions === 1 ? "" : "s"} in evidence`,
+      hint: "Expand the matrix rows tagged Conflicting and resolve.",
+    });
+  }
+  if (!items.length) {
+    items.push({
+      title: "No outstanding actions",
+      hint: "Evidence is clean. Run the agent if you want to look for more.",
+    });
+  }
+  root.innerHTML = items
+    .map(
+      (it) => `
+      <li>
+        <div class="wb-step-title">${escapeHtml(it.title)}</div>
+        <div class="wb-step-hint muted">${escapeHtml(it.hint)}</div>
+      </li>`,
+    )
+    .join("");
+};
+
+let _reviewCache = null;
+const fetchReviewOnce = async () => {
+  if (_reviewCache) return _reviewCache;
+  try {
+    const r = await fetch("/api/review");
+    if (!r.ok) return [];
+    const j = await r.json();
+    _reviewCache = j.findings ?? [];
+    return _reviewCache;
+  } catch {
+    return [];
+  }
+};
+
+const renderClaimsAndConfidence = async (id, payload) => {
+  const section = $("#claims-matrix-section");
+  if (!section) return;
+  if (!payload?.result) {
+    section.hidden = true;
+    return;
+  }
+  section.hidden = false;
+  const decision = state.decisionsById?.[id] ?? null;
+  const rows = buildClaimsMatrix({ contributions: payload.result.contributions ?? [], decision });
+  renderClaimsMatrixInto($("#claims-matrix"), rows);
+
+  const donutSlot = $("#confidence-donut-slot");
+  if (donutSlot) donutSlot.innerHTML = renderDonut({ band: payload.result.band, posterior: payload.result.posterior });
+  const scaleSlot = $("#confidence-band-scale-slot");
+  if (scaleSlot) scaleSlot.innerHTML = renderBandScale({ band: payload.result.band });
+  const interp = $("#confidence-interpretation");
+  if (interp) interp.textContent = interpretBand({ band: payload.result.band, posterior: payload.result.posterior, contributions: payload.result.contributions });
+
+  const [allFindings, kbResp] = await Promise.all([
+    fetchReviewOnce(),
+    fetch("/api/kb").then((r) => (r.ok ? r.json() : null)).catch(() => null),
+  ]);
+  if (state.selectedId !== id) return;
+  const myFindings = allFindings.filter((f) => f.individual_id === id);
+  const reresearch = kbResp?.reresearch_recommended?.[id] ?? null;
+  const contradictions = (payload.result.contributions ?? []).filter((c) => c.lr < 1).length;
+  renderNextStepsInto($("#next-steps-list"), { reviewerFindings: myFindings, reresearch, contradictions });
 };
 
 const runAgent = () => {
@@ -1903,7 +2078,7 @@ const capCheck = () => {
   if (!s || !s.cap || s.cap === 0) return true;
   if (!s.cap_hit) return true;
   alert(
-    `Session spend cap of ${fmtUSD(s.cap)} reached (${fmtUSD(s.cost)} spent).\n\n` +
+    `Session spend cap of ${fmtGBP(s.cap)} reached (${fmtGBP(s.cost)} spent).\n\n` +
       `Restart the server to reset the session counter, or raise SESSION_CAP_USD in .env (then restart).`,
   );
   return false;
@@ -1924,7 +2099,7 @@ const rerunCheck = (id, agentLabel) => {
   const proceed = confirm(
     `Re-run guard\n\n` +
       `${agentLabel} on ${name} would be run #${runs + 1}.\n\n` +
-      `Cumulative spend on this person so far: ${fmtUSD(cost)} across ${runs} prior run${runs === 1 ? "" : "s"}.\n\n` +
+      `Cumulative spend on this person so far: ${fmtGBP(cost)} across ${runs} prior run${runs === 1 ? "" : "s"}.\n\n` +
       `Re-running only adds value if the KB has new context since the last run. ` +
       `If you're testing, override anyway. If not, cancel and consider whether ` +
       `you'd be paying for similar searches.\n\n` +

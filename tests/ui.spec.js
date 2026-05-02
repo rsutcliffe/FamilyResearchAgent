@@ -24,6 +24,297 @@ const autoAcceptDialogs = (page) => {
   page.on("dialog", (dialog) => dialog.accept());
 };
 
+test.describe("Workbench chrome (Slice 0)", () => {
+  test("sidebar renders all 5 nav items on tree page", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("#wb-sidebar")).toBeVisible();
+    const keys = await page.locator("#wb-sidebar nav a").evaluateAll((els) =>
+      els.map((e) => e.getAttribute("data-nav-key")),
+    );
+    expect(keys).toEqual(["dashboard", "tree", "list", "sources", "evidence-matrix"]);
+  });
+
+  test("active sidebar item carries aria-current on its own page", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator('#wb-sidebar nav a[data-nav-key="tree"]')).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    await page.goto("/list.html");
+    await expect(page.locator('#wb-sidebar nav a[data-nav-key="list"]')).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+  });
+
+  test("workbench topbar shows the section label", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("#wb-topbar .wb-section-label")).toHaveText("Research Workbench");
+  });
+});
+
+test.describe("Evidence Matrix (Slice 4)", () => {
+  test("filters narrow the table", async ({ page }) => {
+    await page.route("**/api/dashboard/all-claims", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          items: [
+            {
+              individual_id: "@1@",
+              individual_name: "Alice",
+              band: "B",
+              decision: null,
+              contributions: [
+                { kind: "parish_baptism", lr: 50, log_lr: 1.7, source_tier: 1, source_kind: "decision_accept" },
+                { kind: "story_contradiction", lr: 0.4, log_lr: -0.4, source_tier: 3, source_kind: "external_suggestion" },
+              ],
+            },
+            {
+              individual_id: "@2@",
+              individual_name: "Bob",
+              band: "D",
+              decision: null,
+              contributions: [
+                { kind: "census_record", lr: 8, log_lr: 0.9, source_tier: 2, source_kind: "decision_accept" },
+              ],
+            },
+          ],
+        }),
+      }),
+    );
+    await page.goto("/evidence-matrix.html");
+    await expect(page.locator("#wb-sidebar nav a[data-nav-key='evidence-matrix']")).toHaveAttribute("aria-current", "page");
+    // Initial load: 3 rows (Alice has 2, Bob has 1)
+    await expect(page.locator("#matrix-table tbody tr")).toHaveCount(3);
+    // Filter by status=conflicting → only Alice's contradicted row
+    await page.locator("#filter-status").selectOption("conflicting");
+    await expect(page.locator("#matrix-table tbody tr")).toHaveCount(1);
+    // Search for Bob → only Bob's census row
+    await page.locator("#filter-status").selectOption("");
+    await page.locator("#filter-search").fill("bob");
+    await expect(page.locator("#matrix-table tbody tr")).toHaveCount(1);
+    await expect(page.locator("#matrix-table tbody tr td:first-child")).toContainText("Bob");
+  });
+
+  test("clicking a sortable column header toggles sort", async ({ page }) => {
+    await page.route("**/api/dashboard/all-claims", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          items: [
+            { individual_id: "@2@", individual_name: "Zara", band: "B", decision: null, contributions: [{ kind: "parish_baptism", lr: 50, log_lr: 1.7, source_tier: 1, source_kind: "decision_accept" }] },
+            { individual_id: "@1@", individual_name: "Alice", band: "B", decision: null, contributions: [{ kind: "parish_baptism", lr: 50, log_lr: 1.7, source_tier: 1, source_kind: "decision_accept" }] },
+          ],
+        }),
+      }),
+    );
+    await page.goto("/evidence-matrix.html");
+    // Default sort = individual_name asc → Alice first
+    await expect(page.locator("#matrix-table tbody tr td:first-child").first()).toContainText("Alice");
+    await page.locator("th[data-sort-key='individual_name']").click(); // toggle to desc
+    await expect(page.locator("#matrix-table tbody tr td:first-child").first()).toContainText("Zara");
+  });
+});
+
+test.describe("Sources page (Slice 3)", () => {
+  const stubSources = (page) =>
+    page.route("**/api/sources", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          items: [
+            { source: "https://archive.org/parish/wilfrid", tier: 1, citation_count: 5, individuals: [{ id: "@1@", name: "Alice" }, { id: "@2@", name: "Bob" }], last_cited: new Date().toISOString() },
+            { source: "https://findmypast.co.uk/idx", tier: 2, citation_count: 2, individuals: [{ id: "@1@", name: "Alice" }], last_cited: new Date().toISOString() },
+            { source: "https://wikitree.com/X-1", tier: 3, citation_count: 1, individuals: [{ id: "@3@", name: "Carol" }], last_cited: new Date().toISOString() },
+          ],
+        }),
+      }),
+    );
+
+  test("default view groups by individual with accordions", async ({ page }) => {
+    await stubSources(page);
+    await page.goto("/sources.html");
+    await expect(page.locator("#wb-sidebar nav a[data-nav-key='sources']")).toHaveAttribute("aria-current", "page");
+    // 3 individuals (Alice, Bob, Carol) -> 3 accordions
+    const accs = page.locator(".wb-individual-acc");
+    await expect(accs).toHaveCount(3);
+    // Click Alice's accordion to reveal her sources
+    const alice = page.locator('.wb-individual-acc:has(.wb-individual-acc-name:has-text("Alice"))');
+    await alice.locator("summary").click();
+    await expect(alice.locator("table")).toBeVisible();
+    await expect(alice.locator("tbody tr")).toHaveCount(2);
+  });
+
+  test("toggle to By tier view shows tiered sections", async ({ page }) => {
+    await stubSources(page);
+    await page.goto("/sources.html");
+    await page.locator("#group-tier").click();
+    await expect(page.locator("#sources-by-tier")).toBeVisible();
+    await expect(page.locator("#sources-by-individual")).toBeHidden();
+    await expect(page.locator("#sources-by-tier .wb-card")).toHaveCount(3);
+  });
+
+  test("sort by source count reorders accordions", async ({ page }) => {
+    await stubSources(page);
+    await page.goto("/sources.html");
+    await page.locator("#sort-by").selectOption("count-desc");
+    // Alice has 2 sources, Bob and Carol have 1 each — so Alice should be first.
+    const firstName = await page.locator(".wb-individual-acc").first().locator(".wb-individual-acc-name").textContent();
+    expect(firstName?.trim()).toBe("Alice");
+  });
+});
+
+test.describe("Dashboard (Slice 2)", () => {
+  const stubDashboardEndpoints = async (page) => {
+    await page.route("**/api/dashboard/distribution", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ bands: { A: 2, B: 5, C: 1, D: 3 }, total: 11 }),
+      }),
+    );
+    await page.route("**/api/dashboard/recent-runs*", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          items: [{ individual_id: "@1@", individual_name: "Alice", searched_at: new Date().toISOString(), search_count: 5 }],
+        }),
+      }),
+    );
+    await page.route("**/api/dashboard/recent-evidence*", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          items: [
+            { individual_id: "@1@", individual_name: "Alice", kind: "parish_baptism", source: "St Wilfrid", source_tier: 1, added_at: new Date().toISOString() },
+          ],
+        }),
+      }),
+    );
+    await page.route("**/api/dashboard/queue", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          items: [
+            { individual_id: "@5@", individual_name: "Eve", kind: "flagged", severity: "high", summary: "Needs follow-up" },
+          ],
+        }),
+      }),
+    );
+    await page.route("**/api/runs/active", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ runs: [] }) }),
+    );
+  };
+
+  test("renders distribution + threads + evidence cards", async ({ page }) => {
+    await stubDashboardEndpoints(page);
+    await page.goto("/dashboard.html");
+    await expect(page.locator("#wb-sidebar nav a[data-nav-key='dashboard']")).toHaveAttribute("aria-current", "page");
+    await expect(page.locator("#distribution-total")).toHaveText("N = 11 individuals");
+    const bars = page.locator(".wb-bar");
+    await expect(bars).toHaveCount(4);
+    await expect(page.locator("#recent-evidence .wb-feed-row")).toHaveCount(1);
+    await expect(page.locator("#recent-runs .wb-thread")).toHaveCount(1);
+  });
+
+  test("Evidence Queue tab swaps the view and lists queue items", async ({ page }) => {
+    await stubDashboardEndpoints(page);
+    await page.goto("/dashboard.html");
+    await page.locator(".wb-tab[data-tab-key='evidence-queue']").click();
+    await expect(page.locator("#active-projects-view")).toBeHidden();
+    await expect(page.locator("#evidence-queue-view")).toBeVisible();
+    await expect(page.locator("#queue-table tbody tr")).toHaveCount(1);
+    await expect(page.locator("#queue-table tbody tr td:nth-child(2)")).toContainText("Eve");
+  });
+});
+
+test.describe("Detail panel — Claims Matrix + Confidence Donut (Slice 1)", () => {
+  test("clicking a card reveals the new detail sections", async ({ page, isolatedReads }) => {
+    // Stub /api/confidence/:id with a payload that yields one row per category.
+    await page.route("**/api/confidence/*", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          legacy_band: "B",
+          evidence: { identity: [], relationship: [] },
+          result: {
+            band: "B",
+            posterior: 0.854,
+            prior: 0.5,
+            contributions: [
+              { kind: "parish_baptism", lr: 50, log_lr: 1.7, source_tier: 1, source_kind: "decision_accept", note: "St Wilfrid 1842" },
+              { kind: "census_record", lr: 8, log_lr: 0.9, source_tier: 2, source_kind: "decision_accept", note: "1851 Brooklyn" },
+              { kind: "wikitree_profile", lr: 1.8, log_lr: 0.26, source_tier: 3, source_kind: "external_suggestion", note: "from wikitree" },
+            ],
+          },
+        }),
+      }),
+    );
+    await page.route("**/api/review", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ findings: [] }) }),
+    );
+    await page.route("**/api/external/leads/*", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ leads: [] }) }),
+    );
+    await page.route("**/api/siblings/reconcile/*", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ siblings: [], strength: "none" }) }),
+    );
+
+    await page.goto("/");
+    await page.waitForSelector(".card");
+    await page.locator(`.card[data-id="@TF_DAD@"]`).dispatchEvent("click");
+    await expect(page.locator("#claims-matrix-section")).toBeVisible();
+    await expect(page.locator("#confidence-donut-slot svg")).toBeVisible();
+    // Donut centre shows the band letter
+    await expect(page.locator("#confidence-donut-slot svg text").first()).toHaveText("B");
+    // Matrix has the 3 expected rows
+    const claimRows = page.locator("#claims-matrix tbody tr");
+    await expect(claimRows).toHaveCount(3);
+    await expect(page.locator("#confidence-band-scale-slot .wb-band-scale-cell.active")).toHaveText("B");
+  });
+
+  test("Run Bayesian Update button refetches /api/confidence", async ({ page, isolatedReads }) => {
+    let callCount = 0;
+    await page.route("**/api/confidence/*", (route) => {
+      callCount++;
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          legacy_band: "D",
+          evidence: { identity: [], relationship: [] },
+          result: { band: "D", posterior: 0.1, prior: 0.5, contributions: [] },
+        }),
+      });
+    });
+    await page.route("**/api/review", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ findings: [] }) }),
+    );
+    await page.route("**/api/external/leads/*", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ leads: [] }) }),
+    );
+    await page.route("**/api/siblings/reconcile/*", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ siblings: [], strength: "none" }) }),
+    );
+
+    await page.goto("/");
+    await page.waitForSelector(".card");
+    await page.locator(`.card[data-id="@TF_DAD@"]`).dispatchEvent("click");
+    await expect(page.locator("#rerun-bayesian-btn")).toBeVisible();
+    const beforeClicks = callCount;
+    await page.locator("#rerun-bayesian-btn").click();
+    await expect.poll(() => callCount).toBeGreaterThan(beforeClicks);
+  });
+});
+
 test.describe("Tree view", () => {
   test("loads and renders cards", async ({ page }) => {
     await page.goto("/");

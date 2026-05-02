@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Evidence Matrix — Family Research Agent</title>
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/chrome.css" />
+    <link rel="stylesheet" href="/dashboard.css" />
+  </head>
+  <body class="wb-chrome">
+    <main id="dashboard-root">
+      <header class="wb-page-head">
+        <h1>Evidence Matrix</h1>
+        <p class="muted">Every claim across the tree, filterable. Use the status filter to surface contradictions across individuals.</p>
+      </header>
+
+      <section class="wb-card">
+        <div class="wb-filters">
+          <label>Search
+            <input id="filter-search" type="search" placeholder="name…" autocomplete="off" />
+          </label>
+          <label>Claim
+            <select id="filter-claim">
+              <option value="">All</option>
+              <option>Birth / Baptism</option>
+              <option>Marriage</option>
+              <option>Census / Residence</option>
+              <option>Death / Burial</option>
+              <option>Vital records</option>
+              <option>Tree corroboration</option>
+              <option>Other</option>
+            </select>
+          </label>
+          <label>Band
+            <select id="filter-band">
+              <option value="">All</option>
+              <option>A</option>
+              <option>B</option>
+              <option>C</option>
+              <option>D</option>
+            </select>
+          </label>
+          <label>Status
+            <select id="filter-status">
+              <option value="">All</option>
+              <option>corroborated</option>
+              <option>verified</option>
+              <option>confirmed</option>
+              <option>conflicting</option>
+            </select>
+          </label>
+          <span class="muted" id="filter-count" style="margin-left:auto;"></span>
+        </div>
+
+        <table id="matrix-table" class="wb-claims wb-matrix wb-sortable">
+          <thead>
+            <tr>
+              <th data-sort-key="individual_name">Individual</th>
+              <th data-sort-key="band">Band</th>
+              <th data-sort-key="claim">Claim</th>
+              <th data-sort-key="details">Detail</th>
+              <th>Sources</th>
+              <th data-sort-key="status">Status</th>
+            </tr>
+          </thead>
+          <tbody><tr><td colspan="6" class="muted">Loading…</td></tr></tbody>
+        </table>
+      </section>
+    </main>
+
+    <script type="module">
+      import { renderChrome } from "/chrome.js";
+      import { initEvidenceMatrix } from "/evidence-matrix.js";
+      renderChrome({ active: "evidence-matrix", sectionLabel: "Research Workbench" });
+      initEvidenceMatrix();
+    </script>
+  </body>
+</html>

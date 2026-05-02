@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sources — Family Research Agent</title>
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/chrome.css" />
+    <link rel="stylesheet" href="/dashboard.css" />
+  </head>
+  <body class="wb-chrome">
+    <main id="dashboard-root">
+      <header class="wb-page-head">
+        <h1>Sources</h1>
+        <p class="muted">Every cited source across the tree. Default view groups by individual — click a row to expand and see that person's sources. Switch to Tier view to see sources grouped Tier 1 (primary records) → Tier 3 (leads).</p>
+      </header>
+
+      <div class="wb-sources-controls">
+        <div class="wb-toggle" role="tablist" aria-label="Group sources by">
+          <button id="group-individual" type="button" aria-pressed="true">By individual</button>
+          <button id="group-tier" type="button" aria-pressed="false">By tier</button>
+        </div>
+        <label>
+          Sort
+          <select id="sort-by">
+            <option value="name">Name (A→Z)</option>
+            <option value="count-desc">Source count (high → low)</option>
+            <option value="count-asc">Source count (low → high)</option>
+            <option value="recent">Most recently cited</option>
+          </select>
+        </label>
+        <span class="muted" id="sources-count" style="margin-left:auto;"></span>
+      </div>
+
+      <div id="sources-by-individual"></div>
+      <div id="sources-by-tier" hidden></div>
+    </main>
+
+    <script type="module">
+      import { renderChrome } from "/chrome.js";
+      import { initSourcesPage } from "/sources.js";
+      renderChrome({ active: "sources", sectionLabel: "Research Workbench" });
+      initSourcesPage();
+    </script>
+  </body>
+</html>

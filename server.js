@@ -28,6 +28,13 @@ import {
 import { reviewTree } from "./agent/reviewer.js";
 import { reconcileSiblings } from "./agent/siblingReconciliation.js";
 import { deriveConfidenceEvidence } from "./agent/confidenceEvidence.js";
+import {
+  buildDistribution,
+  buildRecentEvidence,
+  buildRecentRuns,
+  buildEvidenceQueue,
+  buildSources,
+} from "./agent/dashboardAggregations.js";
 import { accumulateConfidence } from "./agent/confidence.js";
 import {
   scanIngestFolder,
@@ -110,12 +117,6 @@ if (!process.env.ANTHROPIC_API_KEY) {
 
 const EXTERNAL_API_CACHE_DAYS = Number(process.env.EXTERNAL_API_CACHE_DAYS ?? 30);
 const FAMILYSEARCH_CLIENT_ID = process.env.FAMILYSEARCH_CLIENT_ID;
-if (!isFamilySearchDisabled() && !FAMILYSEARCH_CLIENT_ID) {
-  console.warn(
-    "[externalApi] FAMILYSEARCH_CLIENT_ID not set — FamilySearch lookups will be skipped. " +
-      "Register an app at https://developers.familysearch.org/ to enable, or set FAMILYSEARCH_DISABLE=1 to silence.",
-  );
-}
 
 const externalApiClients = {
   searchWikiTree: searchWikiTreePersons,
@@ -620,6 +621,106 @@ app.get("/api/ingest/cost-preview", (req, res) => {
 // In-flight runs registry for the topbar indicator.
 app.get("/api/runs/active", (_req, res) => {
   res.json({ runs: listInFlightRuns() });
+});
+
+// Dashboard aggregations (Slice 2). Each is a pure read over JSON files;
+// no agent calls, no paid-API surface, safe to poll cheaply.
+app.get("/api/dashboard/distribution", async (_req, res) => {
+  try {
+    const individuals = await readJson(INDIVIDUALS_FILE);
+    res.json(buildDistribution(individuals));
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get("/api/dashboard/recent-evidence", async (req, res) => {
+  try {
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 20));
+    const [individuals, kb] = await Promise.all([
+      readJson(INDIVIDUALS_FILE),
+      readJson(RESEARCH_KB_FILE),
+    ]);
+    res.json({ items: buildRecentEvidence({ kb, individuals, limit }) });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get("/api/dashboard/recent-runs", async (req, res) => {
+  try {
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 5));
+    const [individuals, evidenceLog] = await Promise.all([
+      readJson(INDIVIDUALS_FILE),
+      readJson(EVIDENCE_LOG_FILE),
+    ]);
+    res.json({ items: buildRecentRuns({ evidenceLog, individuals, limit }) });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Bulk confidence endpoint feeding the Evidence Matrix page (Slice 4).
+// Single read, single LR-table load, computes all individuals at once.
+app.get("/api/dashboard/all-claims", async (_req, res) => {
+  try {
+    const [individuals, families, kb, evidenceLog, externalSuggestions, decisions] = await Promise.all([
+      readJson(INDIVIDUALS_FILE),
+      readJson(FAMILIES_FILE),
+      readJson(RESEARCH_KB_FILE),
+      readJson(EVIDENCE_LOG_FILE),
+      readJson(EXTERNAL_SUGGESTIONS_FILE),
+      readJson(DECISIONS_FILE).catch(() => ({})),
+    ]);
+    const reviewerFindings = reviewTree({ individuals, families, evidenceLog });
+    const items = [];
+    for (const ind of individuals) {
+      const evidence = deriveConfidenceEvidence({ id: ind.id, kb, reviewerFindings, externalSuggestions });
+      const result = accumulateConfidence({ evidence: evidence.identity });
+      items.push({
+        individual_id: ind.id,
+        individual_name: ind.name,
+        band: result.band,
+        legacy_band: ind.confidence,
+        posterior: result.posterior,
+        decision: decisions?.[ind.id]?.decision ?? null,
+        contributions: result.contributions,
+      });
+    }
+    res.json({ items });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get("/api/sources", async (_req, res) => {
+  try {
+    const [individuals, kb, evidenceLog] = await Promise.all([
+      readJson(INDIVIDUALS_FILE),
+      readJson(RESEARCH_KB_FILE),
+      readJson(EVIDENCE_LOG_FILE).catch(() => ({})),
+    ]);
+    res.json({ items: buildSources({ kb, evidenceLog, individuals }) });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get("/api/dashboard/queue", async (_req, res) => {
+  try {
+    const [individuals, families, kb, evidenceLog, decisions] = await Promise.all([
+      readJson(INDIVIDUALS_FILE),
+      readJson(FAMILIES_FILE),
+      readJson(RESEARCH_KB_FILE),
+      readJson(EVIDENCE_LOG_FILE),
+      readJson(DECISIONS_FILE).catch(() => ({})),
+    ]);
+    const reviewerFindings = reviewTree({ individuals, families, evidenceLog });
+    const items = buildEvidenceQueue({ individuals, kb, reviewerFindings, decisions });
+    res.json({ items });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // Cancel an in-flight run by id (signal-aborts its AbortController).
