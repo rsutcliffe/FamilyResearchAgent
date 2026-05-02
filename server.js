@@ -1,5 +1,6 @@
 import express from "express";
-import { promises as fs } from "node:fs";
+import { promises as fs, existsSync } from "node:fs";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { runAgent, runAncestorAgent } from "./agent/researchAgent.js";
@@ -28,7 +29,12 @@ import { reviewTree } from "./agent/reviewer.js";
 import { reconcileSiblings } from "./agent/siblingReconciliation.js";
 import { deriveConfidenceEvidence } from "./agent/confidenceEvidence.js";
 import { accumulateConfidence } from "./agent/confidence.js";
-import { scanIngestFolder, attachIngestionStatus } from "./agent/ingestion.js";
+import {
+  scanIngestFolder,
+  attachIngestionStatus,
+  extractStory,
+  applyStoryEvidence,
+} from "./agent/ingestion.js";
 import { searchWikiTreePersons, isWikiTreeDisabled } from "./agent/apiClients/wikiTreeClient.js";
 import { searchFamilySearchTree, isFamilySearchDisabled } from "./agent/apiClients/familySearchClient.js";
 import { searchTnaDiscovery, isTnaDisabled } from "./agent/apiClients/tnaDiscoveryClient.js";
@@ -475,6 +481,69 @@ app.get("/api/ingest/scan", async (_req, res) => {
       },
     });
   } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Process a single story file: read it, extract via Claude, match to tree,
+// write story_corroboration evidence. Updates ingestion_log.json with the
+// result. Idempotent — re-running the same file replaces evidence via
+// hash-based evidence_group.
+app.post("/api/ingest/story/:filename", async (req, res) => {
+  const filename = req.params.filename;
+  const filePath = path.join(INGEST_STORIES_DIR, filename);
+  // Defence against directory traversal — only files directly in the
+  // configured stories folder are processable.
+  if (path.dirname(filePath) !== INGEST_STORIES_DIR || filename.startsWith(".") || filename.includes("/")) {
+    res.status(400).json({ error: "Invalid filename" });
+    return;
+  }
+  if (!existsSync(filePath)) {
+    res.status(404).json({ error: "File not found" });
+    return;
+  }
+
+  let log = { files: {} };
+  try { log = await readJson(INGESTION_LOG_FILE); } catch { /* fresh */ }
+
+  try {
+    const storyText = await fs.readFile(filePath, "utf8");
+    const fileBuf = await fs.readFile(filePath);
+    const fileHash = createHash("sha256").update(fileBuf).digest("hex").slice(0, 16);
+    const ourTree = await readJson(INDIVIDUALS_FILE);
+    const extraction = await extractStory({ storyText, ourTree });
+    if (!extraction) throw new Error("Claude returned malformed JSON");
+
+    const kb = await readJson(RESEARCH_KB_FILE);
+    const { kb: nextKb, summary } = applyStoryEvidence({
+      kb, extraction, filename, fileHash,
+    });
+    await writeJsonAtomic(RESEARCH_KB_FILE, nextKb);
+
+    log.files = log.files ?? {};
+    log.files[filename] = {
+      hash: fileHash,
+      kind: "story",
+      status: "ok",
+      last_processed_at: new Date().toISOString(),
+      individuals_matched: summary.individuals_matched,
+      evidence_written: summary.evidence_written,
+      contradictions: summary.contradictions,
+      story_summary: extraction.summary,
+    };
+    await writeJsonAtomic(INGESTION_LOG_FILE, log);
+
+    res.json({ ok: true, filename, summary, story_summary: extraction.summary });
+  } catch (e) {
+    log.files = log.files ?? {};
+    log.files[filename] = {
+      ...(log.files[filename] ?? {}),
+      kind: "story",
+      status: "failed",
+      error: e.message,
+      last_processed_at: new Date().toISOString(),
+    };
+    await writeJsonAtomic(INGESTION_LOG_FILE, log).catch(() => {});
     res.status(500).json({ error: e.message });
   }
 });

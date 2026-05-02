@@ -593,9 +593,51 @@ test.describe("Ingest modal (Phase 1 — list only)", () => {
     await expect(page.locator("#ingest-stories-list")).toContainText("3 matched");
     // Failed entry shows error
     await expect(page.locator("#ingest-documents-list")).toContainText("OCR failed");
-    // Process buttons disabled in Phase 1
-    const processButtons = page.locator(".ingest-process-btn");
-    await expect(processButtons.first()).toBeDisabled();
+    // Story Process buttons enabled (Phase 2); document buttons disabled (await Phase 3)
+    const storyButtons = page.locator("#ingest-stories-list .ingest-process-btn");
+    await expect(storyButtons.first()).toBeEnabled();
+    const docButtons = page.locator("#ingest-documents-list .ingest-process-btn");
+    await expect(docButtons.first()).toBeDisabled();
+  });
+
+  test("clicking Process on a story posts to /api/ingest/story/:filename and reports summary", async ({ page, isolatedReads }) => {
+    let scanCalls = 0;
+    await page.route("**/api/ingest/scan", (route) => {
+      scanCalls += 1;
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          paths: { documents: "/d", stories: "/s" },
+          stories: [
+            { name: "tale.md", hash: "11112222aaaabbbb", kind: "story", size_bytes: 1024,
+              modified_at: "2026-05-02T10:00:00Z", status: "unprocessed", last_processed_at: null },
+          ],
+          documents: [],
+        }),
+      });
+    });
+    let postCalled = false;
+    await page.route("**/api/ingest/story/**", async (route) => {
+      postCalled = true;
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          ok: true,
+          filename: "tale.md",
+          summary: { individuals_matched: 2, evidence_written: 2, contradictions_flagged: 0, contradictions: [] },
+          story_summary: "Family origins narrative",
+        }),
+      });
+    });
+
+    await page.goto("/");
+    await page.waitForSelector(".card");
+    await page.locator("#ingest-documents").click();
+    await page.locator("#ingest-stories-list .ingest-process-btn").click();
+    await expect.poll(() => postCalled).toBe(true);
+    await expect(page.locator("#ingest-status")).toContainText("2 matched, 2 evidence written");
   });
 
   test("shows empty hint when no files in folder", async ({ page, isolatedReads }) => {

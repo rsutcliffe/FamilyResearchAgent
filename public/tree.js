@@ -2280,6 +2280,9 @@ const wireDepth = () => {
       const errorInfo = f.status === "failed" && f.error
         ? `<div class="muted" style="font-size:11px;color:#c00000;">${escapeHtml(f.error)}</div>`
         : "";
+      // Stories are wired up in Phase 2; documents wait for Phase 3.
+      const isStory = kind === "story";
+      const buttonLabel = f.status === "processed" ? "Re-process" : "Process";
       row.innerHTML = `
         <div style="flex:1;min-width:0;">
           <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><strong>${escapeHtml(f.name)}</strong></div>
@@ -2287,11 +2290,35 @@ const wireDepth = () => {
           ${errorInfo}
         </div>
         <span style="font-size:10px;font-weight:700;color:${sb.colour};text-transform:uppercase;min-width:80px;text-align:right;">${sb.label}</span>
-        <button type="button" class="ghost ingest-process-btn" data-name="${escapeHtml(f.name)}" data-kind="${kind}" disabled
-                title="Phase 2 (stories) and Phase 3 (documents) will enable this. For now this list is browse-only.">
-          Process
+        <button type="button" class="ghost ingest-process-btn" data-name="${escapeHtml(f.name)}" data-kind="${kind}"
+                ${isStory ? "" : "disabled"}
+                title="${isStory ? `Process this story via Claude — ~$0.01.` : 'Document processing arrives in Phase 3.'}">
+          ${buttonLabel}
         </button>
       `;
+      const btn = row.querySelector(".ingest-process-btn");
+      if (isStory) {
+        btn.addEventListener("click", async () => {
+          btn.disabled = true;
+          btn.textContent = "Processing…";
+          try {
+            const res = await fetch(`/api/ingest/story/${encodeURIComponent(f.name)}`, { method: "POST" });
+            const body = await res.json();
+            if (!res.ok) throw new Error(body.error ?? `HTTP ${res.status}`);
+            // Re-scan to pick up the new processed status.
+            await refreshIngestModal();
+            $("#ingest-status").textContent =
+              `${f.name}: ${body.summary.individuals_matched} matched, ${body.summary.evidence_written} evidence written` +
+              (body.summary.contradictions_flagged > 0
+                ? `, ${body.summary.contradictions_flagged} contradiction(s) flagged`
+                : "");
+          } catch (e) {
+            $("#ingest-status").textContent = `${f.name}: ${e.message}`;
+            btn.disabled = false;
+            btn.textContent = buttonLabel;
+          }
+        });
+      }
       list.appendChild(row);
     }
   };
