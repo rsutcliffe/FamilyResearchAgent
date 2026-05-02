@@ -171,6 +171,176 @@ export const applyStoryEvidence = ({ kb, extraction, filename, fileHash, lrTable
   return { kb: next, summary };
 };
 
+// Document extraction prompt. Image/PDF is attached separately as a
+// content block; this prompt asks Claude to identify the document type
+// (drives the LR), transcribe key facts, and match to tree individuals.
+const DOCUMENT_KINDS = [
+  "civil_bmd_certificate", "civil_bmd_index",
+  "parish_baptism", "parish_marriage", "parish_burial", "parish_register_index",
+  "will_or_probate",
+  "census_record",
+  "memorial_inscription",
+  "newspaper_obituary", "newspaper_announcement",
+  "unknown_document",
+];
+
+export const buildDocumentExtractionPrompt = ({ ourTree = [] }) => {
+  const treeLines = ourTree
+    .map((p) => `${p.id}\t${p.name ?? ""}\tb.${p.birth_year ?? "?"}\t${p.birth_place ?? ""}`)
+    .join("\n");
+  return `You are reading a genealogy document (image or PDF — civil record, parish register, census, will, etc.). Identify the document type, transcribe the key facts, and match named individuals to the family tree below.
+
+Return JSON only, with this shape:
+{
+  "document_kind": "${DOCUMENT_KINDS.join("\" | \"")}",
+  "transcript_summary": "1-2 sentence plain-English summary of what the document records",
+  "individuals_mentioned": [
+    {
+      "tree_id": "@I...@",
+      "tree_name": "...",
+      "match_confidence": "strong" | "medium" | "weak",
+      "corroborating_facts": ["..."],
+      "contradicting_facts": ["..."]
+    }
+  ]
+}
+
+document_kind guide:
+  civil_bmd_certificate — UK GRO birth/marriage/death certificate (1837+).
+  civil_bmd_index       — index entry only (e.g. FreeBMD); reference but no certificate text.
+  parish_baptism / _marriage / _burial — original parish register entry naming the individual.
+  parish_register_index — transcribed/indexed parish entry (FamilySearch IGI etc.).
+  will_or_probate       — probate document, will, or letters of administration.
+  census_record         — UK census 1841–1911 page or transcript.
+  memorial_inscription  — gravestone / memorial photo with transcription.
+  newspaper_obituary / _announcement — news clipping (death notice, marriage notice, BMD column).
+  unknown_document      — anything else, or unidentifiable.
+
+match_confidence guide:
+  strong = name + at least one date/place explicitly match the tree entry
+  medium = name + plausible context but ambiguous date/place
+  weak   = name only; could be a different person with the same name
+
+Tree (id\\tname\\tbirth_year\\tbirth_place):
+${treeLines}`;
+};
+
+export const parseDocumentExtractionResponse = (text) => {
+  const parsed = parseStoryExtractionResponse(text); // shape is the same family
+  if (!parsed) return null;
+  parsed.document_kind = DOCUMENT_KINDS.includes(parsed.document_kind)
+    ? parsed.document_kind
+    : "unknown_document";
+  parsed.transcript_summary = parsed.transcript_summary ?? "";
+  return parsed;
+};
+
+// Apply a document extraction to the KB. LR is looked up from the
+// confidence_lrs table by document_kind; falls back to a conservative
+// 2.0 for unknown_document so the find is still recorded.
+export const applyDocumentEvidence = ({ kb, extraction, filename, fileHash, lrTable }) => {
+  // Inline LR table loader — same pattern as applyStoryEvidence to keep
+  // the function pure-friendly when callers want to override.
+  const table = lrTable ?? loadLrTableSafe();
+  const kind = extraction?.document_kind ?? "unknown_document";
+  const def = table?.sources_identity?.[kind];
+  const lr = def?.lr_match ?? 2.0;
+  const tier = def?.tier ?? 3;
+
+  const next = JSON.parse(JSON.stringify(kb));
+  next.confidence_evidence = next.confidence_evidence ?? {};
+
+  const summary = {
+    document_kind: kind,
+    individuals_matched: 0,
+    evidence_written: 0,
+    contradictions_flagged: 0,
+    contradictions: [],
+  };
+
+  for (const m of extraction?.individuals_mentioned ?? []) {
+    if (!m.tree_id) continue;
+    summary.individuals_matched += 1;
+    if ((m.contradicting_facts ?? []).length > 0) {
+      summary.contradictions_flagged += 1;
+      summary.contradictions.push(`${m.tree_name || m.tree_id}: ${m.contradicting_facts.join("; ")}`);
+    }
+    if (m.match_confidence !== "strong") continue;
+    if ((m.corroborating_facts ?? []).length === 0) continue;
+
+    next.confidence_evidence[m.tree_id] = next.confidence_evidence[m.tree_id] ?? { identity: [], relationship: [] };
+    next.confidence_evidence[m.tree_id].identity.push({
+      kind,
+      lr,
+      source_tier: tier,
+      source_kind: "document",
+      source: filename,
+      evidence_group: `doc_${fileHash}_${m.tree_id}`,
+      note: m.corroborating_facts.join("; "),
+      added_at: new Date().toISOString(),
+    });
+    summary.evidence_written += 1;
+  }
+
+  return { kb: next, summary };
+};
+
+// Fallback LR-table load that doesn't throw — used by applyDocumentEvidence
+// to stay test-friendly when the table file isn't available.
+const loadLrTableSafe = () => {
+  try {
+    const tablePath = path.join(path.dirname(new URL(import.meta.url).pathname), "..", "data", "confidence_lrs.json");
+    return JSON.parse(fs.readFileSync(tablePath, "utf8"));
+  } catch {
+    return null;
+  }
+};
+
+// Conservative cost estimate: ~$0.05/document at typical census image
+// resolution + the prompt overhead. Used by the UI cost-preview before
+// processing. Upper-bound estimate; actuals usually lower.
+const COST_PER_DOCUMENT_USD = 0.05;
+export const estimateDocumentCost = ({ fileCount = 0 } = {}) => {
+  if (!Number.isFinite(fileCount) || fileCount <= 0) return 0;
+  return fileCount * COST_PER_DOCUMENT_USD;
+};
+
+// Vision API extraction. PDFs and images are read off disk and attached
+// as base64 content blocks alongside the text prompt.
+export const extractDocument = async ({ filePath, ourTree, fetchImpl }) => {
+  const ext = path.extname(filePath).toLowerCase();
+  const mediaType = ext === ".pdf" ? "application/pdf"
+    : ext === ".png" ? "image/png"
+    : "image/jpeg";
+  const buf = fs.readFileSync(filePath);
+  const base64 = buf.toString("base64");
+  const prompt = buildDocumentExtractionPrompt({ ourTree });
+
+  if (fetchImpl) {
+    const res = await fetchImpl({ prompt, mediaType, base64 });
+    return parseDocumentExtractionResponse(res);
+  }
+  const blockType = mediaType === "application/pdf" ? "document" : "image";
+  const response = await anthropicClient().messages.create({
+    model: MODEL,
+    max_tokens: MAX_TOKENS,
+    messages: [
+      {
+        role: "user",
+        content: [
+          { type: blockType, source: { type: "base64", media_type: mediaType, data: base64 } },
+          { type: "text", text: prompt },
+        ],
+      },
+    ],
+  });
+  const text = response.content
+    .filter((b) => b.type === "text")
+    .map((b) => b.text)
+    .join("");
+  return parseDocumentExtractionResponse(text);
+};
+
 // One-shot extraction call to Claude (text). Returns the parsed extraction
 // or throws on extraction/network failure. Callers wrap in try/catch and
 // log a "failed" entry in the ingestion log.

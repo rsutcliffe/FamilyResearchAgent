@@ -593,11 +593,56 @@ test.describe("Ingest modal (Phase 1 — list only)", () => {
     await expect(page.locator("#ingest-stories-list")).toContainText("3 matched");
     // Failed entry shows error
     await expect(page.locator("#ingest-documents-list")).toContainText("OCR failed");
-    // Story Process buttons enabled (Phase 2); document buttons disabled (await Phase 3)
+    // Process buttons enabled for both stories (Phase 2) and documents (Phase 3)
     const storyButtons = page.locator("#ingest-stories-list .ingest-process-btn");
     await expect(storyButtons.first()).toBeEnabled();
     const docButtons = page.locator("#ingest-documents-list .ingest-process-btn");
-    await expect(docButtons.first()).toBeDisabled();
+    await expect(docButtons.first()).toBeEnabled();
+  });
+
+  test("clicking Process on a document confirms cost then posts to /api/ingest/document/:filename", async ({ page, isolatedReads }) => {
+    await page.route("**/api/ingest/scan", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          paths: { documents: "/d", stories: "/s" },
+          stories: [],
+          documents: [
+            { name: "1841_census.jpg", hash: "11112222aaaabbbb", kind: "document",
+              size_bytes: 102400, modified_at: "2026-05-02T10:00:00Z",
+              status: "unprocessed", last_processed_at: null },
+          ],
+        }),
+      }),
+    );
+    let postCalled = false;
+    await page.route("**/api/ingest/document/**", async (route) => {
+      postCalled = true;
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          ok: true,
+          filename: "1841_census.jpg",
+          summary: {
+            document_kind: "census_record", individuals_matched: 3, evidence_written: 3,
+            contradictions_flagged: 0, contradictions: [],
+          },
+          transcript_summary: "1841 census, Heptonstall township",
+        }),
+      });
+    });
+    // Auto-confirm the cost dialog
+    page.on("dialog", (d) => d.accept());
+
+    await page.goto("/");
+    await page.waitForSelector(".card");
+    await page.locator("#ingest-documents").click();
+    await page.locator("#ingest-documents-list .ingest-process-btn").click();
+    await expect.poll(() => postCalled).toBe(true);
+    await expect(page.locator("#ingest-status")).toContainText("census_record");
+    await expect(page.locator("#ingest-status")).toContainText("3 matched");
   });
 
   test("clicking Process on a story posts to /api/ingest/story/:filename and reports summary", async ({ page, isolatedReads }) => {

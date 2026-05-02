@@ -34,6 +34,9 @@ import {
   attachIngestionStatus,
   extractStory,
   applyStoryEvidence,
+  extractDocument,
+  applyDocumentEvidence,
+  estimateDocumentCost,
 } from "./agent/ingestion.js";
 import { searchWikiTreePersons, isWikiTreeDisabled } from "./agent/apiClients/wikiTreeClient.js";
 import { searchFamilySearchTree, isFamilySearchDisabled } from "./agent/apiClients/familySearchClient.js";
@@ -546,6 +549,72 @@ app.post("/api/ingest/story/:filename", async (req, res) => {
     await writeJsonAtomic(INGESTION_LOG_FILE, log).catch(() => {});
     res.status(500).json({ error: e.message });
   }
+});
+
+// Process a single document via Claude vision. Same shape as story
+// processing but with image/PDF attachment + document_kind-driven LR.
+app.post("/api/ingest/document/:filename", async (req, res) => {
+  const filename = req.params.filename;
+  const filePath = path.join(INGEST_DOCUMENTS_DIR, filename);
+  if (path.dirname(filePath) !== INGEST_DOCUMENTS_DIR || filename.startsWith(".") || filename.includes("/")) {
+    res.status(400).json({ error: "Invalid filename" });
+    return;
+  }
+  if (!existsSync(filePath)) {
+    res.status(404).json({ error: "File not found" });
+    return;
+  }
+
+  let log = { files: {} };
+  try { log = await readJson(INGESTION_LOG_FILE); } catch { /* fresh */ }
+
+  try {
+    const fileBuf = await fs.readFile(filePath);
+    const fileHash = createHash("sha256").update(fileBuf).digest("hex").slice(0, 16);
+    const ourTree = await readJson(INDIVIDUALS_FILE);
+    const extraction = await extractDocument({ filePath, ourTree });
+    if (!extraction) throw new Error("Claude returned malformed JSON");
+
+    const kb = await readJson(RESEARCH_KB_FILE);
+    const { kb: nextKb, summary } = applyDocumentEvidence({
+      kb, extraction, filename, fileHash,
+    });
+    await writeJsonAtomic(RESEARCH_KB_FILE, nextKb);
+
+    log.files = log.files ?? {};
+    log.files[filename] = {
+      hash: fileHash,
+      kind: "document",
+      document_kind: summary.document_kind,
+      status: "ok",
+      last_processed_at: new Date().toISOString(),
+      individuals_matched: summary.individuals_matched,
+      evidence_written: summary.evidence_written,
+      contradictions: summary.contradictions,
+      transcript_summary: extraction.transcript_summary,
+    };
+    await writeJsonAtomic(INGESTION_LOG_FILE, log);
+
+    res.json({ ok: true, filename, summary, transcript_summary: extraction.transcript_summary });
+  } catch (e) {
+    log.files = log.files ?? {};
+    log.files[filename] = {
+      ...(log.files[filename] ?? {}),
+      kind: "document",
+      status: "failed",
+      error: e.message,
+      last_processed_at: new Date().toISOString(),
+    };
+    await writeJsonAtomic(INGESTION_LOG_FILE, log).catch(() => {});
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Cost preview: rough estimate before the user fires a batch of vision
+// extractions. Conservative upper bound; actuals usually lower.
+app.get("/api/ingest/cost-preview", (req, res) => {
+  const fileCount = Number(req.query.count ?? 0);
+  res.json({ estimated_cost_usd: estimateDocumentCost({ fileCount }), file_count: fileCount });
 });
 
 // In-flight runs registry for the topbar indicator.
