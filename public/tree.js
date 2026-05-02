@@ -2251,6 +2251,80 @@ const wireDepth = () => {
     }
   });
 
+  // Ingest modal — Phase 1: list-only. Phase 2/3 wire up the Process
+  // buttons to story / document extraction endpoints.
+  const STATUS_BADGE = {
+    unprocessed: { label: "unprocessed", colour: "#5a6170" },
+    processed:   { label: "processed",   colour: "#1f6b3a" },
+    changed:     { label: "changed",     colour: "#bf6f00" },
+    failed:      { label: "failed",      colour: "#c00000" },
+  };
+  const fmtKB = (bytes) => bytes < 1024 ? `${bytes}B` : `${(bytes / 1024).toFixed(0)}KB`;
+
+  const renderIngestList = (files, kind, listSelector, emptySelector) => {
+    const list = $(listSelector);
+    const empty = $(emptySelector);
+    list.innerHTML = "";
+    if (!files || files.length === 0) {
+      empty.hidden = false;
+      return;
+    }
+    empty.hidden = true;
+    for (const f of files) {
+      const sb = STATUS_BADGE[f.status] ?? STATUS_BADGE.unprocessed;
+      const row = document.createElement("div");
+      row.style.cssText = "padding:8px 10px;border-bottom:1px solid #eee;display:flex;gap:8px;align-items:center;font-size:13px;";
+      const matchInfo = f.status === "processed" && f.individuals_matched != null
+        ? ` · ${f.individuals_matched} matched, ${f.evidence_written} evidence`
+        : "";
+      const errorInfo = f.status === "failed" && f.error
+        ? `<div class="muted" style="font-size:11px;color:#c00000;">${escapeHtml(f.error)}</div>`
+        : "";
+      row.innerHTML = `
+        <div style="flex:1;min-width:0;">
+          <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><strong>${escapeHtml(f.name)}</strong></div>
+          <div class="muted" style="font-size:11px;">${fmtKB(f.size_bytes)} · hash ${escapeHtml(f.hash.slice(0, 8))}…${matchInfo}</div>
+          ${errorInfo}
+        </div>
+        <span style="font-size:10px;font-weight:700;color:${sb.colour};text-transform:uppercase;min-width:80px;text-align:right;">${sb.label}</span>
+        <button type="button" class="ghost ingest-process-btn" data-name="${escapeHtml(f.name)}" data-kind="${kind}" disabled
+                title="Phase 2 (stories) and Phase 3 (documents) will enable this. For now this list is browse-only.">
+          Process
+        </button>
+      `;
+      list.appendChild(row);
+    }
+  };
+
+  const refreshIngestModal = async () => {
+    const status = $("#ingest-status");
+    status.textContent = "Scanning…";
+    try {
+      const res = await fetch("/api/ingest/scan");
+      if (!res.ok) {
+        status.textContent = `Scan failed: ${(await res.json()).error}`;
+        return;
+      }
+      const { documents, stories, paths } = await res.json();
+      $("#ingest-paths").innerHTML =
+        `Stories folder: <code>${escapeHtml(paths.stories)}</code><br>` +
+        `Documents folder: <code>${escapeHtml(paths.documents)}</code>`;
+      renderIngestList(stories, "story", "#ingest-stories-list", "#ingest-stories-empty");
+      renderIngestList(documents, "document", "#ingest-documents-list", "#ingest-documents-empty");
+      status.textContent = `Found ${stories.length} stories, ${documents.length} documents.`;
+    } catch (e) {
+      status.textContent = `Scan failed: ${e.message}`;
+    }
+  };
+
+  $("#ingest-documents")?.addEventListener("click", async () => {
+    await refreshIngestModal();
+    $("#ingest-dialog").showModal();
+  });
+  $("#ingest-rescan")?.addEventListener("click", async () => {
+    await refreshIngestModal();
+  });
+
   // Active-runs indicator: poll every 5 seconds while the page is open.
   // Updates the topbar dot + count, and re-renders the modal if it's open.
   let activeRunsModalOpen = false;

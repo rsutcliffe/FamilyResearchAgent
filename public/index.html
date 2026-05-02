@@ -32,6 +32,7 @@
         <button id="reset-view" title="Reset view">Reset</button>
         <button id="import-gedcom" title="Import an external GEDCOM (Ancestry export, etc.) as Tier 3 leads — never raises a band on its own; surfaced to agents as hypotheses to verify">Import .ged</button>
         <button id="claim-descendants" title="Promote unmatched people from your imported GEDCOM(s) into the local tree — useful for adding your own descendants (children, grandchildren) who weren't in the curated ancestor tree">Claim from import</button>
+        <button id="ingest-documents" title="Scan the ingest/documents and ingest/stories folders, see what's available to process, and run extraction against selected files. Cost preview before any paid processing.">Ingest</button>
         <button id="review-tree" title="Run deterministic checks against the whole tree — chronology, age gaps, confidence-band vs evidence, dangling references. Free at runtime, no LLM.">Review</button>
         <button id="active-runs" class="ghost" title="Show currently running agents and cancel them" style="position:relative;">
           <span id="active-runs-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#5a6170;margin-right:6px;vertical-align:middle;"></span>
@@ -158,6 +159,38 @@
           <button type="button" id="import-submit" class="primary">
             Import
           </button>
+        </menu>
+      </form>
+    </dialog>
+
+    <dialog id="ingest-dialog">
+      <form method="dialog">
+        <h3>Ingest documents &amp; stories</h3>
+        <p class="muted">
+          Scan the configured folders for files to process. Stories are
+          plain text (~$0.01 each). Documents use Claude vision
+          (~$0.05 each typical census image). Cost preview appears
+          before processing.
+        </p>
+        <div id="ingest-paths" class="muted" style="font-size:11px;margin-bottom:8px;"></div>
+
+        <h4 style="margin-top:16px;margin-bottom:6px;">Stories</h4>
+        <div id="ingest-stories-list" style="border:1px solid #ddd;border-radius:4px;max-height:25vh;overflow-y:auto;"></div>
+        <p id="ingest-stories-empty" class="muted" hidden style="text-align:center;padding:12px;font-size:12px;">
+          No stories found. Drop .md or .txt files into the stories folder shown above.
+        </p>
+
+        <h4 style="margin-top:16px;margin-bottom:6px;">Documents</h4>
+        <div id="ingest-documents-list" style="border:1px solid #ddd;border-radius:4px;max-height:25vh;overflow-y:auto;"></div>
+        <p id="ingest-documents-empty" class="muted" hidden style="text-align:center;padding:12px;font-size:12px;">
+          No documents found. Drop .pdf, .jpg, or .png files into the documents folder shown above.
+        </p>
+
+        <p id="ingest-status" class="muted" style="font-size:12px;margin-top:8px;"></p>
+
+        <menu>
+          <button value="cancel" formnovalidate>Close</button>
+          <button type="button" id="ingest-rescan" class="ghost">Re-scan</button>
         </menu>
       </form>
     </dialog>

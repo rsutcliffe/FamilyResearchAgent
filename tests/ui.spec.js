@@ -547,6 +547,77 @@ test.describe("Sibling reconciliation panel", () => {
   });
 });
 
+test.describe("Ingest modal (Phase 1 — list only)", () => {
+  test("topbar exposes an Ingest button", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("#ingest-documents")).toBeVisible();
+  });
+
+  test("modal renders both folders' contents with status badges", async ({ page, isolatedReads }) => {
+    await page.route("**/api/ingest/scan", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          paths: { documents: "/abs/ingest/documents", stories: "/abs/ingest/stories" },
+          stories: [
+            { name: "grandfather.md", hash: "abcd1234abcd1234", kind: "story", size_bytes: 2048,
+              modified_at: "2026-05-02T10:00:00Z", status: "unprocessed", last_processed_at: null },
+            { name: "essay.txt", hash: "ffff2222ffff2222", kind: "story", size_bytes: 5120,
+              modified_at: "2026-05-02T10:00:00Z", status: "processed", individuals_matched: 3,
+              evidence_written: 3, last_processed_at: "2026-05-02T11:00:00Z" },
+          ],
+          documents: [
+            { name: "1841_census.jpg", hash: "11112222aaaabbbb", kind: "document", size_bytes: 102400,
+              modified_at: "2026-05-02T10:00:00Z", status: "changed", last_processed_at: "2026-05-01T10:00:00Z" },
+            { name: "broken.pdf", hash: "deadbeef", kind: "document", size_bytes: 4096,
+              modified_at: "2026-05-02T10:00:00Z", status: "failed", error: "OCR failed: corrupt PDF" },
+          ],
+        }),
+      }),
+    );
+    await page.goto("/");
+    await page.waitForSelector(".card");
+    await page.locator("#ingest-documents").click();
+    await expect(page.locator("#ingest-dialog")).toBeVisible();
+    await expect(page.locator("#ingest-stories-list")).toContainText("grandfather.md");
+    await expect(page.locator("#ingest-stories-list")).toContainText("essay.txt");
+    await expect(page.locator("#ingest-documents-list")).toContainText("1841_census.jpg");
+    await expect(page.locator("#ingest-documents-list")).toContainText("broken.pdf");
+    // Status badges visible
+    await expect(page.locator("#ingest-stories-list")).toContainText("unprocessed");
+    await expect(page.locator("#ingest-stories-list")).toContainText("processed");
+    await expect(page.locator("#ingest-documents-list")).toContainText("changed");
+    await expect(page.locator("#ingest-documents-list")).toContainText("failed");
+    // Processed entry shows match info
+    await expect(page.locator("#ingest-stories-list")).toContainText("3 matched");
+    // Failed entry shows error
+    await expect(page.locator("#ingest-documents-list")).toContainText("OCR failed");
+    // Process buttons disabled in Phase 1
+    const processButtons = page.locator(".ingest-process-btn");
+    await expect(processButtons.first()).toBeDisabled();
+  });
+
+  test("shows empty hint when no files in folder", async ({ page, isolatedReads }) => {
+    await page.route("**/api/ingest/scan", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          paths: { documents: "/abs/docs", stories: "/abs/stories" },
+          stories: [],
+          documents: [],
+        }),
+      }),
+    );
+    await page.goto("/");
+    await page.waitForSelector(".card");
+    await page.locator("#ingest-documents").click();
+    await expect(page.locator("#ingest-stories-empty")).toBeVisible();
+    await expect(page.locator("#ingest-documents-empty")).toBeVisible();
+  });
+});
+
 test.describe("Active runs indicator", () => {
   test("topbar shows '0 running' when nothing is in flight", async ({ page, isolatedReads }) => {
     await page.route("**/api/runs/active", (route) =>

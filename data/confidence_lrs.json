@@ -17,7 +17,9 @@
     "tna_catalogue_ref":         { "tier": 2, "lr_match": 6,   "lr_no_match": 0.95 },
     "wikitree_profile":          { "tier": 3, "lr_match": 1.8, "lr_no_match": 1.00 },
     "familysearch_tree_match":   { "tier": 3, "lr_match": 1.8, "lr_no_match": 1.00 },
-    "member_family_tree":        { "tier": 3, "lr_match": 1.5, "lr_no_match": 1.00 }
+    "member_family_tree":        { "tier": 3, "lr_match": 1.5, "lr_no_match": 1.00 },
+    "story_corroboration":       { "tier": 3, "lr_match": 3.0, "lr_no_match": 1.00 },
+    "story_contradiction":       { "tier": 3, "lr_match": 0.4, "lr_no_match": 1.00 }
   },
 
   "sources_relationship": {

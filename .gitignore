@@ -10,3 +10,7 @@ test-results/
 tests/**/__screenshots__/
 
 data/external_suggestions.json.bak-*
+ingest/documents/*
+ingest/stories/*
+!ingest/documents/.gitkeep
+!ingest/stories/.gitkeep

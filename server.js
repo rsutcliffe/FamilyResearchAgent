@@ -28,6 +28,7 @@ import { reviewTree } from "./agent/reviewer.js";
 import { reconcileSiblings } from "./agent/siblingReconciliation.js";
 import { deriveConfidenceEvidence } from "./agent/confidenceEvidence.js";
 import { accumulateConfidence } from "./agent/confidence.js";
+import { scanIngestFolder, attachIngestionStatus } from "./agent/ingestion.js";
 import { searchWikiTreePersons, isWikiTreeDisabled } from "./agent/apiClients/wikiTreeClient.js";
 import { searchFamilySearchTree, isFamilySearchDisabled } from "./agent/apiClients/familySearchClient.js";
 import { searchTnaDiscovery, isTnaDisabled } from "./agent/apiClients/tnaDiscoveryClient.js";
@@ -42,6 +43,13 @@ const DECISIONS_FILE = path.join(DATA_DIR, "decisions.json");
 const ANCESTOR_LOG_FILE = path.join(DATA_DIR, "ancestor_discovery_log.json");
 const RESEARCH_KB_FILE = path.join(DATA_DIR, "research_kb.json");
 const EXTERNAL_SUGGESTIONS_FILE = path.join(DATA_DIR, "external_suggestions.json");
+const INGESTION_LOG_FILE = path.join(DATA_DIR, "ingestion_log.json");
+const INGEST_DOCUMENTS_DIR = process.env.INGEST_DOCUMENTS_DIR
+  ? path.resolve(process.env.INGEST_DOCUMENTS_DIR)
+  : path.join(__dirname, "ingest", "documents");
+const INGEST_STORIES_DIR = process.env.INGEST_STORIES_DIR
+  ? path.resolve(process.env.INGEST_STORIES_DIR)
+  : path.join(__dirname, "ingest", "stories");
 const SOURCE_GEDCOM = path.join(__dirname, "research", "Sutcliffe_CleanTree_v1.ged");
 const OUTPUTS_DIR = path.join(__dirname, "outputs");
 const PORT = Number(process.env.PORT) || 3000;
@@ -442,6 +450,30 @@ app.get("/api/review", async (_req, res) => {
     ]);
     const findings = reviewTree({ individuals, families, evidenceLog });
     res.json({ findings });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Ingestion: scan the documents/ and stories/ folders, attach
+// processed-status from the ingestion log. No API calls — this is the
+// browse-and-pick surface before any cost is incurred.
+app.get("/api/ingest/scan", async (_req, res) => {
+  try {
+    const docs = scanIngestFolder({ folderPath: INGEST_DOCUMENTS_DIR, kind: "document" });
+    const stories = scanIngestFolder({ folderPath: INGEST_STORIES_DIR, kind: "story" });
+    let log = { files: {} };
+    try { log = await readJson(INGESTION_LOG_FILE); } catch { /* fresh install */ }
+    const documents = attachIngestionStatus(docs, log);
+    const storyEntries = attachIngestionStatus(stories, log);
+    res.json({
+      documents,
+      stories: storyEntries,
+      paths: {
+        documents: INGEST_DOCUMENTS_DIR,
+        stories: INGEST_STORIES_DIR,
+      },
+    });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
