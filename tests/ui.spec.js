@@ -547,6 +547,44 @@ test.describe("Sibling reconciliation panel", () => {
   });
 });
 
+test.describe("Active runs indicator", () => {
+  test("topbar shows '0 running' when nothing is in flight", async ({ page, isolatedReads }) => {
+    await page.route("**/api/runs/active", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ runs: [] }) }),
+    );
+    await page.goto("/");
+    await expect(page.locator("#active-runs-count")).toHaveText("0 running");
+  });
+
+  test("indicator updates and modal renders runs with cancel buttons", async ({ page, isolatedReads }) => {
+    let runs = [
+      { id: "@A@", label: "Ann Sweeting — record discovery", started_at: new Date().toISOString(), elapsed_ms: 12_000 },
+      { id: "@B@:father", label: "Joseph Sutcliffe — find father", started_at: new Date().toISOString(), elapsed_ms: 65_000 },
+    ];
+    await page.route("**/api/runs/active", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ runs }) }),
+    );
+    let aborted = null;
+    await page.route("**/api/runs/abort/**", async (route) => {
+      const url = route.request().url();
+      const decoded = decodeURIComponent(url);
+      const m = decoded.match(/abort\/([^?]+)/);
+      aborted = m ? m[1] : null;
+      runs = runs.filter((r) => r.id !== aborted);
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true }) });
+    });
+
+    await page.goto("/");
+    await expect(page.locator("#active-runs-count")).toHaveText("2 running");
+    await page.locator("#active-runs").click();
+    await expect(page.locator("#active-runs-dialog")).toBeVisible();
+    await expect(page.locator("#active-runs-list")).toContainText("Ann Sweeting");
+    await expect(page.locator("#active-runs-list")).toContainText("Joseph Sutcliffe");
+    await page.locator(`button.abort-run-btn[data-id="@A@"]`).click();
+    await expect.poll(() => aborted).toBe("@A@");
+  });
+});
+
 test.describe("Tree review", () => {
   test("topbar exposes a Review button", async ({ page }) => {
     await page.goto("/");

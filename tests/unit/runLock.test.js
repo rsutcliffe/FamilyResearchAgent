@@ -4,6 +4,10 @@ import {
   tryAcquireRunLock,
   releaseRunLock,
   __resetRunLockForTests,
+  registerInFlightRun,
+  unregisterInFlightRun,
+  listInFlightRuns,
+  abortInFlightRun,
 } from "../../agent/runLock.js";
 
 beforeEach(() => __resetRunLockForTests());
@@ -51,6 +55,42 @@ describe("tryAcquireRunLock", () => {
     const out = tryAcquireRunLock(undefined, { now: () => 0 });
     assert.equal(out.ok, false);
     assert.match(out.reason, /missing id/);
+  });
+
+  test("listInFlightRuns is empty until something is registered", () => {
+    assert.deepEqual(listInFlightRuns(), []);
+  });
+
+  test("registerInFlightRun + listInFlightRuns surface label and elapsed", () => {
+    const ac = new AbortController();
+    registerInFlightRun("@A@", ac, "Ann Sweeting (record discovery)");
+    const runs = listInFlightRuns({ now: () => Date.now() });
+    assert.equal(runs.length, 1);
+    assert.equal(runs[0].id, "@A@");
+    assert.equal(runs[0].label, "Ann Sweeting (record discovery)");
+    assert.ok(runs[0].started_at);
+    assert.ok(runs[0].elapsed_ms >= 0);
+  });
+
+  test("unregisterInFlightRun removes the entry", () => {
+    registerInFlightRun("@A@", new AbortController(), "X");
+    unregisterInFlightRun("@A@");
+    assert.deepEqual(listInFlightRuns(), []);
+  });
+
+  test("abortInFlightRun signals the AbortController and removes it", () => {
+    const ac = new AbortController();
+    let aborted = false;
+    ac.signal.addEventListener("abort", () => { aborted = true; });
+    registerInFlightRun("@A@", ac, "X");
+    const ok = abortInFlightRun("@A@");
+    assert.equal(ok, true);
+    assert.equal(aborted, true);
+    assert.deepEqual(listInFlightRuns(), []);
+  });
+
+  test("abortInFlightRun returns false if id is not in flight", () => {
+    assert.equal(abortInFlightRun("@NOPE@"), false);
   });
 
   test("simulates the 89-second EventSource reconnect: 2nd attempt 89s after 1st completion is rejected", () => {

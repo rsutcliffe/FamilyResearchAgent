@@ -33,6 +33,10 @@
         <button id="import-gedcom" title="Import an external GEDCOM (Ancestry export, etc.) as Tier 3 leads — never raises a band on its own; surfaced to agents as hypotheses to verify">Import .ged</button>
         <button id="claim-descendants" title="Promote unmatched people from your imported GEDCOM(s) into the local tree — useful for adding your own descendants (children, grandchildren) who weren't in the curated ancestor tree">Claim from import</button>
         <button id="review-tree" title="Run deterministic checks against the whole tree — chronology, age gaps, confidence-band vs evidence, dangling references. Free at runtime, no LLM.">Review</button>
+        <button id="active-runs" class="ghost" title="Show currently running agents and cancel them" style="position:relative;">
+          <span id="active-runs-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#5a6170;margin-right:6px;vertical-align:middle;"></span>
+          <span id="active-runs-count">0 running</span>
+        </button>
         <button id="export-gedcom" title="Export an updated GEDCOM with confidence bands, accepted citations as SOUR records, and any agent-proposed individuals">Export .ged</button>
         <a href="/list" class="link">List view</a>
       </div>
@@ -154,6 +158,24 @@
           <button type="button" id="import-submit" class="primary">
             Import
           </button>
+        </menu>
+      </form>
+    </dialog>
+
+    <dialog id="active-runs-dialog">
+      <form method="dialog">
+        <h3>Running agents</h3>
+        <p class="muted">
+          Each in-flight agent run is consuming Anthropic API spend. Click
+          Cancel to abort one — the agent will stop mid-stream and any
+          partial work is discarded.
+        </p>
+        <div id="active-runs-list" style="max-height:50vh;overflow-y:auto;"></div>
+        <p id="active-runs-empty" class="muted" hidden style="text-align:center;padding:20px;">
+          No agent runs in flight.
+        </p>
+        <menu>
+          <button value="cancel" formnovalidate>Close</button>
         </menu>
       </form>
     </dialog>

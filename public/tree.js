@@ -2251,6 +2251,81 @@ const wireDepth = () => {
     }
   });
 
+  // Active-runs indicator: poll every 5 seconds while the page is open.
+  // Updates the topbar dot + count, and re-renders the modal if it's open.
+  let activeRunsModalOpen = false;
+  const fmtElapsed = (ms) => {
+    const s = Math.floor(ms / 1000);
+    if (s < 60) return `${s}s`;
+    return `${Math.floor(s / 60)}m ${s % 60}s`;
+  };
+  const renderActiveRunsList = (runs) => {
+    const list = $("#active-runs-list");
+    const empty = $("#active-runs-empty");
+    list.innerHTML = "";
+    if (runs.length === 0) {
+      empty.hidden = false;
+      return;
+    }
+    empty.hidden = true;
+    for (const r of runs) {
+      const row = document.createElement("div");
+      row.style.cssText = "padding:10px;border-bottom:1px solid #eee;display:flex;gap:10px;align-items:center;";
+      row.innerHTML = `
+        <div style="flex:1;">
+          <div><strong>${escapeHtml(r.label || r.id)}</strong></div>
+          <div class="muted" style="font-size:11px;">id: ${escapeHtml(r.id)} · running for ${fmtElapsed(r.elapsed_ms)}</div>
+        </div>
+        <button type="button" class="abort-run-btn" data-id="${escapeHtml(r.id)}" style="background:#c00000;color:white;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px;">Cancel</button>
+      `;
+      row.querySelector(".abort-run-btn").addEventListener("click", async () => {
+        const btn = row.querySelector(".abort-run-btn");
+        btn.disabled = true;
+        btn.textContent = "Cancelling…";
+        try {
+          await fetch(`/api/runs/abort/${encodeURIComponent(r.id)}`, { method: "POST" });
+        } catch (e) {
+          alert(`Cancel failed: ${e.message}`);
+        }
+        await pollActiveRuns();
+      });
+      list.appendChild(row);
+    }
+  };
+  const pollActiveRuns = async () => {
+    try {
+      const res = await fetch("/api/runs/active");
+      if (!res.ok) return;
+      const { runs } = await res.json();
+      const count = runs.length;
+      const countEl = $("#active-runs-count");
+      const dotEl = $("#active-runs-dot");
+      if (countEl && dotEl) {
+        countEl.textContent = `${count} running`;
+        dotEl.style.background = count === 0 ? "#5a6170" : "#1f6b3a";
+        if (count > 0) {
+          dotEl.style.boxShadow = "0 0 6px rgba(31,107,58,0.7)";
+        } else {
+          dotEl.style.boxShadow = "none";
+        }
+      }
+      if (activeRunsModalOpen) renderActiveRunsList(runs);
+    } catch {
+      /* swallow — the indicator just won't update */
+    }
+  };
+  pollActiveRuns();
+  setInterval(pollActiveRuns, 5000);
+
+  $("#active-runs")?.addEventListener("click", async () => {
+    activeRunsModalOpen = true;
+    await pollActiveRuns();
+    $("#active-runs-dialog").showModal();
+  });
+  $("#active-runs-dialog")?.addEventListener("close", () => {
+    activeRunsModalOpen = false;
+  });
+
   $("#refresh-leads-btn")?.addEventListener("click", async () => {
     const id = state.selectedId;
     if (!id) return;

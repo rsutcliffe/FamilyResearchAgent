@@ -16,7 +16,14 @@ import {
   parseExternalLookups,
 } from "./agent/researchKb.js";
 import { gatherApiLeads, isCacheFresh } from "./agent/externalApiOrchestrator.js";
-import { tryAcquireRunLock, releaseRunLock } from "./agent/runLock.js";
+import {
+  tryAcquireRunLock,
+  releaseRunLock,
+  registerInFlightRun,
+  unregisterInFlightRun,
+  listInFlightRuns,
+  abortInFlightRun,
+} from "./agent/runLock.js";
 import { reviewTree } from "./agent/reviewer.js";
 import { reconcileSiblings } from "./agent/siblingReconciliation.js";
 import { deriveConfidenceEvidence } from "./agent/confidenceEvidence.js";
@@ -440,6 +447,22 @@ app.get("/api/review", async (_req, res) => {
   }
 });
 
+// In-flight runs registry for the topbar indicator.
+app.get("/api/runs/active", (_req, res) => {
+  res.json({ runs: listInFlightRuns() });
+});
+
+// Cancel an in-flight run by id (signal-aborts its AbortController).
+// 200 + ok=true if cancelled, 404 if no such run is in flight.
+app.post("/api/runs/abort/:id", (req, res) => {
+  const ok = abortInFlightRun(req.params.id);
+  if (!ok) {
+    res.status(404).json({ error: "no run in flight for that id" });
+    return;
+  }
+  res.json({ ok: true });
+});
+
 // Bayesian confidence breakdown for one individual. Phase 2: read-only,
 // information-only — does NOT modify the canonical individual.confidence
 // field. Blends stored evidence (decision accepts) with ephemeral derived
@@ -632,7 +655,11 @@ app.get("/api/agent/run/:id", async (req, res) => {
   };
 
   const ac = new AbortController();
-  req.on("close", () => ac.abort());
+  registerInFlightRun(id, ac, `${profile.name} — record discovery`);
+  req.on("close", () => {
+    ac.abort();
+    unregisterInFlightRun(id);
+  });
 
   // Build KB context body for this individual using current KB state, prior
   // runs, and any external GEDCOM suggestions so the agent can use them as
@@ -706,6 +733,7 @@ app.get("/api/agent/run/:id", async (req, res) => {
   });
   } finally {
     releaseRunLock(id);
+    unregisterInFlightRun(id);
   }
 
   res.end();
@@ -758,7 +786,11 @@ app.get("/api/ancestor/run/:childId/:role", async (req, res) => {
 
   const send = (event) => res.write(`data: ${JSON.stringify(event)}\n\n`);
   const ac = new AbortController();
-  req.on("close", () => ac.abort());
+  registerInFlightRun(lockKey, ac, `${child.name} — find ${role}`);
+  req.on("close", () => {
+    ac.abort();
+    unregisterInFlightRun(lockKey);
+  });
 
   // Build KB context for the ancestor search anchored on the child.
   // Pre-fetch external API leads for the child first (cache-respecting).
@@ -824,6 +856,7 @@ app.get("/api/ancestor/run/:childId/:role", async (req, res) => {
   });
   } finally {
     releaseRunLock(lockKey);
+    unregisterInFlightRun(lockKey);
   }
 
   res.end();
