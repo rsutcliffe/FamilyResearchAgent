@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - '.claude/**'
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - '.claude/**'
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    uses: rsutcliffe/ci-templates/.github/workflows/ci-next-basic.yml@v2
+    with:
+      package-manager: npm
+      node-version: "22"
+      test-command: "npm run test:unit"
+      run-playwright: true
+      playwright-command: "npm run test:ui"
+      pre-test-command: "echo 'ANTHROPIC_API_KEY=ci-fake-key-not-used-by-tests' > .env"
+    secrets:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
