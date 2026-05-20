@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   ci:
-    uses: rsutcliffe/ci-templates/.github/workflows/ci-next-basic.yml@v3
+    uses: rsutcliffe/ci-templates/.github/workflows/ci-next-basic.yml@v4
     with:
       package-manager: npm
       node-version: "22"
