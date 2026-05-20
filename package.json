@@ -21,7 +21,7 @@
     "node": ">=20.6"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.40.0",
+    "@anthropic-ai/sdk": "^0.97.1",
     "express": "^4.21.0"
   },
   "devDependencies": {
