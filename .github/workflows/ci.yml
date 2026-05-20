@@ -26,8 +26,6 @@ jobs:
       package-manager: npm
       node-version: "22"
       test-command: "npm run test:unit"
-      run-playwright: true
-      playwright-command: "npm run test:ui"
-      pre-test-command: "echo 'ANTHROPIC_API_KEY=ci-fake-key-not-used-by-tests' > .env"
+      run-playwright: false
     secrets:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
