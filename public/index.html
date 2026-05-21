@@ -5,14 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Sutcliffe Family Tree</title>
     <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/chrome.css" />
     <link rel="stylesheet" href="/tree.css" />
   </head>
-  <body class="tree-mode">
+  <body class="tree-mode wb-chrome">
     <header id="topbar">
-      <div class="brand">
-        <strong>Sutcliffe Family Tree</strong>
-        <span class="muted">Record Discovery</span>
-      </div>
       <div id="stats" class="muted"></div>
       <div id="spend" class="muted" title="Session and lifetime API spend"></div>
       <div class="controls">
@@ -39,7 +36,6 @@
           <span id="active-runs-count">0 running</span>
         </button>
         <button id="export-gedcom" title="Export an updated GEDCOM with confidence bands, accepted citations as SOUR records, and any agent-proposed individuals">Export .ged</button>
-        <a href="/list" class="link">List view</a>
       </div>
     </header>
 
@@ -61,7 +57,30 @@
         </div>
         <button id="stop-btn" class="ghost">Stop</button>
       </section>
-      <section id="result"></section>
+      <section id="claims-matrix-section" hidden>
+        <div class="wb-section-row">
+          <div class="wb-section-main">
+            <h3 class="wb-section-title">Claims &amp; Evidence Matrix</h3>
+            <table id="claims-matrix" class="wb-claims"></table>
+          </div>
+          <aside class="wb-section-side">
+            <div class="wb-confidence-card">
+              <div class="wb-confidence-label">Confidence</div>
+              <div id="confidence-donut-slot"></div>
+              <div id="confidence-band-scale-slot"></div>
+              <p id="confidence-interpretation" class="muted"></p>
+            </div>
+            <div class="wb-next-steps">
+              <div class="wb-confidence-label">Next Steps</div>
+              <ul id="next-steps-list"></ul>
+            </div>
+          </aside>
+        </div>
+      </section>
+      <section id="full-narrative" hidden>
+        <h3 class="wb-section-title" style="padding: 0 16px;">Agent research narrative</h3>
+        <section id="result"></section>
+      </section>
       <section id="sibling-reconciliation" hidden>
         <div class="external-leads-header">
           <strong>Sibling corroboration</strong>
@@ -70,13 +89,13 @@
         <div id="sibling-reconciliation-summary" class="muted" style="font-size:13px;margin-bottom:6px;"></div>
         <div id="sibling-reconciliation-list"></div>
       </section>
-      <details id="confidence-breakdown" hidden style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);">
-        <summary style="cursor:pointer;font-weight:600;font-size:14px;">
-          <span>Confidence breakdown</span>
+      <section id="confidence-breakdown" hidden>
+        <div class="external-leads-header">
+          <strong>Confidence breakdown</strong>
           <span id="confidence-breakdown-summary" class="muted" style="font-weight:400;margin-left:8px;font-size:13px;"></span>
-        </summary>
+        </div>
         <div id="confidence-breakdown-body" style="margin-top:8px;font-size:13px;"></div>
-      </details>
+      </section>
       <section id="external-leads" hidden>
         <div class="external-leads-header">
           <strong>External API leads</strong>
@@ -370,6 +389,10 @@
       </form>
     </dialog>
 
+    <script type="module">
+      import { renderChrome } from "/chrome.js";
+      renderChrome({ active: "tree", sectionLabel: "Research Workbench" });
+    </script>
     <script src="/tree.js" type="module"></script>
   </body>
 </html>

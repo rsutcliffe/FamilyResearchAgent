@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard — Family Research Agent</title>
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/chrome.css" />
+    <link rel="stylesheet" href="/dashboard.css" />
+  </head>
+  <body class="wb-chrome">
+    <main id="dashboard-root">
+      <div id="active-projects-view">
+        <header class="wb-page-head">
+          <h1>Active Projects</h1>
+          <p class="muted">Snapshot of the tree's current health: how confidence is distributed, which agents are running right now, and what's been ingested recently. Use this view to spot which line needs the next research push.</p>
+        </header>
+        <section class="wb-card" id="distribution-card">
+          <header>
+            <h2>Global Confidence Distribution</h2>
+            <span class="muted" id="distribution-total"></span>
+          </header>
+          <div id="distribution-chart" class="wb-distribution"></div>
+        </section>
+
+        <div class="wb-row">
+          <section class="wb-card" id="threads-card">
+            <header>
+              <h2>Active Research Threads</h2>
+              <a href="/" class="wb-card-link">Open tree →</a>
+            </header>
+            <div id="active-threads"><p class="muted">Loading…</p></div>
+            <div class="wb-subhead">Recently finished</div>
+            <div id="recent-runs"><p class="muted">Loading…</p></div>
+          </section>
+
+          <section class="wb-card" id="recent-evidence-card">
+            <header>
+              <h2>Recent Evidence Ingested</h2>
+            </header>
+            <div id="recent-evidence"><p class="muted">Loading…</p></div>
+          </section>
+        </div>
+      </div>
+
+      <div id="evidence-queue-view" hidden>
+        <header class="wb-page-head">
+          <h1>Evidence Queue</h1>
+          <p class="muted">Triage worklist of items needing your attention: flagged decisions, reviewer findings (chronology issues, age gaps), individuals marked for re-research, and contradictions in stored evidence. Sorted with the highest-severity items first.</p>
+        </header>
+        <section class="wb-card" id="queue-card">
+          <header>
+            <h2>Evidence Queue</h2>
+            <span class="muted" id="queue-count"></span>
+          </header>
+          <table id="queue-table" class="wb-claims">
+            <thead>
+              <tr>
+                <th>Severity</th>
+                <th>Individual</th>
+                <th>Issue</th>
+                <th>Detail</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </section>
+      </div>
+    </main>
+
+    <script type="module">
+      import { renderChrome } from "/chrome.js";
+      import { initDashboard } from "/dashboard.js";
+      let activeTab = "active-projects";
+      const onTabChange = (key) => {
+        activeTab = key;
+        document.getElementById("active-projects-view").hidden = key !== "active-projects";
+        document.getElementById("evidence-queue-view").hidden = key !== "evidence-queue";
+      };
+      renderChrome({
+        active: "dashboard",
+        sectionLabel: "Research Workbench",
+        tabs: [
+          { key: "active-projects", label: "Active Projects" },
+          { key: "evidence-queue", label: "Evidence Queue" },
+        ],
+        activeTab,
+        onTabChange,
+      });
+      initDashboard();
+    </script>
+  </body>
+</html>

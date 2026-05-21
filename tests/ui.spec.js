@@ -24,6 +24,362 @@ const autoAcceptDialogs = (page) => {
   page.on("dialog", (dialog) => dialog.accept());
 };
 
+test.describe("Workbench chrome (Slice 0)", () => {
+  test("sidebar renders all 5 nav items on tree page", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("#wb-sidebar")).toBeVisible();
+    const keys = await page.locator("#wb-sidebar nav a").evaluateAll((els) =>
+      els.map((e) => e.getAttribute("data-nav-key")),
+    );
+    expect(keys).toEqual(["dashboard", "tree", "list", "sources", "evidence-matrix"]);
+  });
+
+  test("active sidebar item carries aria-current on its own page", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator('#wb-sidebar nav a[data-nav-key="tree"]')).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    await page.goto("/list.html");
+    await expect(page.locator('#wb-sidebar nav a[data-nav-key="list"]')).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+  });
+
+  test("workbench topbar shows the section label", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("#wb-topbar .wb-section-label")).toHaveText("Research Workbench");
+  });
+});
+
+test.describe("Evidence Matrix (Slice 4)", () => {
+  test("filters narrow the table", async ({ page }) => {
+    await page.route("**/api/dashboard/all-claims", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          items: [
+            {
+              individual_id: "@1@",
+              individual_name: "Alice",
+              band: "B",
+              decision: null,
+              contributions: [
+                { kind: "parish_baptism", lr: 50, log_lr: 1.7, source_tier: 1, source_kind: "decision_accept" },
+                { kind: "story_contradiction", lr: 0.4, log_lr: -0.4, source_tier: 3, source_kind: "external_suggestion" },
+              ],
+            },
+            {
+              individual_id: "@2@",
+              individual_name: "Bob",
+              band: "D",
+              decision: null,
+              contributions: [
+                { kind: "census_record", lr: 8, log_lr: 0.9, source_tier: 2, source_kind: "decision_accept" },
+              ],
+            },
+          ],
+        }),
+      }),
+    );
+    await page.goto("/evidence-matrix.html");
+    await expect(page.locator("#wb-sidebar nav a[data-nav-key='evidence-matrix']")).toHaveAttribute("aria-current", "page");
+    // Initial load: 3 rows (Alice has 2, Bob has 1)
+    await expect(page.locator("#matrix-table tbody tr")).toHaveCount(3);
+    // Filter by status=conflicting → only Alice's contradicted row
+    await page.locator("#filter-status").selectOption("conflicting");
+    await expect(page.locator("#matrix-table tbody tr")).toHaveCount(1);
+    // Search for Bob → only Bob's census row
+    await page.locator("#filter-status").selectOption("");
+    await page.locator("#filter-search").fill("bob");
+    await expect(page.locator("#matrix-table tbody tr")).toHaveCount(1);
+    await expect(page.locator("#matrix-table tbody tr td:first-child")).toContainText("Bob");
+  });
+
+  test("clicking a row opens the drill-down drawer", async ({ page }) => {
+    await page.route("**/api/dashboard/all-claims", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          items: [
+            {
+              individual_id: "@1@",
+              individual_name: "Alice Bellingham",
+              band: "B",
+              decision: null,
+              contributions: [
+                { kind: "parish_baptism", lr: 50, log_lr: 1.7, source_tier: 1, source_kind: "decision_accept", note: "St Wilfrid 1842" },
+              ],
+            },
+          ],
+        }),
+      }),
+    );
+    await page.route("**/api/confidence/*", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          legacy_band: "B",
+          evidence: { identity: [], relationship: [] },
+          result: {
+            band: "B",
+            posterior: 0.85,
+            prior: 0.5,
+            contributions: [
+              { kind: "parish_baptism", lr: 50, log_lr: 1.7, source_tier: 1, source_kind: "decision_accept", note: "St Wilfrid 1842" },
+            ],
+          },
+        }),
+      }),
+    );
+    await page.route("**/api/evidence/*", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ agent_result: "## What we know\n\nAlice was born 1842." }),
+      }),
+    );
+
+    await page.goto("/evidence-matrix.html");
+    await page.locator("#matrix-table tbody tr").first().click();
+    await expect(page.locator("#claim-drawer")).toBeVisible();
+    await expect(page.locator("#drawer-title")).toHaveText("Alice Bellingham");
+    await expect(page.locator("#drawer-narrative")).toContainText("Alice was born 1842");
+    // Close
+    await page.locator("#drawer-close").click();
+    await expect(page.locator("#claim-drawer")).toBeHidden();
+  });
+
+  test("clicking a sortable column header toggles sort", async ({ page }) => {
+    await page.route("**/api/dashboard/all-claims", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          items: [
+            { individual_id: "@2@", individual_name: "Zara", band: "B", decision: null, contributions: [{ kind: "parish_baptism", lr: 50, log_lr: 1.7, source_tier: 1, source_kind: "decision_accept" }] },
+            { individual_id: "@1@", individual_name: "Alice", band: "B", decision: null, contributions: [{ kind: "parish_baptism", lr: 50, log_lr: 1.7, source_tier: 1, source_kind: "decision_accept" }] },
+          ],
+        }),
+      }),
+    );
+    await page.goto("/evidence-matrix.html");
+    // Default sort = individual_name asc → Alice first
+    await expect(page.locator("#matrix-table tbody tr td:first-child").first()).toContainText("Alice");
+    await page.locator("th[data-sort-key='individual_name']").click(); // toggle to desc
+    await expect(page.locator("#matrix-table tbody tr td:first-child").first()).toContainText("Zara");
+  });
+});
+
+test.describe("Sources page (Slice 3)", () => {
+  const stubSources = (page) =>
+    page.route("**/api/sources", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          archive_citations: [
+            { source: "TNA RG 15/22309, 1921 Census, Hunslet", source_id: "@S1@", tier: 2, citation_count: 2, individuals: [{ id: "@1@", name: "Alice" }, { id: "@2@", name: "Bob" }], last_cited: new Date().toISOString() },
+            { source: "GRO Birth Index 1842 Q2 Pontefract", source_id: "@S2@", tier: 2, citation_count: 1, individuals: [{ id: "@1@", name: "Alice" }], last_cited: new Date().toISOString() },
+          ],
+          accepted_citations: [
+            { source: "St Wilfrid baptism register 1842", tier: 1, citation_count: 1, individuals: [{ id: "@3@", name: "Carol" }], last_cited: new Date().toISOString(), sample: "fol. 23" },
+          ],
+          search_trail: [
+            { source: "FreeBMD John Sutcliffe 1842", tier: null, citation_count: 1, individuals: [{ id: "@1@", name: "Alice" }], last_cited: new Date().toISOString() },
+          ],
+        }),
+      }),
+    );
+
+  test("renders three honest categories", async ({ page }) => {
+    await stubSources(page);
+    await page.goto("/sources.html");
+    await expect(page.locator("#wb-sidebar nav a[data-nav-key='sources']")).toHaveAttribute("aria-current", "page");
+    await expect(page.locator("#archive-body")).toBeVisible();
+    await expect(page.locator("#accepted-body")).toBeVisible();
+    await expect(page.locator("#trail-body")).toBeVisible();
+    // Archive: 2 unique sources × 3 individuals (Alice in both, Bob in TNA only)
+    // → 2 accordions (one per individual)
+    const archAccs = page.locator("#archive-body .wb-individual-acc");
+    await expect(archAccs).toHaveCount(2);
+    await expect(page.locator("#archive-count")).toContainText("2 unique source");
+  });
+
+  test("flat view shows a table per category", async ({ page }) => {
+    await stubSources(page);
+    await page.goto("/sources.html");
+    await page.locator("#view-flat").click();
+    await expect(page.locator("#archive-body table")).toBeVisible();
+    await expect(page.locator("#archive-body .wb-individual-acc")).toHaveCount(0);
+  });
+
+  test("search trail explicitly labelled as not-citations", async ({ page }) => {
+    await stubSources(page);
+    await page.goto("/sources.html");
+    await expect(page.locator(".wb-card:has-text('Agent search trail') .wb-section-blurb")).toContainText("not citations");
+  });
+});
+
+test.describe("Dashboard (Slice 2)", () => {
+  const stubDashboardEndpoints = async (page) => {
+    await page.route("**/api/dashboard/distribution", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ bands: { A: 2, B: 5, C: 1, D: 3 }, total: 11 }),
+      }),
+    );
+    await page.route("**/api/dashboard/recent-runs*", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          items: [{ individual_id: "@1@", individual_name: "Alice", searched_at: new Date().toISOString(), search_count: 5 }],
+        }),
+      }),
+    );
+    await page.route("**/api/dashboard/recent-evidence*", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          items: [
+            { individual_id: "@1@", individual_name: "Alice", kind: "parish_baptism", source: "St Wilfrid", source_tier: 1, added_at: new Date().toISOString() },
+          ],
+        }),
+      }),
+    );
+    await page.route("**/api/dashboard/queue", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          items: [
+            { individual_id: "@5@", individual_name: "Eve", kind: "flagged", severity: "high", summary: "Needs follow-up" },
+          ],
+        }),
+      }),
+    );
+    await page.route("**/api/runs/active", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ runs: [] }) }),
+    );
+  };
+
+  test("renders distribution + threads + evidence cards", async ({ page }) => {
+    await stubDashboardEndpoints(page);
+    await page.goto("/dashboard.html");
+    await expect(page.locator("#wb-sidebar nav a[data-nav-key='dashboard']")).toHaveAttribute("aria-current", "page");
+    await expect(page.locator("#distribution-total")).toHaveText("N = 11 individuals");
+    const bars = page.locator(".wb-bar");
+    await expect(bars).toHaveCount(4);
+    await expect(page.locator("#recent-evidence .wb-feed-row")).toHaveCount(1);
+    await expect(page.locator("#recent-runs .wb-thread")).toHaveCount(1);
+  });
+
+  test("Evidence Queue tab swaps the view and lists queue items", async ({ page }) => {
+    await stubDashboardEndpoints(page);
+    await page.goto("/dashboard.html");
+    await page.locator(".wb-tab[data-tab-key='evidence-queue']").click();
+    await expect(page.locator("#active-projects-view")).toBeHidden();
+    await expect(page.locator("#evidence-queue-view")).toBeVisible();
+    await expect(page.locator("#queue-table tbody tr")).toHaveCount(1);
+    await expect(page.locator("#queue-table tbody tr td:nth-child(2)")).toContainText("Eve");
+  });
+});
+
+test.describe("Detail panel — Claims Matrix + Confidence Donut (Slice 1)", () => {
+  test("clicking a card reveals the new detail sections", async ({ page, isolatedReads }) => {
+    // Stub /api/confidence/:id with a payload that yields one row per category.
+    await page.route("**/api/confidence/*", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          legacy_band: "B",
+          evidence: { identity: [], relationship: [] },
+          result: {
+            band: "B",
+            posterior: 0.854,
+            prior: 0.5,
+            contributions: [
+              { kind: "parish_baptism", lr: 50, log_lr: 1.7, source_tier: 1, source_kind: "decision_accept", note: "St Wilfrid 1842" },
+              { kind: "census_record", lr: 8, log_lr: 0.9, source_tier: 2, source_kind: "decision_accept", note: "1851 Brooklyn" },
+              { kind: "wikitree_profile", lr: 1.8, log_lr: 0.26, source_tier: 3, source_kind: "external_suggestion", note: "from wikitree" },
+            ],
+          },
+        }),
+      }),
+    );
+    await page.route("**/api/review", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ findings: [] }) }),
+    );
+    await page.route("**/api/external/leads/*", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ leads: [] }) }),
+    );
+    await page.route("**/api/siblings/reconcile/*", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ siblings: [], strength: "none" }) }),
+    );
+
+    await page.goto("/");
+    await page.waitForSelector(".card");
+    await page.locator(`.card[data-id="@TF_DAD@"]`).dispatchEvent("click");
+    await expect(page.locator("#claims-matrix-section")).toBeVisible();
+    await expect(page.locator("#confidence-donut-slot svg")).toBeVisible();
+    // Donut centre shows the band letter
+    await expect(page.locator("#confidence-donut-slot svg text").first()).toHaveText("B");
+    // Matrix has the 3 expected rows
+    const claimRows = page.locator("#claims-matrix tbody tr");
+    await expect(claimRows).toHaveCount(3);
+    await expect(page.locator("#confidence-band-scale-slot .wb-band-scale-cell.active")).toHaveText("B");
+  });
+
+  test("donut shows the legacy band (not Bayesian) as the headline", async ({ page, isolatedReads }) => {
+    // Legacy A, but Bayesian-derived band would be D because the only
+    // contribution is a reviewer finding. Display rule: legacy wins
+    // until there's independent evidence (decision_accept or Tier 1/2).
+    await page.route("**/api/confidence/*", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          legacy_band: "A",
+          evidence: { identity: [], relationship: [] },
+          result: {
+            band: "D",
+            posterior: 0.13,
+            prior: 0.5,
+            contributions: [
+              { kind: "member_family_tree", lr: 1.5, log_lr: 0.18, source_tier: 3, source_kind: "external_suggestion" },
+            ],
+          },
+        }),
+      }),
+    );
+    await page.route("**/api/review", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ findings: [] }) }),
+    );
+    await page.route("**/api/external/leads/*", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ leads: [] }) }),
+    );
+    await page.route("**/api/siblings/reconcile/*", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ siblings: [], strength: "none" }) }),
+    );
+
+    await page.goto("/");
+    await page.waitForSelector(".card");
+    await page.locator(`.card[data-id="@TF_DAD@"]`).dispatchEvent("click");
+    await expect(page.locator("#confidence-donut-slot svg text").first()).toHaveText("A");
+    await expect(page.locator("#confidence-band-scale-slot .wb-band-scale-cell.active")).toHaveText("A");
+    // No rerun button anymore
+    await expect(page.locator("#rerun-bayesian-btn")).toHaveCount(0);
+  });
+});
+
 test.describe("Tree view", () => {
   test("loads and renders cards", async ({ page }) => {
     await page.goto("/");
@@ -477,8 +833,7 @@ test.describe("Confidence breakdown panel (Phase 2)", () => {
     await expect(page.locator("#confidence-breakdown-summary")).toContainText("Legacy");
     await expect(page.locator("#confidence-breakdown-summary")).toContainText("Bayesian");
     await expect(page.locator("#confidence-breakdown-summary")).toContainText("93.0%");
-    // Expand to see contributions
-    await page.locator("#confidence-breakdown summary").click();
+    // Always-visible: contributions show without expanding (no <details> wrap).
     await expect(page.locator("#confidence-breakdown-body")).toContainText("parish_baptism");
     await expect(page.locator("#confidence-breakdown-body")).toContainText("member_family_tree");
     // Strongest contribution should be listed first
