@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.97.1",
-    "express": "^4.21.0"
+    "express": "^5.2.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",
