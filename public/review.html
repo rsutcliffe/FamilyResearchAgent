@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Review — Sutcliffe Family Research Agent</title>
+    <link rel="stylesheet" href="/style.css" />
+    <style>
+      #review-app {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 24px 20px 48px;
+      }
+      #review-app > header {
+        display: flex;
+        align-items: baseline;
+        gap: 20px;
+        margin-bottom: 24px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 14px;
+      }
+      #review-app > header h1 {
+        margin: 0;
+        font-size: 18px;
+        color: #1f3864;
+      }
+      .nav-links {
+        display: flex;
+        gap: 14px;
+        margin-left: auto;
+        font-size: 13px;
+      }
+      .nav-links a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      .nav-links a:hover { text-decoration: underline; }
+
+      /* Tabs */
+      .tabs {
+        display: flex;
+        gap: 2px;
+        margin-bottom: 20px;
+        border-bottom: 2px solid var(--border);
+      }
+      .tab-btn {
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -2px;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--muted);
+        cursor: pointer;
+      }
+      .tab-btn.active {
+        color: var(--accent);
+        border-bottom-color: var(--accent);
+      }
+      .tab-count {
+        display: inline-block;
+        background: var(--border);
+        color: var(--muted);
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 1px 6px;
+        margin-left: 5px;
+      }
+      .tab-panel { display: none; }
+      .tab-panel.active { display: block; }
+
+      /* Table */
+      .review-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      .review-table th {
+        text-align: left;
+        padding: 8px 10px;
+        font-weight: 600;
+        color: var(--muted);
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+      .review-table td {
+        padding: 10px 10px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+      }
+      .review-table tr:last-child td { border-bottom: none; }
+      .review-table tr.disputed td { opacity: 0.5; }
+
+      .person-name { font-weight: 600; }
+      .person-dates { color: var(--muted); font-size: 12px; }
+      .finding-error { color: #c00000; font-size: 12px; margin: 2px 0; }
+      .finding-warning { color: #bf6f00; font-size: 12px; margin: 2px 0; }
+      .finding-info { color: var(--muted); font-size: 12px; margin: 2px 0; }
+      .link-arrow { color: var(--muted); margin: 0 4px; }
+      .disputed-tag {
+        display: inline-block;
+        background: #f0f0f0;
+        color: var(--muted);
+        border-radius: 3px;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 1px 5px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      .empty-state {
+        padding: 40px 0;
+        text-align: center;
+        color: var(--muted);
+      }
+      .action-cell { white-space: nowrap; }
+      .action-cell button { margin-left: 6px; }
+
+      /* Dialogs */
+      dialog {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 24px 28px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+        max-width: 420px;
+        width: 100%;
+      }
+      dialog h3 { margin: 0 0 6px; font-size: 15px; }
+      dialog form label {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 12px;
+      }
+      dialog form label input,
+      dialog form label select,
+      dialog form label textarea {
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 6px 8px;
+        font-size: 13px;
+        font-family: inherit;
+        width: 100%;
+      }
+      dialog form textarea { resize: vertical; }
+      dialog menu {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin: 20px 0 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="review-app">
+      <header>
+        <h1>Review Queue</h1>
+        <nav class="nav-links">
+          <a href="/">Tree</a>
+          <a href="/list.html">Research</a>
+        </nav>
+      </header>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="confirm">
+          To Confirm <span class="tab-count" id="confirm-count">—</span>
+        </button>
+        <button class="tab-btn" data-tab="weak">
+          Weak Links <span class="tab-count" id="weak-count">—</span>
+        </button>
+      </div>
+
+      <!-- Confirmation Queue -->
+      <div class="tab-panel active" id="tab-confirm">
+        <div id="confirm-loading" class="empty-state">Loading…</div>
+        <div id="confirm-empty" class="empty-state" hidden>
+          All Band A/B individuals have been formally confirmed.
+        </div>
+        <table class="review-table" id="confirm-table" hidden>
+          <thead>
+            <tr>
+              <th>Person</th>
+              <th>Gen</th>
+              <th>Band</th>
+              <th>Place</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="confirm-body"></tbody>
+        </table>
+      </div>
+
+      <!-- Weak Links -->
+      <div class="tab-panel" id="tab-weak">
+        <div id="weak-loading" class="empty-state">Loading…</div>
+        <div id="weak-empty" class="empty-state" hidden>
+          No suspect relationships found.
+        </div>
+        <table class="review-table" id="weak-table" hidden>
+          <thead>
+            <tr>
+              <th>Parent</th>
+              <th>Child</th>
+              <th>Kind</th>
+              <th>Band</th>
+              <th>Issues</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="weak-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Confirm dialog -->
+    <dialog id="confirm-dialog">
+      <form method="dialog">
+        <h3>Record source citation</h3>
+        <p class="muted">
+          Confirm that evidence supports this person. All fields except URL are required.
+        </p>
+        <label>Source title<input name="title" required /></label>
+        <label>Repository<input name="repository" required /></label>
+        <label>Reference / folio<input name="reference" required /></label>
+        <label>URL <input name="url" type="url" /></label>
+        <label>
+          Confidence band
+          <select name="new_confidence" required>
+            <option value="">—</option>
+            <option value="A">A — Verified (Tier 1 source)</option>
+            <option value="B">B — Probable</option>
+            <option value="C">C — Uncertain</option>
+          </select>
+        </label>
+        <label>Notes (optional)<textarea name="note" rows="2"></textarea></label>
+        <menu>
+          <button value="cancel">Cancel</button>
+          <button class="primary" value="confirm">Confirm</button>
+        </menu>
+      </form>
+    </dialog>
+
+    <!-- Dispute dialog -->
+    <dialog id="dispute-dialog">
+      <form method="dialog">
+        <h3>Dispute this link</h3>
+        <p class="muted" id="dispute-summary"></p>
+        <label>
+          Reason for dispute (required)
+          <textarea name="reason" rows="3" required placeholder="e.g. Dates conflict with baptism register — wrong generation"></textarea>
+        </label>
+        <menu>
+          <button value="cancel">Cancel</button>
+          <button class="primary" value="confirm">Dispute Link</button>
+        </menu>
+      </form>
+    </dialog>
+
+    <script src="/review.js" type="module"></script>
+  </body>
+</html>

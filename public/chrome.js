@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { key: "list", label: "Ancestors (List)", href: "/list.html" },
   { key: "sources", label: "Sources", href: "/sources.html" },
   { key: "evidence-matrix", label: "Evidence Matrix", href: "/evidence-matrix.html" },
+  { key: "review-queue", label: "Review Queue", href: "/review.html" },
 ];
 
 // Single dot icon used for every nav item — keeps the chrome dependency-

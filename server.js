@@ -26,6 +26,7 @@ import {
   abortInFlightRun,
 } from "./agent/runLock.js";
 import { reviewTree } from "./agent/reviewer.js";
+import { getUnconfirmedHighConfidence, getWeakLinks } from "./agent/review.js";
 import { reconcileSiblings } from "./agent/siblingReconciliation.js";
 import { deriveConfidenceEvidence } from "./agent/confidenceEvidence.js";
 import {
@@ -460,6 +461,85 @@ app.get("/api/review", async (_req, res) => {
     ]);
     const findings = reviewTree({ individuals, families, evidenceLog });
     res.json({ findings });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Review: unconfirmed high-confidence individuals (Band A/B, no accepted decision).
+app.get("/api/review/unconfirmed", async (_req, res) => {
+  try {
+    const [individuals, decisions] = await Promise.all([
+      readJson(INDIVIDUALS_FILE),
+      readJson(DECISIONS_FILE),
+    ]);
+    const items = getUnconfirmedHighConfidence({ individuals, decisions });
+    res.json({ items });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Review: relationships with reviewer errors/warnings or D-band confidence.
+app.get("/api/review/weak-links", async (_req, res) => {
+  try {
+    const [individuals, families, relationships, evidenceLog] = await Promise.all([
+      readJson(INDIVIDUALS_FILE),
+      readJson(FAMILIES_FILE),
+      readJson(RELATIONSHIPS_FILE),
+      readJson(EVIDENCE_LOG_FILE),
+    ]);
+    const items = getWeakLinks({ individuals, families, relationships, evidenceLog });
+    res.json({ items });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Dispute a parent-child link: soft-flag it and remove from KB confirmed_relatives.
+app.post("/api/review/dispute-link/:id", async (req, res) => {
+  const relId = decodeURIComponent(req.params.id);
+  const { reason } = req.body ?? {};
+  if (!reason?.trim()) {
+    res.status(400).json({ error: "reason is required" });
+    return;
+  }
+  try {
+    const [relationships, kb] = await Promise.all([
+      readJson(RELATIONSHIPS_FILE),
+      readJson(RESEARCH_KB_FILE),
+    ]);
+    const idx = relationships.findIndex((r) => r.id === relId);
+    if (idx === -1) {
+      res.status(404).json({ error: "relationship not found" });
+      return;
+    }
+    const rel = relationships[idx];
+    relationships[idx] = {
+      ...rel,
+      disputed: true,
+      dispute_reason: reason.trim(),
+      disputed_at: new Date().toISOString(),
+    };
+
+    // Remove from KB confirmed_relatives for both individuals
+    const { parent_id, child_id } = rel;
+    if (kb.confirmed_relatives) {
+      for (const [ownerId, relatives] of Object.entries(kb.confirmed_relatives)) {
+        if (ownerId === parent_id || ownerId === child_id) {
+          kb.confirmed_relatives[ownerId] = relatives.filter(
+            (r) => r.relative_id !== parent_id && r.relative_id !== child_id,
+          );
+        }
+      }
+    }
+    kb.last_changed_at = new Date().toISOString();
+
+    await Promise.all([
+      writeJsonAtomic(RELATIONSHIPS_FILE, relationships),
+      writeJsonAtomic(RESEARCH_KB_FILE, kb),
+    ]);
+    res.json({ ok: true, relationship: relationships[idx] });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
