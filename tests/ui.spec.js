@@ -25,13 +25,13 @@ const autoAcceptDialogs = (page) => {
 };
 
 test.describe("Workbench chrome (Slice 0)", () => {
-  test("sidebar renders all 5 nav items on tree page", async ({ page }) => {
+  test("sidebar renders all 6 nav items on tree page", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("#wb-sidebar")).toBeVisible();
     const keys = await page.locator("#wb-sidebar nav a").evaluateAll((els) =>
       els.map((e) => e.getAttribute("data-nav-key")),
     );
-    expect(keys).toEqual(["dashboard", "tree", "list", "sources", "evidence-matrix"]);
+    expect(keys).toEqual(["dashboard", "tree", "list", "sources", "evidence-matrix", "review-queue"]);
   });
 
   test("active sidebar item carries aria-current on its own page", async ({ page }) => {
